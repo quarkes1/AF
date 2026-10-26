@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "characterId": "af-guide",
+  "name": "Aurore",
+  "status": "approved",
+  "approvedOn": "2026-10-26",
+  "defaultPose": "01-neutral",
+  "rendering": {
+    "source": "full-body",
+    "anchor": "bottom-center",
+    "allowUpperBodyCrop": true,
+    "preserveAspectRatio": true
+  },
+  "sprites": [
+    {
+      "id": "01-neutral",
+      "label": "日常",
+      "status": "approved",
+      "file": "sprites/01-neutral.png",
+      "width": 1024,
+      "height": 1536,
+      "alpha": true,
+      "approvedOn": "2026-10-26",
+      "sha256": "ada85b8f36edafec60cc2959a4bc0b20b40433c8d5979697cb2060a2fa09c64e"
+    },
+    {
+      "id": "02-smile",
+      "label": "微笑",
+      "status": "approved",
+      "file": "sprites/02-smile.png",
+      "width": 1024,
+      "height": 1536,
+      "alpha": true,
+      "approvedOn": "2026-10-26",
+      "sha256": "c3014f38ce1cfc9fd111c349dfd02ad4011e1c3d0235df24ad88ecc14fcaf679"
+    },
+    {
+      "id": "03-thinking",
+      "label": "思考",
+      "status": "approved",
+      "file": "sprites/03-thinking.png",
+      "width": 1024,
+      "height": 1536,
+      "alpha": true,
+      "approvedOn": "2026-10-26",
+      "sha256": "e1cbb1c5c5d0c4ae4b9a29d752aa89a179b877428365c3ca0711f28a44c17649"
+    },
+    {
+      "id": "04-confused",
+      "label": "困惑",
+      "status": "approved",
+      "file": "sprites/04-confused.png",
+      "width": 1024,
+      "height": 1536,
+      "alpha": true,
+      "approvedOn": "2026-10-26",
+      "sha256": "732b1b4b2628e81c61f5e8a48279cb04c38febf1f828680b35f712f21476c8a4"
+    },
+    {
+      "id": "05-surprised",
+      "label": "惊讶",
+      "status": "approved",
+      "file": "sprites/05-surprised.png",
+      "width": 1024,
+      "height": 1536,
+      "alpha": true,
+      "approvedOn": "2026-10-26",
+      "sha256": "acbb0d495dd703608c949e1b57e7a586f682dfb88eba0bc2a5a035f0cb1ee697"
+    },
+    {
+      "id": "06-explaining",
+      "label": "讲解",
+      "status": "approved",
+      "file": "sprites/06-explaining.png",
+      "width": 1024,
+      "height": 1536,
+      "alpha": true,
+      "approvedOn": "2026-10-26",
+      "sha256": "4473a2a005e237ffd78b7a76c59d3a18cb05e3213f04c48aaef6537ad0168965"
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+[
+  {
+    "name": "derivative",
+    "tex": "f'(a)=\\lim_{h\\to 0}\\frac{f(a+h)-f(a)}{h}",
+    "width": 295.932,
+    "height": 53.59920000000001
+  },
+  {
+    "name": "parabola",
+    "tex": "y=x^2",
+    "width": 67.9704,
+    "height": 26.133600000000005
+  },
+  {
+    "name": "tangent",
+    "tex": "y=2x-1",
+    "width": 110.83200000000001,
+    "height": 20.904
+  },
+  {
+    "name": "slope",
+    "tex": "f'(1)=2",
+    "width": 95.80799999999999,
+    "height": 25.415999999999997
+  },
+  {
+    "name": "x_axis",
+    "tex": "x",
+    "width": 13.727999999999998,
+    "height": 10.872
+  },
+  {
+    "name": "y_axis",
+    "tex": "y",
+    "width": 11.76,
+    "height": 15.528
+  },
+  {
+    "name": "zero",
+    "tex": "0",
+    "width": 12,
+    "height": 16.512
+  },
+  {
+    "name": "one",
+    "tex": "1",
+    "width": 12,
+    "height": 15.984000000000002
+  },
+  {
+    "name": "point",
+    "tex": "(1,1)",
+    "width": 53.34479999999999,
+    "height": 24
+  },
+  {
+    "name": "long_sample",
+    "tex": "\\begin{aligned} f(a+h)-f(a)&=(a+h)^2-a^2\\\\ &=2ah+h^2\\\\ \\frac{f(a+h)-f(a)}{h}&=2a+h \\quad(h\\ne0)\\\\ f^{\\prime}(a)&=2a \\end{aligned}",
+    "width": 372.5616,
+    "height": 153.2112
+  }
+]

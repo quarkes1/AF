@@ -1,6 +1,0 @@
-export { registerFilesystemHandlers } from './filesystem.ipc'
-export { registerSettingsHandlers } from './settings.ipc'
-export { registerWindowHandlers } from './window.ipc'
-export { registerChatHistoryHandlers } from './chat-history.ipc'
-export { registerRagHandlers } from './rag.ipc'
-export { registerRagFilesHandlers } from './rag-files.ipc'
