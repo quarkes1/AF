@@ -2,15 +2,15 @@
 
 在互动中自然学习
 
-版本：开发基线 v1.0｜更新：2026-10-26
+版本：开发基线 v1.3｜更新：2026-10-26
 
 本文面向项目全体成员，用于统一产品目标、功能边界、交互与技术方案，并为后续分工、开发和验收提供依据。本文已定稿，是后续开发的唯一产品与工程规格依据。设计定稿不代表应用功能已经实现；开发完成须按本文任务与验收要求提供证据。
 
 ## 阅读说明
 
-全部设计汇总在本文件内。第 1–14 节涵盖产品、双模式、资料、角色、记忆及系统；第 15 节定义界面导航与交互；第 16 节记录参考项目研究；第 17–21 节定义工程基线、LaTeX 与工具契约、原子任务及验收矩阵；第 22 节规定基线效力与变更控制；第 23 节集中展示参考图和样式；第 24 节定义剧本准备、字幕与操作音效。
+全部设计汇总在本文件内。第 1–14 节涵盖产品、双模式、资料、角色、记忆及系统；第 15 节定义界面导航与交互；第 16 节记录参考项目研究；第 17–21 节定义工程基线、LaTeX 与工具契约、原子任务及验收矩阵；第 22 节规定基线效力与变更控制；第 23 节集中展示参考图和样式；第 24 节定义剧本准备、字幕与操作音效；第 25 节定义 Agent 运行时、角色成长、任务调度及 MCP／Skill 机制。
 
-U01–U29 是强制产品要求；D01–D10 是规范默认，只有文中明确开放的设置项允许用户调整。第 20 节的任务编号用于实施分工，P00–P14 是页面编号。图版和配套说明共同构成视觉与交互基线；任何有效变更均先更新本文件，再同步同版本 PDF。
+U01–U34 是强制产品要求；D01–D10 是规范默认，只有文中明确开放的设置项允许用户调整。第 20 节的任务编号用于实施分工，P00–P14 是页面编号。图版和配套说明共同构成视觉与交互基线；任何有效变更均先更新本文件，再同步同版本 PDF。
 
 ## 1. 产品目的
 
@@ -51,6 +51,12 @@ AF 是面向大学生的本地优先桌面应用。用户选择喜欢的角色�
 | U27 | 角色对白按口述节奏逐字显示，默认 4 字／秒，可调 3–5 字／秒；旁白、行动和场景描述完整淡入。空格补全当前页，再次按下才推进。 |
 | U28 | 正常进入前预生成当前一幕完整的确定剧本；交互打断后重写未播放内容，恢复时当前页之外至少已有五页可播放缓冲，并继续补齐新幕。选择／回答边界和短幕完整收束为例外。 |
 | U29 | 首版 SFX 仅保留对白手动推进和按钮操作音，不播放逐字字幕音或角色配音；BGM 独立持续与过渡。 |
+| U30 | AF 是具备工具循环、上下文管理、任务调度、Skill 与 MCP 接入的 Agent 应用；优先直接复用 dsh 运行组件，不能仅实现资料提示词嵌入。 |
+| U31 | 后台统筹负责可靠运行；搭档在角色知识与授权范围内自主关注、研究及交流；专业研究按任务启动，不强制每轮多 Agent。 |
+| U32 | 经历和关系按实际事件积累，兴趣与看法默认允许有依据地自动发展，用户可查看、纠正、撤回或关闭；核心人设不自动改写。 |
+| U33 | AF 自研代码采用 MIT，接受符合组合与分发条件的 GPL 组件；优先原包接入，其次最小改造，具体复用清单、适配与验证见第 19、25 节。 |
+| U34 | AF 必须作为自包含的独立桌面应用交付。用户安装 AF 后不需另行下载、安装或配置 dsh、Node.js、Python、文档转换器、OCR 宿主、数据库或 MCP／Skill 宿主；核心功能依赖由 AF 随包提供和管理。联网模型、用户资料及可选平台账号的边界和干净机器验收见 25.2.1。 |
+
 
 ## 3. 信息组织
 
@@ -151,7 +157,7 @@ AF 是面向大学生的本地优先桌面应用。用户选择喜欢的角色�
 
 ### 6.2 系统可访问不等于角色已知道
 
-系统可索引已授权材料，但角色发言仅依据档案、亲历、被告知与实际查到的内容。记录信息可用范围和角色获知事件。搭档看到教材文件名，不等于读过全部内容；学过一点不变成学科专家。
+系统可索引已授权材料，但角色发言仅依据档案、亲历、被告知与实际查到的内容。系统可用、角色个人经历与共同经历按 25.6 分开；角色实际发生的后台阅读可成为个人经历，未播放剧本不属于个人或共同亲历。记录信息可用范围和角色获知事件。搭档看到教材文件名，不等于读过全部内容；学过一点不变成学科专家。
 
 专业研究服务检索、核对、返回证据报告；搭档按性格回应。可通过资料摘录／解答助手呈现正确解释，不必每次引入具名配角，不伪称真实老师回复。
 
@@ -235,7 +241,7 @@ QQ 参考证明 OneBot HTTP 桥接思路，不证明 AF 已可下载群课件；
 | Save | id、角色／背景／身份快照、activeBranch、mainCursor、learningCursor、stateVersion。 |
 | StoryEvent | saveId、branchId、顺序号、来源、节点、角色可知范围、发生／提交时间、causedBy。 |
 | EpisodePlan | 幕／片段编号、前提、提纲、未发生状态、资料引用、版本。 |
-| ActScript／ScriptPage | actId、scriptRevision、saveId、branchId、basedOnEventSeq、pageId／nodeId、分页版本、就绪状态、交互／收束边界及呈现游标；未播放页是草稿，不是亲历。 |
+| ActScript／ScriptPage | actId、scriptRevision、contextRevision、saveId、branchId、basedOnEventSeq、pageId／nodeId、分页版本、就绪状态、交互／收束边界及呈现游标；未播放页是草稿，不是亲历。 |
 | Checkpoint | 最后事件号、状态快照、游标、schemaVersion，可回看或分叉。 |
 | Memory／Mood | 来源事件、事实键、类型、重要性、置信度、替代／删除状态；心情含时间和最后应用事件号。 |
 | Branch | branchId、parentBranchId、forkEventSeq；记忆、心情、关系、学习会话与作答记录携带分支归属和来源事件。 |
@@ -249,9 +255,11 @@ QQ 参考证明 OneBot HTTP 桥接思路，不证明 AF 已可下载群课件；
 
 ### 10.3 生成与提交
 
-任务状态：idle → collecting → generating → validating → ready → presenting → committed；失败 failed，取消 cancelled。剧本完整性与逐页播放状态另按 24.4 管理。未呈现文本只在草稿缓存；已显示部分按字素范围提交呈现事实与恢复锚点，不把未收束整页记成已经读完，也不据此认定掌握。关系与心情只消费可见的已提交事件。
+作业状态、Agent 任务状态、剧本就绪和演出状态分别归属不同实体，不使用一个通用 status 代替；唯一枚举、转换及完成条件见 25.3.1。原有 collecting／generating／validating 只作为作业 stage，不是另一套任务生命周期；ready 属于剧本，presenting 属于演出，committed 属于事件提交事实。未呈现文本只在草稿缓存；已显示部分按字素范围提交呈现事实与恢复锚点，不把未收束整页记成已经读完，也不据此认定掌握。
 
-结果关联 turnId／jobId／saveId／branchId／stateVersion。单存档前台写入串行；插话中止或隔离旧生成，迟到结果不覆盖新状态。后台只生成未提交候选，不提前改变经历。
+关系只消费当前分支允许的真实相处事件；心情还可消费已提交、对该角色可知的个人经历，例如实际后台阅读。对角色可知不等于对用户可见：个人经历不得据此标成共同经历、用户掌握或已经向用户说过。两类可见范围均须显式记录，统一遵循 25.6。
+
+结果关联 turnId／jobId／taskId／saveId／branchId／stateVersion，标识对应关系见 17.11.1。单存档前台写入串行；插话中止或隔离旧生成，迟到结果不覆盖新状态。后台索引与预生成只产生候选，不提前改变经历；角色实际研究按 25.6 提交个人获知事件。不得把原生会话里已生成但未呈现的 assistant 消息恢复到角色上下文，具体隔离与重建见 25.4.1。
 
 规范默认 D09：事件和游标原子提交；记忆、心情、总结以 lastAppliedEvent 幂等追赶，失败不重复应用。已发生和已读有区别，没看过内容不能作为角色与用户的共同学习证据。快照升级失败保留原文件，不静默丢档。
 
@@ -529,7 +537,7 @@ QQ 参考证明 OneBot HTTP 桥接思路，不证明 AF 已可下载群课件；
 
 点击立绘只展开并聚焦输入框；已有历史时显示最近回复，无历史时用预置短招呼，不因打开面板自动调用模型。重复点击只聚焦，不叠加面板或重复请求。Enter 发送，Shift+Enter 换行；输入法组合期间 Enter 不发送，空白文本不发送。关闭按钮与 Esc 收起面板且保留草稿，Esc 先退出输入法候选或顶层子面板。
 
-发送后显示提交状态，用户消息使用全局姓名；回复在本面板显示，长文本在回复区域内滚动，不能无限向上伸长遮脸。当前生成可停止，失败保留输入并提供重试。面板收起不丢弃正在进行的请求，后台完成不强制展开或抢焦点。同一存档的首页交流进入该档共同历史与记忆候选，不按聊天次数推进主线章节号；进入主线时保留现有剧情锚点，不把首页聊天另建为独立人格。
+发送后显示提交状态，用户消息使用全局姓名；回复在本面板显示，长文本在回复区域内滚动，不能无限向上伸长遮脸。当前生成可停止，失败保留输入并通过 jobs.retry 重试；不重复写入已接受用户输入。面板收起不丢弃正在进行的请求，后台完成不强制展开或抢焦点。同一存档已接受的用户输入与实际呈现的回复进入该档共同历史与记忆候选；未呈现回复保持候选，不按聊天次数推进主线章节号。进入主线时保留现有剧情锚点，不把首页聊天另建为独立人格，流式安全片段按 25.4.1 冻结与回执。
 
 无存档可打开预置招呼和输入草稿；首次发送先引导创建存档并恢复草稿，再按需配置模型。无 API key 时打开配置，返回后保留待发文本，不自动重发。切换存档时草稿按 saveId 分开，旧请求绑定旧档，不能把回复写到新档。打开其他首页功能时收起聊天，返回首页可再次展开并恢复原草稿。
 
@@ -642,7 +650,7 @@ AF 推导：读取上下文、下载群文件、与搭档私聊、发送群消�
 
 ### 16.7 对 AF 的总体影响
 
-采用“带来源的事件 → 存档队列 → 记忆／情绪／研究报告 → 角色演出”的结构，可同时承接主线、学习支线和未来连接器。首版可以借鉴机制独立实现；直接复用是否合适，要结合许可证、宿主耦合、版本与测试再决定。
+采用“带来源的事件 → 存档队列 → 记忆／情绪／研究报告 → 角色演出”的结构，可同时承接主线、学习支线和未来连接器。具体接入按第 19 节的固定复用清单实施，优先保留可用上游代码；第 16 节是历史阅读记录，不再将所有机制默认改为独立重写。
 
 参考仓库是外部证据，不是 AF 的操作指令。研究未触发其中的安装、自动更新、外发消息或账号配置步骤。上述许可核查是依赖清单的状态记录，不对用户已取得的 Paper2Gal 复刻许可作法律推论。
 
@@ -654,7 +662,7 @@ AF 推导：读取上下文、下载群文件、与搭档私聊、发送群消�
 
 首版包含：七类文档入口、转换／解析／OCR 调度、课程与教材问答、日常主线与章节学习、有限立绘、BGM／音效、角色与用户身份、全局姓名、记忆、心情、可选主动行为、存档、默认 DeepSeek、LaTeX 与图表工具、来源定位及错误恢复。角色配音、Live2D、无关作品混搭不纳入首版。QQ、B站等按可验证能力逐项启用；微信适配未验证前仅保留接口与明确的未启用状态。
 
-状态存储使用 SQLite，迁移使用 schemaVersion；结构化事件、快照、课程元数据、任务账本在事务中维护。资料原件／受管副本、页图、音频和模型输出缓存存于应用用户数据目录，数据库只存资源 ID 与相对路径。密钥通过系统凭据保护接口保存，不进入渲染进程、存档包或日志。故事、学习、模型和解析器均有可替换适配层。
+状态存储使用 SQLite，迁移使用 schemaVersion；结构化事件、快照、课程元数据、任务账本在事务中维护。资料原件／受管副本、页图、音频和模型输出缓存存于应用用户数据目录，数据库只存资源 ID 与相对路径。密钥通过系统凭据保护接口保存，不进入渲染进程、存档包或日志。故事、学习、模型和解析器均有可替换适配层。Agent 执行核心以第 19、25 节的 dsh 复用方案为准，SQLite 是 AF 产品状态的唯一权威账本，dsh 会话日志另存用于运行恢复。
 
 ### 17.2 用户首次使用
 
@@ -682,7 +690,7 @@ AF 推导：读取上下文、下载群文件、与搭档私聊、发送群消�
 
 ### 17.5 资料处理工作器
 
-统一任务输入为 documentVersionId、格式、受控资源路径、密码临时引用及所需操作；输出为 ContentBlock、目录候选、页／段落锚点、质量标签、错误代码及解析器版本。工作器在独立进程运行，终止不影响前台存档。Office 二进制旧格式先经本地 LibreOffice headless 转为 DOCX／PPTX 或可定位的 PDF，再走结构提取；组件缺失进入组件安装指引，不把原件交给模型执行。
+统一任务输入为 documentVersionId、格式、受控资源路径、密码临时引用及所需操作；输出为 ContentBlock、目录候选、页／段落锚点、质量标签、错误代码及解析器版本。工作器在独立进程运行，终止不影响前台存档。Office 二进制旧格式先经 AF 随包管理的本地 LibreOffice headless 转为 DOCX／PPTX 或可定位的 PDF，再走结构提取；不得要求用户安装 Office、LibreOffice 或其他转换工具。组件缺失、损坏或不兼容属于 AF 安装完整性错误，提供诊断及 AF 自身修复／重新安装入口，不把部署步骤转嫁给用户，也不把原件交给模型执行。OCR 引擎及首版支持语言的必要模型同样随包提供，遵循 25.2.1。
 
 PDF 优先取文本层，扫描页采用 OCR，页图保留；公式 OCR 产物是待验证 LaTeX，不直接当正确答案。MD／TXT 直接解析并做编码检查。DOCX／PPTX 的图片、表格和原始结构与文本分开保留。任何格式不保证任意损坏文件可恢复；必须给失败原因、原件保留和单文件重试。
 
@@ -724,15 +732,146 @@ PDF 优先取文本层，扫描页采用 OCR，页图保留；公式 OCR 产物�
 
 ### 17.10 包装、配置与离线能力
 
-发布 Windows 安装包和便携测试版之一，配置与数据使用用户目录；运行依赖、转换组件、字体、BGM／音效和默认立绘应有资源清单。无网络能看材料、原文和已生成历史，不能伪造新模型输出。日志记录任务 ID、阶段、耗时和脱敏错误，不记录 key 或未经选择的外部私聊正文。
+正式发布必须包含 25.2.1 规定的完整 Windows 安装包，便携测试版可另行提供，不能替代完整包验收。配置与数据使用用户目录；运行依赖、转换组件、字体、BGM／音效和默认立绘应有资源清单。无网络能看材料、原文和已生成历史，不能伪造新模型输出。日志记录任务 ID、阶段、耗时和脱敏错误，不记录 key 或未经选择的外部私聊正文。
 
 ### 17.11 客户端命令与响应格式
 
-客户端通过类型化 IPC 调用应用服务，渲染进程不直接读密钥／文件系统。命令包包含 requestId、command、payload、saveId／branchId（适用时）、expectedStateVersion（写操作）；响应为 ok、requestId、stateVersion、data 或 error。error 固定包含 code、message、retryable、detailsRef。异步任务返回 jobId，进度事件包含 jobId、stage、completedUnits、totalUnits（未知可空）。cancel(jobId) 的重复调用无副作用。
+客户端通过类型化 IPC 调用应用服务，渲染进程不直接读密钥／文件系统。本节的字段、命令、幂等、错误与事件规则是前端、主进程、工作进程和模型工具共同遵循的契约。F15 先将本节及 25.2.2、25.3.1 落为 src/shared/contracts/ 中的类型、运行时 schema 和合法／非法样本，再开展依赖它们的实现；不可由两端各自猜测。实现文件可以按领域拆分，不能形成第二套规格。
 
 命令域分为 profile.update、provider.configure／test、resource.scan／parse／retry／remove、course.classify、textbook.suggest／answer／skip／confirm、save.create／checkpoint／replay／fork／export、story.send／advance／interrupt／prepare／resume／buffer.status、learning.enter／resume／discuss／submit／return、memory.correct／delete、audio.configure、connector.configure／pause。命令层负责权限、幂等与事务，模型工具通过同一服务调用，不旁路接口。
 
 STATE_CONFLICT／STALE_STATE 重新取状态；SOURCE_MISSING 重新定位；PARSE_FAILED 按文件重试；MODEL_AUTH／MODEL_QUOTA／MODEL_RATE／MODEL_TIMEOUT 按原因恢复；MATH_PARSE／MATH_UNKNOWN／LAYOUT_OVERFLOW 保留有效旧节点。可重试错误不清空输入，不可重试错误给具体修正入口，后台日志不泄露正文和凭据。
+
+#### 17.11.1 公共类型、标识和版本
+
+以下类型记号具有约束力：ID 默认为程序生成的 UUID 字符串；characterTemplateId、poseId、cueId、Skill／工具注册名等稳定登记 ID 例外，使用清单中的字符串（例如 af-guide），不强制改成 UUID。Revision 为从 1 起的安全整数，Version／Seq 为从 0 起的安全整数；时间为 UTC ISO 8601 字符串。字段名后的 ? 表示可省略，否则必填；允许 null 时显式写为“类型或 null”。缺省、空串、0 和 null 不互相替代；未知字段、未知枚举、NaN 和超限整数拒绝为 INVALID_PAYLOAD。所有查询分页使用 limit（默认 20，1–100）和 opaque cursor（首批为 null），结果固定为 items、nextCursor（结束为 null）。
+
+| ID／字段 | 唯一职责 | 生命周期与对应关系 |
+|---|---|---|
+| requestId | 一次 IPC／控制桥请求的关联 ID | 每次实际发送唯一；响应原样回传。网络／进程重试另建 requestId，不用它判断业务重复。 |
+| idempotencyKey | 一次业务意图的去重 ID | 所有写命令必填；同意图重试保持，相同键改变命令／目标／业务 payload 返回 IDEMPOTENCY_CONFLICT。 |
+| turnId | 一次已接受用户输入或可信触发 | 一次交互最多创建一个 turn；一个 turn 可关联多个 job。未发送草稿、只开面板不创建 turn。 |
+| jobId | 一项面向产品的持久作业 | GenerationJob 的主键；本地解析可没有 AgentTask，模型作业可包含多个 task。整幕生成作业完成不代表已经播放。 |
+| taskId／taskRevision | 一次 Agent 执行及其尝试版本 | task 必须归属一个 job；受管续写共用父 job 与预算。重试新建 taskId 并记录 retryOf，不能复活终态。 |
+| sessionId／runtimeEpoch | 宿主会话和运行进程代次 | 由程序分配，renderer 不提交；相同 sessionId 不跨 epoch 复用。会话不是产品存档 ID。 |
+| stateVersion | 被命令修改的聚合版本 | Save 的所有分支共用该档版本，其他领域按 profile／provider／resource／course／connector／audio 聚合维护；事务提交时递增。 |
+| basedOnEventSeq | 生成时读取的正史截止位置 | 记录因果依据，不要求每翻一页都等于最新事件号；同一剧本的合法呈现可继续追加事件，不因此废弃其余页。 |
+| contextRevision | 分支的生成上下文失效版本 | 用户提交新输入／选择、身份核心改版、相关记忆纠正／撤回、权限撤销或显式影响本幕的事件使其递增；普通翻页、通知入箱不递增。 |
+| actId／scriptRevision | 一幕与其候选剧本版本 | 插话重写递增 scriptRevision，当前演出只消费活动版本；缓存键同时包含 contextRevision、分支及分页版本。 |
+
+Request 固定包含 protocolVersion=1、requestId、command、target、saveId、branchId、expectedStateVersion、idempotencyKey、payload。target 为 {kind,id}，kind 限 profile／provider／resource／course／save／connector／audio／job；id 在集合查询或新建时为 null，其余为目标 ID。非存档命令和 save.create／list 的 saveId／branchId 均为 null；save.get／checkpoints／activate／rename／export／delete 等档级操作在读取前可能没有分支信息，允许 saveId 有值而 branchId=null，由 main 解析目标档并检查授权。save.replay／fork 通过 checkpointId 解析原档与分支并与已传 scope 核对。既有 story／learning／character／memory／growth 的写命令必须显式传匹配的 saveId 与 branchId，不可由“当前活动档”猜测。写已有聚合时 expectedStateVersion 必填 Version；查询和新建为 null。只读命令 idempotencyKey 为 null。主进程校验 target、payload 中的 ID 及授权一致，不接受客户端自报 userId、角色权限、runtimeEpoch 或工具授权集合。
+
+Response 是二选一封闭对象：成功为 {protocolVersion:1,requestId,ok:true,stateVersion,data}，失败为 {protocolVersion:1,requestId,ok:false,stateVersion,error}；不得同时带 data 与 error。stateVersion 为目标现版本，无法确定或跨聚合查询为 null。error 必含 code、message、retryable、detailsRef（脱敏诊断 ID 或 null），可含 fieldErrors 数组，每项为 {field,code,message}。异步接受结果 JobAccepted 为 {jobId,turnId:ID或null,status:"queued",pollAfterMs:250}；其中 queued 是接受时的快照，后续以 jobs.get 和事件为准。
+
+读取实体使用 Snapshot={id,version,value}；value 的字段按本书对应实体／页面定义，不含数据库内部路径、key、原生会话原文和隐藏答案。列表返回 Summary，仅含 ID、名称、当前状态、更新时间及页面明确展示的摘要；详细正文按 ID 读取，不把全部存档或文档正文塞进列表。ResourceRef 为注册资源 ID；SourceRef 为 {documentVersionId,blockId,anchor}，anchor 为 {kind:"page"或"slide"或"paragraph",index:从1起整数,region?:归一化矩形}；无定位证据不得生成伪锚点。
+
+#### 17.11.2 客户端命令登记表
+
+下表为首版白名单。R 为只读，W 为短事务写，A 为先持久接受再异步执行；A 的首次接受响应必须为 JobAccepted。ID 所属范围及 expectedStateVersion 均按上一节检查。未特别列出的返回实体使用对应 Snapshot；变更返回新版本 Snapshot，不能只回一个无含义的 success。UI 不直接调用控制桥的 turn.run。需要新增命令时先修订本表及契约样本，不能用任意字符串 command 绕过登记。
+
+| 命令／类型 | payload 必需及可选字段 | 成功 data 与额外规则 |
+|---|---|---|
+| profile.get／R | 空对象 | 全局档案 Snapshot。 |
+| profile.update／W | patch：displayName?、preferredAddress?、timezone?、textScale?、reducedMotion? | 全局档案；姓名 trim 后 1–32 字素，称谓允许空，缩放 1–1.5；其他设置走其专属命令。 |
+| provider.list／R | 空对象 | profile 摘要数组，只有 secretConfigured，不返回 key。 |
+| provider.configure／W | providerId、protocol、baseUrl、modelId、keyAction（keep／replace／clear）、apiKey? | 脱敏 provider Snapshot；仅 replace 必须携带非空 apiKey，处理后不回传。新建 providerId 可为 null；同域和跨域密钥规则见 17.3。 |
+| provider.test／A | providerId | JobAccepted；作业结果 {reachable,capabilities,errorCode:字符串或null}，真实失败不得记成已配置成功。 |
+| resource.pick／R | mode（folder／files） | 原生选择器返回 ResourceRef 数组；取消为 []，不接受 renderer 自行拼接的任意文件路径。 |
+| resource.scan／A | resourceIds:ID数组、recursive:boolean | JobAccepted；结果为扫描批次 ID、文件数和各格式／失败计数，原件只读。 |
+| resource.parse／A | documentVersionIds:ID数组 | JobAccepted；每文档独立状态与 ContentBlock 引用，不把全文作为完成事件 payload。 |
+| resource.retry／A | documentVersionId、retryStage（convert／extract／ocr／index） | JobAccepted；只重试失败阶段，已有效产物保持。 |
+| resource.list／R | courseId:ID或null、status:字符串或null、limit?、cursor? | 文档 Summary 的分页结果。 |
+| resource.get／R | documentVersionId | 文档状态、解析质量及可用锚点 Snapshot。 |
+| resource.open／R | sourceRef | 受控 viewerRef 及已验证锚点；原件失联可用受管快照，不能返回任意 file URL。 |
+| resource.remove／W | documentVersionId、mode（unlink／deleteManagedCopy） | 移除结果及受影响课程 ID；默认 unlink，不删除原件，不销毁仍被历史引用的版本证据。 |
+| course.list／R | limit?、cursor? | 课程 Summary 的分页结果。 |
+| course.get／R | courseId | 科目、目录映射版本及教材状态 Snapshot。 |
+| course.classify／A | documentVersionIds:ID数组 | JobAccepted；结果 {suggestions,unclassifiedDocumentIds}，归类建议有 SourceRef。 |
+| course.assign／W | courseId、documentVersionIds:ID数组、operation（link／unlink） | 更新的课程 Snapshot；一份资料可关联多科。 |
+| textbook.suggest／A | courseId、documentVersionIds:ID数组 | JobAccepted；结果为 17.4 候选数组及证据，不自动标 confirmed。 |
+| textbook.answer／A | courseId、questionId、answer（1–2000 字素） | JobAccepted；结果 {state,question:对象或null,candidates}；最多三轮，questionId 不能重答成新轮。 |
+| textbook.skip／W | courseId | inferred／generic 教材状态及目录 Snapshot，跳过不阻塞。 |
+| textbook.confirm／W | courseId、candidateId:ID或null、chapterMapVersion、useExistingProgress:boolean | 教材／映射 Snapshot；candidateId 为 null 代表显式选择通用框架，旧证据不改写。 |
+| save.list／R | limit?、cursor? | 故事存档 Summary 的分页结果，选中不激活。 |
+| save.get／R | saveId | 当前档案、角色、分支、游标与 contextRevision Snapshot。 |
+| save.create／W | name（1–64 字素）、characterTemplateId、characterTemplateVersion、worldSetting、partnerIdentity、userIdentity、relationshipStart、courseIds:ID数组 | 新 Save Snapshot；初始化分支和角色快照，所有 ID 由主进程生成。 |
+| save.activate／W | saveId、branchId | 活动 Save Snapshot；旧任务仍绑定旧档，新档不得接收其结果。 |
+| save.rename／W | saveId、name（1–64 字素） | Save Snapshot；不改稳定 ID。 |
+| save.checkpoint／W | saveId、branchId、label（0–64 字素） | Checkpoint Snapshot；包含呈现游标，不制造额外经历。 |
+| save.checkpoints／R | saveId、branchId、limit?、cursor? | 保存点 Summary 的分页结果。 |
+| save.replay／R | checkpointId、cursor:对象或null | 只读回看视图与只读标记，不激活／分叉、不更新学习或外发。 |
+| save.fork／W | checkpointId、name（1–64 字素） | 新 Branch Snapshot；不自动绑定连接器，不复用原角色宿主会话。 |
+| save.export／A | saveId、includeDocuments:boolean | JobAccepted；结果为受控导出 ResourceRef，无凭据、隐藏原生会话或其他档私聊。 |
+| save.delete／W | saveId、confirmedName | {deletedId}；确认名必须匹配，活动任务先取消并隔离，不影响其他档。 |
+| character.get／R | saveId | 当前档角色快照、个人／共同经历摘要及成长设置 Snapshot。 |
+| character.update／W | saveId、patch、changeMode（futureOnly／newChapter／fork） | 角色 Snapshot；patch 仅限 6.1 字段，身份／世界变化必须 newChapter 或 fork；模板变化不能暗改旧档。 |
+| story.send／A | channel（home／story）、text（trim 后 1–8000 字素）、anchor:对象或null | JobAccepted；创建 turn，一次接受一次写入 user_input；已有剧情需重写时与 interrupt 走同一版本栅栏。 |
+| story.prepare／A | actId:ID或null、mode（normal／afterInterrupt） | JobAccepted；结果为 ActScript 引用及 BufferStatus，正常模式整幕完整才能完成。 |
+| story.interrupt／A | actId、scriptRevision、anchor、text（1–8000 字素） | JobAccepted；原子提交已呈现范围、新 turn、contextRevision 与新 scriptRevision，旧尾部失效；接受后不能由停止生成撤销用户输入。 |
+| story.advance／W | actId、scriptRevision、pageId、action（revealAll／next）、revealedGraphemeCount | {cursor,playbackState,stateVersion}；revealAll 只发出补全显示意图，不据此记成实际呈现；next 要求当前页完整呈现回执已提交，并通过缓冲及交互门控。 |
+| story.present／W | receipt：17.11.4 定义的 PresentationReceiptInput | {acceptedReceiptId,cursor,stateVersion}；去重且校验字素范围，不能由普通 advance 冒认页面已呈现。 |
+| story.choose／A | actId、scriptRevision、pageId、choiceId | JobAccepted；只接受当前等待选项，不能从未选择草稿推进，choiceId 需属于该页。 |
+| story.resume／W | actId、scriptRevision | {cursor,playbackState,buffer}；不满足门槛返回 BUFFER_NOT_READY，不隐式重发输入。 |
+| story.buffer.status／R | actId、scriptRevision | BufferStatus，见下一节。 |
+| story.history／R | beforeEventSeq:Seq或null、limit?、cursor? | 当前分支已呈现对白／用户输入分页；不含未来页和研究私有日志。 |
+| learning.enter／A | courseId、chapterId、chapterMapVersion | JobAccepted；结果含 learningSessionId、冻结 mainReturnAnchor 和学习节点引用。 |
+| learning.get／R | learningSessionId | 当前学习节点、游标、辅助状态及题干 Snapshot；答案未解锁前不返回。 |
+| learning.resume／W | learningSessionId | 会话 Snapshot；旧教材映射不静默替换。 |
+| learning.discuss／A | learningSessionId、nodeId、text（1–8000 字素） | JobAccepted；保存 discussionAnchor，不替用户提交题目答案。 |
+| learning.submit／A | learningSessionId、questionId、questionVersion、answer、aidEventIds:ID数组 | JobAccepted；answer 为题型白名单结构：choiceIds:ID数组、text:字符串、number:十进制字符串与 unit:字符串三选一；结果为 Attempt Snapshot。辅助标记由服务核对，不信任客户端删 aidEventIds。 |
+| learning.hint／W | learningSessionId、questionId、level（hint／answer） | {content,aidEventId}；记辅助事件后返回内容。 |
+| learning.review／A | attemptId、reason（1–2000 字素） | JobAccepted；追加复核，不覆盖原评分。 |
+| learning.return／W | learningSessionId | {mainReturnAnchor,saveId,branchId}，保留学习游标。 |
+| memory.list／R | kind:字符串或null、limit?、cursor? | 当前分支可见记忆的分页结果及来源。 |
+| memory.correct／W | memoryId、replacement（1–4000 字素）、reason? | 修订后 Snapshot；使派生摘要失效并重建上下文，不擦除原始审计记录。 |
+| memory.delete／W | memoryId、deleteScope（entryAndDerived／entryDerivedAndSource） | {suppressionId,affectedContextRevision}；删除原始事件的范围与确认按 7.1，不能越档。 |
+| growth.list／R | status:字符串或null、limit?、cursor? | 当前档成长记录及修订链分页。 |
+| growth.configure／W | enabled:boolean | 成长设置 Snapshot，关闭不抹掉已有条目。 |
+| growth.correct／W | entryId、replacement（1–4000 字素） | 修订后 GrowthEntry Snapshot，明确纠正不占自动激活额度。 |
+| growth.retract／W | entryId、reason? | {suppressionId,affectedContextRevision}，派生摘要同步失效。 |
+| audio.get／R | 空对象 | 音频设置 Snapshot。 |
+| audio.configure／W | master?、bgm?、sfx?（均 0–1）、muted?、backgroundPolicy? | 音频 Snapshot；后台策略限 continue／attenuate／pause。 |
+| audio.preview／W | cueId | {actionId,played:boolean}，只播放登记资源；用户点击预听，不调用 TTS。 |
+| settings.get／R | 空对象 | 全局／当前档设置快照及来源版本。 |
+| settings.update／W | patch：typewriterEnabled?、charsPerSecond?、animationIntensity?、runInTray? | 设置 Snapshot；速度 3–5、默认 4；动效 full／reduced；托盘默认 false，不能由模型修改。 |
+| connector.list／R | 空对象 | 能力／连接状态摘要，不返回 token 或未经授权的消息正文。 |
+| connector.configure／W | connectorId、enabled、readGrantIds:ID数组、sendGrantIds:ID数组、targetSaveId:ID或null、targetBranchId:ID或null | 脱敏连接器 Snapshot；未验证能力不可 enabled，不把读权限等同发送权限。 |
+| connector.pause／W | connectorId、paused:boolean | Snapshot；暂停不补发过期事件、不重置外发账本。 |
+| jobs.get／R | jobId | {jobId,status,stage,completedUnits,totalUnits:整数或null,taskSummaries,resultRef:ID或null,pendingInput:对象或null,error:对象或null}，按 scope 过滤；pendingInput 为 {questionId,reason,prompt,allowedActions}，供等待／暂停后的明确恢复操作。 |
+| jobs.cancel／W | jobId | {jobId,cancelAccepted:boolean,alreadyTerminal:boolean,status}；终态时不改原结果、cancelAccepted=false，重复取消不新建意图，不重试外发。 |
+| jobs.respond／A | jobId、questionId、action（answer／continue）、answer?:1–8000 字素文本、budgetId?:ID | 返回同 jobId 的 JobAccepted；仅 waiting_user／paused 可接受，answer 动作必须有文本。questionId 由暂停原因记录生成，continue 用于用户已补资料或确认受管预算；不得借此恢复终态或绕过授权。 |
+| jobs.retry／A | jobId、budgetId?:ID | 新 JobAccepted；仅 failed／cancelled 且可重试的目标可用，新建 job／task 并记录 retryOfJobId，沿用原 turn 和已接受输入，不重复写 user_input／选择。旧 job 保持终态；completed 不重新执行，superseded 需按当前情境发新意图。 |
+| events.read／R | filter（当前 save／branch、指定 job 或当前用户 system 流）、afterSeq:Seq、limit? | {items:Event数组,nextSeq,hasMore}；补读当前授权事件，nextSeq 是服务已扫描到的游标，不以过滤后的事件数推算。 |
+| events.subscribe／R | filter、afterSeq:Seq | {subscriptionId,watermarkSeq}；先补读至 watermarkSeq，再经 preload 白名单 af:events 推送其后事件；缓冲期间按 eventId 去重，不留“查询后才订阅”的丢事件窗口。 |
+| events.unsubscribe／R | subscriptionId | {unsubscribed:true}；仅解除当前 renderer 拥有的订阅，重复解除无副作用，窗口销毁自动释放。 |
+| artifacts.get／R | artifactId、cursor:字符串或null、maxChars?:整数 | {artifactId,type,content,sourceRefs,coverage,validation,truncation,nextCursor}；只读当前授权且 audience=renderer 的已验证展示投影，每批默认 8000、最多 32000 字素；不返回原始提示词、研究私有日志、隐藏答案或未选分支。 |
+| story.page.get／R | actId、scriptRevision、pageId | {page,cursor,buffer}；只返回该活动版本确定路径的已验证演出页，含类型化 richBlocks 与登记资源 ID。允许为本地播放预取后续页，但不提交回执／共同历史，不暴露未选择分支草稿。 |
+
+所有用户文本均按字素限制、保留原文而以清理后的显示文本参与模板；不得用输入内容拼接脚本或 HTML。character.update 的 patch 只允许档案字段，不能带核心版本号或把成长记录写成核心。provider.configure 的 key 仅经受控 IPC 输入密钥服务，不进入通用任务、持久命令正文或审计日志。settings 命令以 profile 为 target；character／story／learning／memory／growth 命令以 save 为 target，输入中的子实体必须属于该 save／branch。只读单例 profile／audio 查询允许 target.id=null，由 main 解析当前用户单例，不允许借此查询其他用户。
+
+story.send／interrupt 的 anchor 为 {actId,nodeId,pageId,scriptRevision,paginationVersion,revealedGraphemeCount} 或 null；首页无主线演出或准备阶段尚无已呈现页面时允许 null，有页面则必须提交可核验锚点。learning 的 mainReturnAnchor 使用相同结构，未进入过主线时为 null。worldSetting 为 {mode:"realWorld"或"custom",description:字符串}；partnerIdentity／userIdentity／relationshipStart 均为非空 1–2000 字素文本。profile 时区采用可验证的 IANA 时区标识。connector.configure 的读取／发送凭据在平台授权流程中保存为 secretRef，不放在通用 payload。
+
+#### 17.11.3 幂等、冲突与失效检查
+
+处理顺序固定为 schema／来源校验 → 当前授权和归属检查 → 同目标幂等键查询 → 版本校验 → 单事务接受。已接受重复意图返回原 job／结果，不重新检验已经因该命令递增的旧 expectedStateVersion；未被接受的 STALE_STATE 不占用幂等键，刷新后可重试。相同键不同业务 payload（不含 requestId 和仅用于并发检查的 expectedStateVersion）必报冲突。幂等账本与业务记录一起持久保存，直至对应数据被明确删除；重启／读档不清空。
+
+A 命令原子保存意图、必要 user_input／选择事件、job 和待调度记录后才返回 JobAccepted；接受不代表模型成功。模型结果到达时逐项校验 scope、runtimeEpoch、taskRevision 的活动性、contextRevision、scriptRevision、授权和来源版本，再验证产物；失败只可写该旧任务的终态／诊断，不可写当前剧情。stateVersion 的 compare-and-swap 在每次实际事务提交时执行；同剧本合法呈现产生的新 stateVersion 不使缓存自动过期，因果失效依据 contextRevision 与第 24 章门控。
+
+新增错误码固定含 INVALID_PAYLOAD、FORBIDDEN、NOT_FOUND、IDEMPOTENCY_CONFLICT、PROTOCOL_MISMATCH、RUNTIME_UNAVAILABLE、RUNTIME_TIMEOUT、CONTEXT_STALE、BUFFER_NOT_READY、INPUT_REQUIRED、TASK_BUSY、CANCELLED、SUPERSEDED。STATE_CONFLICT 是 STALE_STATE 的兼容显示别名，线上只发送 STALE_STATE。INVALID_PAYLOAD／FORBIDDEN／IDEMPOTENCY_CONFLICT 不自动重试；RUNTIME_UNAVAILABLE／RUNTIME_TIMEOUT 可由用户重试新 task，未知外发结果不能自动重试。BUFFER_NOT_READY 保留演出状态并订阅进度，不重复生成新意图。
+
+jobs.respond 原子追加 input.accepted 记录和相应新 turn（仅有新用户文本时）、把父 job 重新排队；job 的 createdByTurnId 保持原触发，追加 acceptedInputTurnIds 明确后续输入归属。jobs.retry 重新检查当前授权、contextRevision、来源版本、预算及未知工具副作用；若原上下文已过时返回 CONTEXT_STALE，不把原输入再写进新正史。task 重试／继续保留关联链但不清零父业务预算。若未知外发回执尚未核对，不允许重跑整个写入链；只可继续已证明没有副作用的阶段。先取消后到达的完成结果被版本栅栏拒绝；若完成事务先提交，取消返回 alreadyTerminal=true。
+
+进入 waiting_user／paused 的 job 同步保存 pendingInput；reason 限 NEED_SOURCE／BUDGET／USER_PAUSED／RECOVERABLE_DEPENDENCY，allowedActions 从 answer／continue 中按实际原因选择，prompt 为可显示的说明。重复 jobs.respond 使用原 idempotencyKey 返回原接受结果，不能重复创建输入 turn。带新用户文本时将其作为新可知输入提交并相应更新 contextRevision，后续任务必须使用更新后的 bundle；不能一边接受回答一边仍按旧上下文执行。
+
+#### 17.11.4 进度、呈现回执和缓冲格式
+
+Event 固定为 {protocolVersion:1,eventId,eventType,scope,seq,occurredAt,payload}；scope 为 {saveId:ID或null,branchId:ID或null,jobId:ID或null,taskId:ID或null}，seq 为该用户 outbox 的持久递增序号，不能与领域 StoryEvent 的 branchEventSeq 混用。事件为至少一次投递；订阅端按 eventId 去重，重连使用 afterSeq 补读；seq 的数值缺口可能来自权限过滤，先由 events.read 返回的 nextSeq 核对服务扫描进度，不直接判为丢失。不能凭最后一条 progress 推断完成。仅当前有权限的流可订阅，不向 renderer 广播其他档私有事件。filter 只允许 {kind:"save",saveId,branchId}、{kind:"job",jobId} 或 {kind:"system"} 三种对象，system 只含当前用户公共运行状态，不含其他档正文。
+
+job.progress 的 payload 固定为 {jobId,status,stage,completedUnits,totalUnits}；task 事件含 taskId、taskRevision、status，终态含 resultRef 或 error；artifact.validated 含 artifactId、validationStatus、sourceRefs。大正文通过带 scope 的引用读取，不在日志流／通用事件中重复整段文本。主进程提交 SQLite 事务后以 outbox 发布，renderer 断开不会丢已提交状态；重启重放 outbox 不重复应用领域事件。
+
+PresentationReceiptInput 为 {receiptId,actId,nodeId,pageId,scriptRevision,paginationVersion,revealedGraphemeCount,channel}，channel 限 home／story／learning；主进程补 scope、occurredAt、eventId。只能提交已授权且活动的内容及字素前缀，累计范围单调递增，重复 receiptId 无副作用；内容 hash、page 字素总数和当前游标由已验证产物确定，不能由 renderer 指定任意文本。home／learning 也需关联已验证呈现批次的 actId／pageId，可使用单页批次，不要求首页聊天生成一整幕主线。
+
+BufferStatus 为 {actId,scriptRevision,contextRevision,currentPageId:ID或null,followingValidatedPageCount,actComplete,nearestBoundary:对象或null,canResume,reason}。nearestBoundary 为 {pageId,kind:"choice"或"requiresInput"或"actEnd",reachable:boolean} 或 null；reason 限 FULL_ACT_READY／FIVE_FOLLOWING_READY／INPUT_BOUNDARY_READY／SHORT_ACT_COMPLETE／PREPARING／STALE／FAILED。canResume 必须由第 24.3 节条件计算，followingValidatedPageCount 不含当前页和无效／未选分支。若只因五页门槛完成恢复子任务，整幕 job 仍在生成，不能将 actComplete 置 true。
 
 ### 17.12 项目目录与模块边界（开发强制规范）
 
@@ -751,19 +890,24 @@ STATE_CONFLICT／STALE_STATE 重新取状态；SOURCE_MISSING 重新定位；PAR
 | assets/backgrounds/ | 场景背景图 | 使用稳定资源 ID、尺寸及授权记录；与角色立绘分层。 |
 | assets/fonts/ | 本地打包字体及许可证 | UI 中文字体、数学字体；数学引擎自带字体通过构建步骤归集，不手工改写依赖包。 |
 | assets/audio/bgm/ 与 assets/audio/sfx/ | 游戏 BGM 与音效 | manifest 标明 cueId、循环点及来源；首版不设置角色配音生成流程。 |
+| assets/skills/ | 受管的内置 Skill 与流程资源 | 按名称与版本组织 SKILL.md、references/、templates/；不得读取用户其他应用的私有技能目录。 |
 | assets/registry.json | 静态资源总清单 | 统一 ID、类型、相对路径、hash、许可及元数据；不含用户本地绝对路径。 |
 | src/main/ | Electron 主进程与应用服务 | 生命周期、数据库、文件与权限、任务调度、凭据、模型及系统适配。 |
+| src/main/runtime/ | dsh 运行进程、控制桥与 AF 原生插件适配 | 详见 25.2；含 worker/、plugins/、bridge/，产品规则仍在 modules/。 |
 | src/preload/ | 最小权限的类型化桥接 | 只暴露白名单命令与事件订阅，不暴露任意 Node API。 |
 | src/renderer/ | React 界面及交互 | 页面、视觉小说舞台、学习面板、UI 状态与布局；不能直接读数据库、文件或 API key。 |
 | src/shared/ | 跨进程纯类型与契约 | IPC DTO、事件、schema、错误码及纯校验；禁止 Electron／Node／DOM 运行时依赖。 |
 | tests/ | 自动化测试与固定样本 | unit/、integration/、e2e/、fixtures/；样本使用可分发合成文件，不存真实私聊或 API key。 |
 | scripts/ | 可复用开发与文档工具 | 资源校验、打包、迁移检查、PDF 导出；脚本不可导入 renderer 业务代码作为后门。 |
+| config/runtime/ | 受控 dsh profile、能力与 MCP 配置模板 | 无真实密钥；默认关闭通用 shell 和自动更新；与依赖版本一并校验。 |
 | config/ | 构建、发布及工具配置 | 打包配置、资源复制规则、质量检查配置；electron.vite.config.ts 留在根目录作为入口。 |
 | docs/ | 项目设计、技术和协作文档 | PDF 设计文档必须直接置于 docs/ 根目录，与统一 Markdown 设计源同级。 |
 | docs/assets/ | 文档专用图片及公式示例 | 有效界面参考图、图表、数学排版示例；不得作为应用运行时品牌或角色资源目录。 |
+| docs/research/reuse-lock.json | 具体复用版本与归属的机器可读记录 | 实施 H01 时生成；不是另一份产品规格；字段与发布记录见 19.7。 |
 | docs/research/、docs/decisions/ | 外部研究与工程决策记录 | 可存核查记录，所有有效产品规格仍回写本设计书，避免多份规格冲突。 |
 | build/ | 全部生成的编译、构建及打包产物 | compiled/ 为 electron-vite 输出，packages/ 为安装包或便携包，reports/ 为测试与版式报告；均可重建。 |
 | tmp/ | 本地临时与预览文件 | 草稿、中间转换、PDF 渲染预览；可清理，不作为正式交付或资源来源。 |
+| LICENSE、THIRD_PARTY_NOTICES.md | 自研代码 MIT 与第三方版权、许可、修改记录 | GPL 组合发行须同时包含相应许可与源代码交付信息，不能仅用 MIT 覆盖所有内容。 |
 | 根目录配置文件 | 可复现安装与构建入口 | package.json、唯一包管理器锁文件、electron.vite.config.ts、tsconfig*.json、README.md、.gitignore、.env.example。 |
 
 #### 17.12.2 业务模块映射
@@ -794,9 +938,9 @@ STATE_CONFLICT／STALE_STATE 重新取状态；SOURCE_MISSING 重新定位；PAR
 
 构建配置必须将 electron-vite 编译输出显式归入 build/compiled/，安装包与便携包归入 build/packages/；不继续生成平行的 out/、dist/、release/ 或 output/ 作为当前标准。build/、tmp/、node_modules/、本地环境文件和用户数据库必须被版本控制忽略；配置及锁文件纳入版本控制。清理脚本只能处理明确列举且已校验属于仓库的生成目录。
 
-统一设计源为 docs/AF项目设计书.md，同版本发布快照为 docs/AuroraForge-设计规格书-v1.0.pdf。PDF 必须放 docs/ 根目录；不保留平行的旧版有效规格或 output/pdf/ 交付。后续文档构建工具放 scripts/docs/，中间页图在 tmp/，最终 PDF 的位置是构建产物通则的明确例外；构建工具不能另行定义产品规则。
+统一设计源为 docs/AF项目设计书.md，同版本发布快照为 docs/AuroraForge-设计规格书-v1.3.pdf。PDF 必须放 docs/ 根目录；不保留平行的旧版有效规格或 output/pdf/ 交付。后续文档构建工具放 scripts/docs/，中间页图在 tmp/，最终 PDF 的位置是构建产物通则的明确例外；构建工具不能另行定义产品规则。
 
-F11 先完成目录骨架、配置与导入边界检查，再执行 F01 等实现。验收包括：干净检出可安装与构建；编译及打包产物只落在约定的 build/ 子目录；打包后 Aurore 立绘、字体、透明 Logo、BGM 与数学字体均可离线加载；renderer 越层导入被检查拒绝；PDF 在 docs/ 根目录；用户数据与密钥未进入仓库或安装包。已有结构与本节冲突时迁移到本节，不以“旧目录已存在”作为例外。
+F11 先完成目录骨架、配置与导入边界检查，再执行 F01 等实现。基础验收为：干净检出可安装依赖并构建最小骨架；编译及试验打包只落在约定的 build/ 子目录；使用已登记基准素材验证资源复制／解析规则；renderer 越层导入被检查拒绝；PDF 在 docs/ 根目录；用户数据与密钥未进入仓库或安装包。F11 不依赖尚未制作的全部场景／音频或最终运行组件；完整资源闭包、Aurore／字体／Logo／BGM／数学字体离线加载及安装包验收归 Q06、Q03，不能把发行完成作为创建骨架的前置。已有结构与本节冲突时迁移到本节，不以“旧目录已存在”作为例外。
 
 ## 18. LaTeX、图表与 Agent 工具契约
 
@@ -826,7 +970,7 @@ verified 可发布为已核验结论。rejected 禁止作为正确解释或答�
 
 ### 18.4 Agent／Subagent 可调用工具
 
-下列是 AF 必须实现的应用工具契约，不声称已存在于 dsh 或任意 MCP 中。工具默认在本地应用服务执行，模型只获取允许的数据。统一输入含 requestId、saveId（需要时）、允许资源引用和参数；统一输出含 ok、artifactRef、diagnostics、retryable，错误不得夹带可执行指令。
+下列是 AF 必须实现的应用工具契约，不声称已存在于 dsh 或任意 MCP 中。工具默认在本地应用服务执行，模型只获取允许的数据。模型通过第 25 节的统一注册表调用；原生工具和 MCP 工具遵守同一权限、版本、取消与结果契约，不另建绕过应用服务的路径。统一输入含 requestId、saveId（需要时）、允许资源引用和参数；统一输出含 ok、artifactRef、diagnostics、retryable，错误不得夹带可执行指令。
 
 | 工具 | 输入 → 输出 | 成功条件与失败边界 |
 |---|---|---|
@@ -858,32 +1002,94 @@ verified 可发布为已核验结论。rejected 禁止作为正确解释或答�
 
 示例曲线使用 `y=x^2`，在 `x=1` 处的切线为 `y=2x-1`，以 `f'(1)=2` 标注。坐标和曲线由图表工具按同一坐标变换绘制，不能依赖生成图片里“看起来像切线”的线条。参考图的黑板数理区域在本次 PDF 中改为实际 LaTeX 与矢量绘图示范。
 
-## 19. 开源 Skill／MCP 研究与复用决策
+## 19. 开源复用、许可证与具体适配
 
-### 19.1 核查记录与边界
+### 19.1 采用原则与许可边界
 
-核查日期为 2026-10-25。研究阅读以下官方仓库／文档，不安装这些服务到用户账号，不宣称已与 AF 集成。公开源码、source-available、可直接复用是不同状态；选择具体版本后核对 LICENSE、第三方资源与测试。Skill 提供流程指引，MCP 提供可调用工具，二者都不能代替 AF 自身的权限、状态和验收。
+核查日期为 2026-10-26。本章是已确定的开发选型与适配要求，不是“只参考、不复用”的研究愿望。可直接工作的包优先以锁定版本依赖接入；需要改动时保留核心算法与版权，在边界增加适配或维护最小补丁。只有接口无法满足 AF、许可证不允许、无法验证或成本确实更高时，才针对该部分另行实现，并在同一规格中记录技术理由。不能以个人习惯默认重写已有完整能力。
 
-| 来源 | 已核查能力 | AF 的采用方式 |
+AF 自研代码采用 MIT。第三方源码、许可证与 NOTICE 保持原有归属，不改署名冒充原创；角色、美术、字体、音频、模型权重和第三方服务条件单独登记，源码 MIT 不自动覆盖这些资源。本文不把“非盈利可扩展”的许可口头描述替代实际素材的可分发授权记录。
+
+项目接受 GPL 组件；GPL 不是一律排除的理由。采用时记录准确的 SPDX 标识、版本与例外，判断组合关系并满足相应分发要求。若构成受 GPL 约束的整体，组合版本按适用 GPL 提供许可与对应源代码，不能只声明整个发行物为 MIT；AF 可独立授权的原创部分仍可保留 MIT。独立程序并列分发、插件、进程通信或仅使用 MCP 均不能单凭形式推定不受组合义务影响。Apache-2.0 与 GPLv3 可兼容组合；不得把这一结论套用于 GPL-2.0-only。相关依据见 [GPLv3 原文](https://www.gnu.org/licenses/gpl-3.0.html)、[Apache 官方兼容说明](https://www.apache.org/licenses/GPL-compatibility.html)。
+
+根 LICENSE 标明 AF 原创代码范围；THIRD_PARTY_NOTICES.md 标明每个实际分发组件、来源、许可与修改。含 GPL 的组合发行记录适用许可及获取对应源代码、构建和安装材料的方法。依赖及资源清单须覆盖实际递归依赖和打包文件，不能只查根 package.json。这里的许可选择已经确定，不需要因遇到 GPL 再重复询问能否采用；具体存在不兼容或授权不明时才报告该组件的实际问题。
+
+本次完成源码、公开接口与许可阅读，没有安装或运行这些上游插件，也没有完成 AF 集成测试。下文“直接”表示确定的复用方式，不代表已经接入或免验收。每一项都必须通过 H 系列任务与原功能任务的验收。
+
+### 19.2 复用分类
+
+| 类别 | 实施含义 | 交付要求 |
 |---|---|---|
-| [MCP reference servers](https://github.com/modelcontextprotocol/servers) | filesystem、fetch、memory 等参考实现，官方明确并非生产就绪保证 | 借鉴只读目录边界、取证和结构化记忆；应用封装更窄的资源工具，不直接开放写文件／删除。 |
-| [MarkItDown-MCP](https://github.com/microsoft/markitdown/blob/main/packages/markitdown-mcp/README.md) | convert_to_markdown(uri) 的本地工具，支持多种传输 | 作为文字结构提取候选，先经受控路径网关；不保证数学、页码和旧 Office 全部高保真。 |
-| [Anthropic Skills](https://github.com/anthropics/skills) | 指令、脚本、资源组合的 Skill 结构；部分文档 Skill 仅 source-available | 借鉴文档处理和“渲染后核验”的流程，自行编写 AF 流程；逐目录核对许可，不一概称为开源可复制。 |
-| [Agent Skills 规范](https://agentskills.io/specification) | Skill 元数据、指令和资源组织方式 | 用于 AF 内置流程包的字段组织与渐进加载，不绑定某一家模型。 |
-| [KaTeX](https://github.com/KaTeX/KaTeX) | TeX 数学渲染、服务端输出和本地字体资源 | 作为前端首选数学排版，实际方法与容器检查由 AF 工具封装。 |
-| [MathJax](https://github.com/mathjax/MathJax) | 数学输入与 SVG 等输出适配 | 用作兼容性评估和本次 PDF 的 LaTeX 矢量示范；不是以截图代替公式源。 |
+| D：直接依赖 | 保留上游实现，以明确版本调用公开接口 | 增加必要的配置、AF 包装与契约测试，不复制整套源码进业务目录。 |
+| A：适配复用 | 复用选定源码或模块，改宿主、存储、事件或 UI 接口 | 标明具体文件、保留部分、修改部分及补丁，不能只说“参考”。 |
+| C：条件接入 | 已列明缺少的兼容、归属或业务前置 | 满足条件后按 D／A 接入；未满足时功能保持真实未启用状态。 |
+| N：本版不接入 | 超出范围或已有确定替代组件 | 写明原因与替代方案，不启动第二套重复系统。 |
 
-### 19.2 外部证据
+### 19.3 运行核心、工具与 Skill 复用清单
 
-DeepSeek 默认别名与基地址依据[官方首调文档](https://api-docs.deepseek.com/quick_start/agent_integrations/)，模型发现依据[模型列表文档](https://api-docs.deepseek.com/api/list-models/)。只固定用户选择的 deepseek-flash 别名，不硬编码背后版本的上下文、价格或发布日期。
+| ID／组件 | 许可／类别 | 保留与具体适配 |
+|---|---|---|
+| RE01：dsh 运行核心 | MIT；D＋AF 控制桥 | 直接使用 agent、agent-loop、session、session-projection、system-prompt、tools、原生执行器和必要 scope／llm 依赖；AF 增加任务上下文、生命周期和取消桥，不重写模型—工具循环。 |
+| RE02：dsh Skill 注册与加载 | MIT；D | 使用 dsh-skill、dsh-tool-skill、dsh-skill-filesystem；限定内置与用户显式安装目录，按角色／任务暴露目录和加载正文；AF 编写自己的学习、剧本与成长 Skill。 |
+| RE03：dsh MCP 客户端与资源 | MIT；D＋策略包装 | 使用 dsh-mcp-client、dsh-mcp-resources；统一能力登记、连接生命周期、命名空间、权限和输出预算。MCP 结果必须转为 AF Artifact，不直接提交正史。 |
+| RE04：dsh 会话持久化与压缩 | MIT；D＋状态适配 | 保留会话日志、恢复与 compaction-basic；压缩只处理工作上下文，不删除 AF 原始事件、改变事实或跨分支合并记忆。持久化组件与核心使用同一版本线。 |
+| RE05：dsh TypeScript SDK | MIT；C | 可用于离线实验与单任务；所查版本没有轮次中取消接口，且 finalResponse 不是单一输入的因果结果。不得原样作为 AF 前台控制层；主路径采用 25.2 的原生 Agent 控制桥。 |
+| RE06：Codex harness／app-server | Apache-2.0；N（首版运行依赖） | 保留其工具注册、上下文及事件协议作为实现参照；首版已有 dsh 主核心，不并行嵌入第二套 harness。确需移植独立代码时保存 Apache 许可、NOTICE 和修改声明；不假定其模型协议可直接替换为 DeepSeek。 |
+| RE07：dsh Office Skill | MIT；A（按需） | 保留可用模板与“结构检查／渲染检查”方法；将通用 shell／任意路径命令改为 AF 文档、预览与导出工具。它不替代 DOC／PPT 转换、原文锚点和 OCR 管线。 |
+| RE08：MarkItDown／其 MCP | MIT；D＋文档适配 | 作为受控文字提取组件调用；资源 ID 经网关转换，不让模型自由传 URI；将结果补为 ContentBlock、版本、锚点和质量标签；缺页码或公式时保留原始页图及其他解析结果。 |
+| RE09：KaTeX | MIT；D | 复用排版引擎、CSS 与字体；由 AF math.render、layout.check 包装。成功排版不等于数学 verified。 |
+| RE10：MathJax | Apache-2.0；C | 仅在 KaTeX 无法覆盖且经兼容测试时使用受控适配；同时用于文档公式示例。禁止额外引入任意执行宏或外链资源。 |
+| RE11：MCP reference servers | 逐目录核查；C | filesystem／fetch 等可按所用目录许可直接运行或裁剪；不得把参考服务器默认的目录权限、记忆模型和可靠性当 AF 保证。AF 内置能力优先用已有应用服务，不为 MCP 再实现一份业务。 |
+| RE12：Anthropic Skills 等外部技能 | 逐目录核查；C | 只接入许可明确覆盖目标目录的内容，source-available 不等于 MIT；可直接使用的部分保留来源并替换 AF 工具映射，不把整库声明为可复制。 |
 
-数学配置依据[KaTeX 选项](https://katex.org/docs/options.html)与[错误处理](https://katex.org/docs/error.html)：解析错误和 unsupported commands 可以被捕获，但不自动解决内容正确性或容器重叠。信任、宏预算和实际版式校验由 AF 增补。
+### 19.4 角色与平台插件的复用清单
 
-六个 dsh 仓库的逐项研究保留在第 16 节。直接复用前需要宿主服务映射、许可证清单与故障测试；不能把“名字相同”视为官方产品关系，也不把参考仓库的测试结果当成本项目测试。
+| ID／组件 | 许可／类别 | 具体保留与改动 |
+|---|---|---|
+| RE13：dsh-bili-humanism 1.11.1 | MIT；A | 保留分层取稿、来源覆盖、预算、反思与提问状态机；将全局账本／人格文档接入 AF saveId＋branchId 事件与成长仓储，外部问题的送达核对改为 AF 实际呈现回执。停用自身每日取稿计时器，由 AF 调度触发。 |
+| RE14：dsh-fish-memory 1.3.3 | MIT；A | 保留相关性／时间／重要性召回、事实更新和预算逻辑；JSON 文件、会话命名与后台写入替换为 AF SQLite 仓储和可见事件过滤，注入改为统一上下文组装。移除自更新及原宿主 Web 管理 UI。 |
+| RE15：dsh-feiyu-mood 0.7.4 | MIT；A | 保留限幅、回稳、置信度及事件驱动的变化计算；飞鱼专属维度和提示改为角色模板配置；按存档／分支存储并使用 manifest 中的 poseId。接入 AF 档案页，不搬原宿主页面。 |
+| RE16：dsh-qq-bridge 1.0.6 | MIT；A（扩展能力） | 保留已实现 OneBot 消息归一化、点名、私聊／群目标与附件处理；将宿主 agent 路由、状态文件和发送改接 AF ConnectorEvent、受控资源与 Delivery 账本。群文件下载须独立验证，不能因聊天可用而标为支持。 |
+| RE17：dsh-bili-subagent 0.8.6 | MIT，含 vendor MIT；A（按需补充） | 保留确有需要的取材／子任务与报告模块；其 vendored bilibili-mcp 单独保留许可。改用 AF 专业任务、统一凭据、预算、报告 Artifact 和调度；不带原低价时段策略、自更新或重复自动登录下载流程。与 RE13 重叠读取由一个后端承担。 |
+| RE18：dsh-speak-up 0.2.6 | package.json 声明 MIT，未见独立 LICENSE；C | 记录实际 MIT 声明，不把缺独立文件自动解释成闭源。接入前归档许可声明和可核对的版权信息，保留相关说明；复用冷却／安静时段／本地门控部分，替换固定人设、宿主 UI 与调度。未满足归属记录时，使用 dsh timer 与 AF 已定 D07 规则实现，不复制归属不明文件。 |
+| RE19：dsh-tts-bridge 1.3.1 | package.json 声明 MIT，未见独立 LICENSE；N | 当前不做角色配音；不引入其浏览器朗读、凭据和音频队列依赖。以后扩展再完成与 RE18 相同的归属记录，并使用独立语音总线；不得以此替代 BGM／操作音效。 |
 
-### 19.3 AF 内置流程包
+以上插件均不能把“安装后能注册工具”当作 AF 适配完成。原插件存在宿主 Web 服务、全局文件目录、自动更新及会话假设；仅保留 AF 实际需要的服务和算法。禁止为了满足一项 inject 依赖把上游整个 Web UI、插件市场或任意 shell 一并开启。
 
-拟内置四个流程：资料入库、教材确认、章节内容制作、角色研究与记忆。每包包含版本、适用任务、所需工具、输入／输出 schema、步骤、恢复策略和验收案例。数学制作流程必须包含第 18 节的五步检查。流程包只引用工具 ID，不保存 API key，不允许附带静默安装或外发指令。热更新流程包不会重写既有存档事件。
+### 19.5 已核对的来源与固定提交
+
+下列 SHA 是本轮源码与许可核查快照。实施时优先选择对应同版本发行包，记录完整性 hash；若该包不可取得，可以从同一提交构建，不把源码的 workspace:* 当作可直接发布安装的版本。需要升级时重新核对接口、许可和回归结果，不静默跟随 main／master。
+
+- RE01–RE05、RE07：deepseek-ai/deepseek-harness，0.2.1-rc.3 版本线，提交 22ddee3792402c3e70ec5f86a63c3e3e895a2f60。[MIT](https://github.com/deepseek-ai/deepseek-harness/blob/22ddee3792402c3e70ec5f86a63c3e3e895a2f60/LICENSE)、[Agent 接口](https://github.com/deepseek-ai/deepseek-harness/blob/22ddee3792402c3e70ec5f86a63c3e3e895a2f60/packages/core/agent/README.zh.md)、[Skill](https://github.com/deepseek-ai/deepseek-harness/blob/22ddee3792402c3e70ec5f86a63c3e3e895a2f60/packages/skill/skill/README.zh.md)、[SDK 限制](https://github.com/deepseek-ai/deepseek-harness/blob/22ddee3792402c3e70ec5f86a63c3e3e895a2f60/packages/sdk/client/README.zh.md)。
+- RE06：openai/codex，提交 970111f6cb62cc02fe36a82ea7d71b37a2889c97。[Apache-2.0](https://github.com/openai/codex/blob/970111f6cb62cc02fe36a82ea7d71b37a2889c97/LICENSE)、[工具运行注册表](https://github.com/openai/codex/blob/970111f6cb62cc02fe36a82ea7d71b37a2889c97/codex-rs/core/src/tools/registry.rs)。
+- RE13：InariNGT-Ofiicial/dsh-bili-humanism，提交 bb72cb2b2b6eb94d501076f429ad7b5a7ea5040f。[MIT](https://github.com/InariNGT-Ofiicial/dsh-bili-humanism/blob/bb72cb2b2b6eb94d501076f429ad7b5a7ea5040f/LICENSE)、[人格接口](https://github.com/InariNGT-Ofiicial/dsh-bili-humanism/blob/bb72cb2b2b6eb94d501076f429ad7b5a7ea5040f/docs/PERSONALITY.md)、[实际提问核对](https://github.com/InariNGT-Ofiicial/dsh-bili-humanism/blob/bb72cb2b2b6eb94d501076f429ad7b5a7ea5040f/lib/post-viewing-question.mjs)。
+- RE14：Yuuyuko-uu/dsh-fish-memory，提交 54b758e8087a26019ac43288bdb5931395b98b05。[MIT](https://github.com/Yuuyuko-uu/dsh-fish-memory/blob/54b758e8087a26019ac43288bdb5931395b98b05/LICENSE)、[核心入口](https://github.com/Yuuyuko-uu/dsh-fish-memory/blob/54b758e8087a26019ac43288bdb5931395b98b05/lib/index.js)。
+- RE15：Yuuyuko-uu/dsh-feiyu-mood，提交 f097615c720c3d91c8a52021a7f28e4bc9dc274a。[MIT](https://github.com/Yuuyuko-uu/dsh-feiyu-mood/blob/f097615c720c3d91c8a52021a7f28e4bc9dc274a/LICENSE)、[核心入口](https://github.com/Yuuyuko-uu/dsh-feiyu-mood/blob/f097615c720c3d91c8a52021a7f28e4bc9dc274a/lib/index.js)。
+- RE16：Yuuyuko-uu/dsh-qq-bridge，提交 4cd7542002f5d2ea65ce48dde4e633cfb8f9a3f8。[MIT](https://github.com/Yuuyuko-uu/dsh-qq-bridge/blob/4cd7542002f5d2ea65ce48dde4e633cfb8f9a3f8/LICENSE)、[桥接入口](https://github.com/Yuuyuko-uu/dsh-qq-bridge/blob/4cd7542002f5d2ea65ce48dde4e633cfb8f9a3f8/lib/host.js)。
+- RE17：Yuuyuko-uu/dsh-bili-subagent，提交 5f2b01401794b346945240216dd617e43e44680b。[根及 vendor 许可说明](https://github.com/Yuuyuko-uu/dsh-bili-subagent/blob/5f2b01401794b346945240216dd617e43e44680b/LICENSE)、[入口](https://github.com/Yuuyuko-uu/dsh-bili-subagent/blob/5f2b01401794b346945240216dd617e43e44680b/index.js)。
+- RE18：Yuuyuko-uu/dsh-speak-up，提交 28846d55052eb56b5294f78692b5227163124698。[包声明](https://github.com/Yuuyuko-uu/dsh-speak-up/blob/28846d55052eb56b5294f78692b5227163124698/package.json)、[宿主入口](https://github.com/Yuuyuko-uu/dsh-speak-up/blob/28846d55052eb56b5294f78692b5227163124698/lib/host.js)。
+- RE19：Yuuyuko-uu/dsh-tts-bridge，提交 4d325f195777790e1fe5c68de082242266083ee4。[包声明](https://github.com/Yuuyuko-uu/dsh-tts-bridge/blob/4d325f195777790e1fe5c68de082242266083ee4/package.json)。
+- RE08–RE12 的许可入口：[MarkItDown MIT](https://github.com/microsoft/markitdown/blob/main/LICENSE)、[KaTeX MIT](https://github.com/KaTeX/KaTeX/blob/main/LICENSE)、[MathJax Apache-2.0](https://github.com/mathjax/MathJax/blob/master/LICENSE)、[MCP reference servers](https://github.com/modelcontextprotocol/servers)、[Anthropic Skills](https://github.com/anthropics/skills)。这些入口是许可与能力来源，不作为浮动生产依赖；H01 必须选择实际使用版本并填入 hash 与递归依赖许可后才能安装入包。
+
+### 19.6 具体适配的完成定义
+
+运行层适配包括：公开接口接入、AF scope 映射、取消及迟到结果隔离、工具结果转换、资源权限、持久化、卸载与进程退出。原生插件工具依然是原生工具，不为满足名词而强制套一层 MCP；原生和 MCP 都进入同一 AF 工具策略。插件内部的安装、自更新、平台发送、全局人格文件修改必须改由 AF 的受控服务承担。
+
+RE13 必须保留来源与覆盖信息。其原来的每日人格摘句不是 AF 必须照搬的频率；AF 自动成长采用 25.7 的按存档事件规则。原“实际助手问句”核对改为 view.presented／external.delivery 回执；角色的后台理解不等待用户阅读，但共同经历只能依据实际呈现。专用 Markdown 可作为导出视图，SQLite 为权威数据，不再出现两套彼此覆盖的真源。
+
+RE14 的权重和召回逻辑需可测试地提取或包裹。把 sid 映射为 saveId 仍不够，所有 query／write／delete 都必须携带 branchId 和截止事件号，祖先分支只继承分叉点前的条目；缓存同样过滤。不能把上游跨会话合并默认用于跨存档角色记忆。
+
+RE15 的情绪变化只消费实际成立的角色或共同经历事件，不消费预生成剧本。情绪变化、长期关系与成长认识是不同数据；不能用心情值直接改核心人设或学科掌握状态。RE16 外发使用非回滚账本；角色通过 QQ 获得的信息进入同一活动档，切档、重试、重启与读档不能重发或串话。
+
+RE17 仅在 RE13 未覆盖的取材或独立专业任务确有需要时启用；每项平台注册一个实际写入执行器，防止不同插件各自点赞、评论或发信。QQ、B站、X、贴吧分别列能力与测试，当前没有可核查实现的 X／贴吧／微信只保留禁用适配入口，不能承诺已支持。
+
+### 19.7 依赖锁定、补丁与交付记录
+
+H01 生成 docs/research/reuse-lock.json，每项字段为 reuseId、repository、commit、packageName、packageVersion、integrity、licenseExpression、licenseFiles、copyright、transitiveLicenses、reuseMode、upstreamFiles、localAdapterPaths、patches、disabledCapabilities、tests、verifiedAt。未集成时 tests 明确为 not_run；不能写通过。第三方标识与 Artifact 记录使用 ID，不嵌入开发机绝对路径。
+
+优先通过依赖和适配调用，确需 fork 时使用锁定依赖或可重现补丁，补丁放 scripts/patches/，保留原文件与修改说明。不要在 node_modules 手工改动后假装可重现，也不要在根目录随意建立 vendor 副本。构建复制实际运行依赖、许可与必要 Node／Python 运行时至 build/compiled/resources/，按对应架构校验；产物不得依赖开发机预装 dsh 或全局 Node。
+
+每项功能的验收记录必须包括规格条目、指定行为、证据和实际复用范围。没有报错、工具可注册、截图近似或已有上游测试通过均不能证明符合 AF；未达标、未验证或只有模拟成功一律不标完成、不作为完成功能提出 PR。GPL 的许可与源代码分发检查是该组合版本的交付条件，不把许可证名称本身当拒绝复用的理由。
 
 ## 20. 原子交付任务与分工接口
 
@@ -891,25 +1097,26 @@ DeepSeek 默认别名与基地址依据[官方首调文档](https://api-docs.dee
 
 本清单覆盖本书全部首版功能及连接器扩展，每项只有一个主要交付结果。编号不代表已经完成；当前状态统一为“待开发”，负责人由组内分配。前置引用相应任务的已验收接口，不要求上游必须完成全部 UI 后才能用样例开发下游。
 
-每项交付必须同时包含接口／数据、正常与失败路径、可复现验收记录；不只提交截图或宣称“运行成功”。所有失败均遵循 errorCode、requestId、retryable，引用第 18 节工具约束。基础 fixture 统一包含七类文件、加密／损坏／扫描样本、公式、长文本、正确／错误／含糊作答以及模拟外部重复事件。
+每项交付必须同时包含接口／数据、正常与失败路径、可复现验收记录；先建立“规格条目→指定行为→验证方法→证据”的逐项核对，全部适用要求达标后才标完成并提出 PR；不只提交截图或宣称“运行成功”。所有失败均遵循 errorCode、requestId、retryable，引用第 18 节工具约束。基础 fixture 统一包含七类文件、加密／损坏／扫描样本、公式、长文本、正确／错误／含糊作答以及模拟外部重复事件。
 
 ### 20.2 基础、模型与品牌
 
 | 编号 | 单一交付物 | 前置 | 输入与边界 | 验收结果 |
 |---|---|---|---|---|
 | F01 | Windows 桌面启动与页面骨架 | F11 | 无 key 也能进入管理页 | 启动、关闭重开不白屏，错误可见。 |
-| F02 | SQLite schema 与事务封装 | F01 | 实体来自 10.2、17.9 | 回滚不留半个存档，迁移失败保留备份。 |
+| F02 | SQLite schema 与事务封装 | F01、F15 | 实体来自 10.2、17.9 | 回滚不留半个存档，迁移失败保留备份。 |
 | F03 | 本地资源注册表 | F02 | 资源 ID → 受控路径 | 越界拒绝，移动后可重新定位。 |
 | F04 | 全局姓名与称呼解析 | F02 | displayName、preferredAddress、角色关系 | 默认我／你；身份不生成原作主角姓名。 |
 | F05 | DeepSeek 首配页与凭据保存 | F01 | 官网跳转、key、secretRef | 默认 deepseek-flash，日志和渲染进程无明文 key。 |
-| F06 | 模型请求与能力适配器 | F05 | 流式／工具／JSON 能力 | 401、429、取消、超时各有可复现分支。 |
+| F06 | 模型请求与能力适配器 | F05、H03 | 流式／工具／JSON 能力 | 401、429、取消、超时各有可复现分支。 |
 | F07 | 其他厂商 profile | F06 | base URL、model ID、独立 key | 切换不跨域复用 key，不静默改模型。 |
 | F08 | SVG Logo 品牌资源接入 | F01 | 透明路径 SVG、最小留白 | 无嵌入位图，深浅容器不拉伸或裁边。 |
 | F09 | 已确认首页及模式入口 | F08、C03 | 默认看板娘、继续故事、课程与资料导航 | 首页布局沿用参考图，无档与继续两态可用。 |
 | F10 | 统一设置与诊断页面 | F04、F07 | 全局／存档作用域、脱敏任务日志、能力状态 | 各模块入口与返回一致，未配置态无假成功。 |
-| F11 | 强制目录骨架与依赖边界 | 无 | 17.12 目录表、electron-vite 配置、资源复制及导入检查 | 构建只进 build/；PDF 进 docs/ 根；越层导入失败；打包资源可加载。 |
-| F12 | 首页左下聊天交互 | F09、C05、C08 | UI-HOME-CHAT-01 与 15.17、saveId 及草稿 | 点击立绘展开；右侧入口不遮挡；流式、关闭、失败及切档不串话。 |
+| F11 | 强制目录骨架与依赖边界 | 无 | 17.12 目录表、electron-vite 配置、资源复制及导入检查 | 目录、最小构建和资源复制规则通过；仅用已登记基准资源验证，不要求此时完成全部角色／音频或最终发行包。 |
+| F12 | 首页左下聊天交互 | F09、C05、C08、F14、H08 | UI-HOME-CHAT-01 与 15.17、saveId 及草稿 | 点击立绘展开；右侧入口不遮挡；流式、关闭、失败及切档不串话。 |
 | F14 | 统一控件与页面过渡层 | F01、F08 | 23.13 动效参数、可取消过渡与简化设置 | 控件占位不抖动；快速开关不排队；键盘焦点及动画简化可用。 |
+| F15 | 共享契约与状态机基线 | F11 | 17.11、25.2.2、25.3.1、25.4.1 | src/shared/contracts/ 的类型、运行时 schema、命令登记及合法／非法 fixture 一致；先通过 21.4 的协议和状态用例再供下游使用。 |
 | F13 | 视觉小说式故事存档界面 | F09、C10、C11 | UI-SAVE-STORIES-01、分页、选中档与预览 | 选中不切档；继续、改名、导出、保存点入口和损坏／空状态按 15.18.2 验收。 |
 
 ### 20.3 文件与教材
@@ -919,18 +1126,18 @@ DeepSeek 默认别名与基地址依据[官方首调文档](https://api-docs.dee
 | D01 | 扫描、指纹与增量清单 | F03 | 指定目录，原件只读 | 重扫去重，新增／改版可识别，取消不改原件。 |
 | D02 | 解析任务队列 | D01 | 并发 2、可取消、独立状态 | 单文件失败不阻塞整批，重试不重复入库。 |
 | D03 | DOCX 结构提取 | D02 | 段落、标题、表格、图片 | 测试样本结构和锚点对应原文。 |
-| D04 | DOC 旧格式转换 | D02 | 受控转换器进程 | 成功接入 D03；缺组件、加密、损坏分别报错。 |
+| D04 | DOC 旧格式转换 | D02 | 受控转换器进程 | 成功接入 D03；缺失随包组件报告 AF 安装完整性错误，加密、损坏分别报错，不要求另装转换器。 |
 | D05 | PPTX 页结构提取 | D02 | 页序、备注、图像 | 页序与原片对应，可纠正阅读顺序。 |
 | D06 | PPT 旧格式转换 | D02 | 中间格式与原件关系 | 不要求用户另存才能支持，取消释放进程。 |
 | D07 | PDF 文本与页图提取 | D02 | 文本层、页码、区域 | 引用可定位，原件失联可读受管快照。 |
 | D08 | OCR 与公式转录调度 | D07 | 扫描页、质量、LaTeX 候选 | 低质量有原图和待核对标记，不冒充正确。 |
 | D09 | MD／TXT 解析 | D02 | 标题、公式、编码、相对引用 | 中文编码可重试，嵌入脚本不执行。 |
-| D10 | ContentBlock 统一层 | D03–D09 | 版本、锚点、质量、资源引用 | 各格式可同一检索和阅读接口访问。 |
-| D11 | 科目建议与人工归类 | D10 | 证据、已有科目 | 不确定入收件箱，纠正与多科关联有效。 |
-| D12 | 教材候选识别 | D10 | 题号／标题／元数据 | 候选有依据，未知版次不编造。 |
+| D10 | ContentBlock 统一层 | D03、D04、D05、D06、D07、D08、D09 | 版本、锚点、质量、资源引用 | 各格式可同一检索和阅读接口访问。 |
+| D11 | 科目建议与人工归类 | D10、F06、D16 | 证据、已有科目 | 不确定入收件箱，纠正与多科关联有效。 |
+| D12 | 教材候选识别 | D10、F06、D16 | 题号／标题／元数据 | 候选有依据，未知版次不编造。 |
 | D13 | 最多三轮教材问答 | D12 | 确认、不知道、跳过 | 跳过进入推定／通用框架，不循环追问。 |
 | D14 | 教材目录与资料映射版本 | D13 | 原目录、通用框架、章节关联 | 改教材不改旧作答证据，原标题可追溯。 |
-| D15 | 资料管理完整状态页 | D01–D14 | 列表、进度、失败、重试 | 删除关联不删原件，部分成功如实展示。 |
+| D15 | 资料管理完整状态页 | D01、D02、D03、D04、D05、D06、D07、D08、D09、D10、D11、D12、D13、D14 | 列表、进度、失败、重试 | 删除关联不删原件，部分成功如实展示。 |
 | D16 | 本地索引与来源检索服务 | D10、F02 | FTS 索引、query、课程／版本／权限过滤 | 中文片段有锚点；未授权／旧版内容不漏出。 |
 
 ### 20.4 角色、故事与存档
@@ -941,16 +1148,16 @@ DeepSeek 默认别名与基地址依据[官方首调文档](https://api-docs.dee
 | C02 | 人格与身份编辑器 | C01、F04 | 人格、双方身份、关系、称呼 | 改模板不暗改旧档，姓名与原作身份隔离。 |
 | C03 | 存档建立与角色快照 | C02、F02 | 用户选择、课程引用 | 每档一位主要搭档，不串关系。 |
 | C04 | 类型化节点 schema 与校验 | C03 | 固定类型、注册资源 ID | 非法 CSS／路径／未知节点被拒绝或回退。 |
-| C05 | 回合队列与版本锁 | C04、F06 | turn、branch、stateVersion | 旧结果迟到不覆盖，重试幂等。 |
+| C05 | 回合队列与版本锁 | C04、F06、H06 | turn、branch、stateVersion | 旧结果迟到不覆盖，重试幂等。 |
 | C06 | 短期篇章规划与线性编号 | C05 | 已发生事件、未读片段 | 回复不自动加片段号，未来变化不改正史。 |
 | C07 | 立绘与对白演出 | C04 | 固定 pose／expression | 缺表情回中性，有限图切换且不遮脸。 |
-| C08 | 插话与自由聊天恢复 | C05、C07 | 当前节点、输入草稿 | 取消不写事件，发送后可恢复或自然续写。 |
+| C08 | 插话与自由聊天恢复 | C05、C07 | 当前节点、输入草稿 | 取消未发送草稿不写事件；已接受输入不撤销，停止／重写后从已呈现前缀自然恢复。 |
 | C09 | 自动、已读跳过与快捷键 | C07 | 焦点、已读状态、用户设置 | 不代选、不跳题，输入框空格不推进。 |
 | C10 | 检查点、回看与分叉 | C05、F02 | 快照、祖先事件集合、分支游标 | 不继承未来记忆／掌握，回看无副作用，不重发消息。 |
 | C11 | 存档管理与导出 | C10 | 重命名、备份、导出范围 | 无密钥，恢复可验证，删除只作用目标。 |
 | C12 | 非全知角色的信息可知层 | C04、D10 | learnedBy、来源与时间 | 可检索材料不自动成为角色已知事实。 |
 | C13 | 研究报告与第三者呈现 | C12、F06 | 引用、取得范围、不确定项 | 真实工具与虚构请教分开，不伪造真人回复。 |
-| C14 | 整幕剧本准备与打断后恢复门控 | C04、C05、C06 | actId、scriptRevision、已呈现锚点、交互／收束边界 | 正常整幕完整；打断后排除当前页至少五页；边界例外、旧任务及未来记忆隔离通过。 |
+| C14 | 整幕剧本准备与打断后恢复门控 | C04、C05、C06、H08 | actId、scriptRevision、contextRevision、已呈现锚点、隔离草稿会话 | 正常整幕完整；打断后排除当前页至少五页；21.4 哨兵与恢复门控通过。 |
 | C15 | 口述速度字幕与页面播放游标 | C07、C09、C14 | 4 字／秒、3–5 范围、字素／分页及空格状态 | 空格补全与推进分离；输入法不误触；旁白和公式完整出现；读档恢复不重复提交。 |
 
 ### 20.5 学习与数学
@@ -979,7 +1186,7 @@ DeepSeek 默认别名与基地址依据[官方首调文档](https://api-docs.dee
 | 编号 | 单一交付物 | 前置 | 输入与边界 | 验收结果 |
 |---|---|---|---|---|
 | R01 | 带证据的分层记忆 | C05、F02 | 分支可见事件、核心、经历、学习引用 | 事实／推断可分，跨档及分叉后的未来经历不召回。 |
-| R02 | 限额召回与事实替代 | R01 | query、事实键、时间与预算 | 过期事项不催促，旧事实可追溯。 |
+| R02 | 限额召回与事实替代 | R01、H06 | query、事实键、时间与预算 | 过期事项不催促，旧事实可追溯。 |
 | R03 | 记忆查看、纠正与删除抑制 | R02 | 来源、删除范围 | 删除不被摘要或再导入复活。 |
 | R04 | 心情更新与立绘选择建议 | R01、C07 | 有来源的变化与置信度 | 低置信保留旧状态，忙碌不扣关系。 |
 | R05 | 主动行为门控与队列 | R02、C05 | 静默时间、冷却、每日预算 | 学习／输入不抢屏，完全退出不运行。 |
@@ -993,11 +1200,53 @@ DeepSeek 默认别名与基地址依据[官方首调文档](https://api-docs.dee
 | X04 | B站取材适配 | X01、C13 | URL、元数据、字幕 | 缺字幕不说已读全文，不默认评论。 |
 | X05 | 外发独立账本 | X01、C10 | deliveryId、目标路由 | 读档不重发，发送状态可追踪。 |
 | X06 | 微信扩展接口与不可用态 | X01 | 能力探测结果 | 未验证入口明确不可用，不展示假连接。 |
-| Q01 | 无障碍与窗口回归 | C09、M06 | 键盘、缩放、对比、紧凑布局 | 焦点返回正确，按钮不裁切。 |
-| Q02 | 故障注入与恢复回归 | 全部核心 | 断网、坏文件、旧回包、迁移中断 | 符合第 21 节矩阵，无丢档／串档。 |
-| Q03 | 安装包与依赖自检 | Q02 | 字体、转换组件、资源与配置 | 新 Windows 用户可按指引完成核心闭环。 |
-| Q04 | 试用、记录与发布材料 | Q03 | 实际体验与学习样本 | 如实报告小样本与失败，不把预期当实测。 |
+| Q01 | 无障碍与窗口回归 | C09、M06、F10、F12、F13、L09 | 键盘、缩放、对比、紧凑布局 | 焦点返回正确，按钮不裁切。 |
+| Q02 | 故障注入与恢复回归 | F10、F12、F13、D15、D16、C11、C12、C13、C15、L08、L09、M06、R03、R04、R05、A03、A04、X05、X06、H04、H07、H09、H10、H11、Q01、Q05 | 第 21、24.6、25.9 节；核心实现闭包、固定样本及故障注入 | 全部核心实现可达；21.4 编号用例及恢复矩阵有记录，无丢档／串档；不依赖最终包验收。 |
+| Q03 | 安装包与依赖自检 | Q06 | U34、25.2.1；Q06 冻结的安装包 hash 与清单 | 只使用 Q06 候选包，在干净 Windows 完成离线本地能力、API 在线闭环与修复／升级／卸载检查；记录包 hash，不重打包替换待测对象。 |
+| Q04 | 试用、记录与发布材料 | H13 | 实际体验与学习样本 | 只对已通过最终验收的同 hash 包试用；如实报告小样本与失败，不把预期当实测。 |
+| Q06 | 冻结自包含发行候选包 | Q02、H01 | 全部核心实现、随包依赖和资源、初始归属清单 | 生成完整安装包、组件清单及 hash；静态依赖闭包／资源自检通过，留待 Q03 做干净机器实测，不提前宣称最终发行通过。 |
 | Q05 | 字幕、整幕与打断恢复专项回归 | C14、C15、F14、A04 | 第 24.6 节样本与故障注入 | 首幕完整、后续五页计数、边界、取消、迟到结果及断网恢复全部符合规则。 |
+
+### 20.7 Agent 运行时与上游适配
+
+| 编号 | 单一交付物 | 前置 | 输入与边界 | 验收结果 |
+|---|---|---|---|---|
+| H01 | 复用锁定与第三方归属记录 | F11 | 第 19 节快照、拟采用依赖闭包与组件版本 | 初始版本、hash、许可、来源与补丁计划齐全，可复现安装；运行能力实测归 H02 等任务，最终归属审计归 H13，不在此要求尚未实现的最终包。 |
+| H02 | dsh 受控运行进程与 profile | F01、H01、F15 | RE01、RE04；25.2、25.2.1 | 仅使用 AF 随包运行组件；不依赖全局 dsh／Node.js 或用户 profile；由 AF 启停，无通用 shell、自更新和独立配置步骤。 |
+| H03 | 运行控制与事件桥 | H02、F02、F15 | 25.2.2 控制桥、25.3.1 状态机；run／steer／inject／cancel／resume | 协议握手、帧限制、取消封口、独立 job 故障域及重启用例通过，不建空档或重放外发。 |
+| H04 | Skill 注册与加载适配 | H02、H01 | RE02、版本与 scope | 摘要发现、按需加载、同名裁决、卸载后不可调用；读文件不等于激活技能。 |
+| H05 | 原生／MCP 统一工具网关 | H03、F03 | RE03、18.4 工具 | 同一权限与预算、schema 与 Artifact；关闭能力后不可旁路调用。 |
+| H06 | 任务上下文与角色知识过滤 | H03、F04、C04 | 25.4.1 ContextBundle、purpose、可知事件投影与抑制版本 | 角色新 turn 新宿主会话；剧本草稿、别档和撤回内容不进入角色输入，21.4 唯一哨兵用例通过。 |
+| H07 | 事件驱动调度与后台任务 | H05、H06 | 25.5、D07、持久任务 | 前台优先、取消／重启去重、预算可查；预取不自动记成角色理解。 |
+| H08 | 三层经历与呈现回执 | H06、C07 | available／personal／shared | 未播放对白不入共同经历；角色可保留实际后台阅读但不假定用户已知。 |
+| H09 | 自动成长与查看纠正 | H08、C04、R01 | 25.7、证据与版本 | 默认有据自动发展；核心设定锁定；关闭、撤回、分支隔离可验证。 |
+| H10 | humanism 取材／反思适配 | H05、H08、H09 | RE13、来源覆盖和 AF 仓储 | 保留上游有效模块；拟问／实际呈现分开；失败／未覆盖诚实显示。 |
+| H11 | fish-memory／mood 适配包 | H06、H08、R01、R03 | RE14、RE15；AF 事件仓储 | 保留召回／变化算法，去原 Web 与自更新；不串分支、无未来记忆。 |
+| H12 | QQ／B站扩展适配 | H05、H07、X01 | RE16、RE17；实际后端 | 所启用能力逐项真实验证；重复／迟到／切档不重发，其他平台禁用。 |
+| H13 | 复用、符合性与组合发行验收 | Q03、H04、H07、H09、H10、H11 | 第 19、25 节；Q06 同 hash 包、Q03 记录、真实依赖／源码交付 | 全部适用规格有证据；包、锁、依赖／许可／源码材料一致；发现任何代码、资源或依赖变化须重新 Q06→Q03→H13，不用源码检查代替发行包验收。 |
+
+
+### 20.8 依赖集合、契约门槛和发行顺序
+
+前置列只允许“无”或明确任务编号列表，禁止“全部核心”“相关任务”及 D03–D09 这类隐式范围。以下核心实现集合固定为 87 项，Q02 的直接前置经过传递闭包必须恰好覆盖此集合；集合行不是新增任务编号。
+
+| 核心实现分组 | 必须覆盖的任务 |
+|---|---|
+| 基础与界面 | F01、F02、F03、F04、F05、F06、F07、F08、F09、F10、F11、F12、F13、F14、F15 |
+| 资料与教材 | D01、D02、D03、D04、D05、D06、D07、D08、D09、D10、D11、D12、D13、D14、D15、D16 |
+| 角色与演出 | C01、C02、C03、C04、C05、C06、C07、C08、C09、C10、C11、C12、C13、C14、C15 |
+| 学习与数学 | L01、L02、L03、L04、L05、L06、L07、L08、L09、M01、M02、M03、M04、M05、M06、M07 |
+| 记忆与音频 | R01、R02、R03、R04、R05、A01、A02、A03、A04 |
+| 运行时与适配 | H01、H02、H03、H04、H05、H06、H07、H08、H09、H10、H11 |
+| 连接基础与回归 | X01、X05、X06、Q01、Q05 |
+
+X02、X03、X04、H12 是按已启用能力验收的可选平台实现，不在本地核心的无条件依赖里；X01、X05、X06 仍是必需的能力边界、账本和不可用态。Q02、Q06、Q03、H13、Q04 是五项集成／发行门槛，不属于上表核心实现集合。所有 96 项任务恰好划入这三类，不允许有任务被遗漏或重复分类。
+
+主顺序为 F11 骨架 → F15 共享契约 → 各领域实现 → Q02 集成故障回归 → Q06 冻结候选完整包 → Q03 干净机器实测 → H13 规格／归属／源码最终验收 → Q04 试用与发布材料。F01 可在 F11 后与 F15 并行搭页面骨架，但 F02／H02 等只在共享契约合格后开始。F15 必需交付字段 schema、状态转换表、错误注册、命令登记、事件与桥协议的正反样本；不是只建一批空类型文件。完成 F15 不代表任何模型服务已真实接通。
+
+H01 先锁定拟用组件和依赖／许可来源，H13 再核对实际包与最终交付，避免 H01 依赖尚未产生的最终包。Q06 只产出候选包及静态完整性证据，Q03 只测试该 hash 的包，H13 消费包和实测记录，不作为打包的前置。任何影响代码、依赖、资源或安装器的修复都生成新候选包／hash，重新执行受影响回归及 Q06→Q03→H13；不得拿旧包通过记录为新包背书。
+
+发行时建立 enabledExtensionTasks 记录，逐项列出实际启用的 X02／X03／X04／H12 及其传递依赖，合入该候选包的必验集合。未启用时显示不可用，不宣称通过；启用时其验证必须在 Q06 冻结前完成，且 Q03／H13 对同包复验相应平台能力，不用“可选”跳过已经对用户开放的功能。此配置不能修改固定核心集合，也不能把 dsh／转换器等核心依赖变成用户自行安装项。
 
 ## 21. 验收矩阵与发布门槛
 
@@ -1031,13 +1280,40 @@ DeepSeek 默认别名与基地址依据[官方首调文档](https://api-docs.dee
 
 试用邀请 5–10 名同学，分别记录陪伴感、角色失真、操作难度、学习反馈正确性和继续使用意愿；学习前后使用不同但等价的独立小题，报告小样本与辅助作答情况，不作因果夸大。发布前需一名未参与该模块实现的组员按矩阵复核。
 
+### 21.4 契约、隔离和依赖的固定回归用例
+
+以下用例是对五项规格缺口的强制验收补充，编号在实现报告中保持稳定。开发时在 tests/fixtures/contracts/ 保存请求／事件／状态序列与预期结构，在 tests/fixtures/context/ 保存人工构造的多档／多分支事件；不使用真实私聊或 API key。F15 固定输入和预期，H03／H06／H08／C14 等补真实执行证据，Q02 集成复验。测试替身可验证门控，真实 dsh／安装包验证不能以替身替代。
+
+| 用例 ID／固定输入 | 必须满足的可观察结果 |
+|---|---|
+| CT01／非法状态 | 向 Job 写入 ready、向 Task 写入 presenting、向 Playback 写入 completed 均被 schema 拒绝；合法 running＋stage=validating 可接受。 |
+| CT02／正常十六页幕 | task 产物可先 completed；整幕未齐 job 不 completed、ActScript 不 ready；整幕齐后 job completed，而 Playback 仍可 preparing，不能生成任何呈现经历。 |
+| CT03／当前页＋四页／五页 | 中断后只准备当前页和四页不能恢复；五页可恢复但 actComplete=false；继续补齐全幕才将 normal 生成目标 completed。选择边界与短幕按 24.6 的既有样本验证。 |
+| CT04／相同幂等键两次发送 | requestId 不同而业务 payload 相同，只生成一个 turn、job 和 user_input；同键改 text 报 IDEMPOTENCY_CONFLICT。模型超时后 jobs.retry 创建关联原 turn 的新 job，不重复 user_input，原 failed job 不复活。 |
+| CT05／版本冲突与正常翻页 | 旧 expectedStateVersion 的新意图报 STALE_STATE，不写半条事件；同 scriptRevision 的正常呈现递增 stateVersion 后，缓存剩余页不被误判过期。 |
+| CT06／取消与迟到回包 | 正在生成时取消，UI 200ms 内显示已接受；超过 5 秒不收敛则终止该 worker，旧 epoch／revision 产物无写入。B job 的事件序列和 worker 不被 A 的取消改变。 |
+| CT07／控制桥损坏 | 不完整帧等待 LF，超 1MiB／非 JSON stdout／协议版本或组件 hash 不符拒绝运行；不把日志当对白或创建假完成任务。 |
+| CT08／outbox 重启 | 提交后、通知前模拟崩溃，重启可补读一次业务事实；重复 eventId 不重复记忆／计分；afterSeq 补读与全量 Snapshot 的状态一致。 |
+| CT09／草稿唯一哨兵 DRAFT_ONLY_7F2A | 十六页草稿在未播第九页包含该文本，仅显示第一页即中断。新 characterDialogue 的 bundle、原生 session 输入、摘要、召回和界面历史均不含哨兵；scriptDraft 审计中可以有它但不得提交经历。 |
+| CT10／半句唯一哨兵 UNSEEN_SUFFIX_91C4 | 一页后半句含哨兵，只显示前五字后中断；重建输入精确包含已显前缀一次，不包含哨兵、未显半句或整页已读标记。 |
+| CT11／个人阅读 PERSONAL_ONLY_A31B | 角色明确研究并实际取得报告含该文本，可进入角色 personal／心情；共同历史和用户掌握不出现；仅系统索引同报告时连 personal 也不得出现。 |
+| CT12／另档／未来分支 OTHER_SAVE_62D0 | B 档与 A 档分叉点后事件含哨兵，A 当前分支上下文、继承摘要和缓存均不含哨兵；分叉保留祖先截止前允许事件。 |
+| CT13／撤回事实 RETRACTED_FACT_5C8E | 事实已进入摘要后撤回／删除，旧 contextHash 不可恢复；新 bundle、检索、原生 compaction 引用不含该事实及派生断言；原始审计是否删除按用户选择分开。 |
+| CT14／首页回复未呈现 | 面板收起后生成完整回复，不产生 shared；再次展开提交实际可见范围回执后才进入历史。只展开招呼不调用模型，不创建 turn。 |
+| CT15／待回答与暂停 | 生成中缺资料时 job waiting_user 不占模型执行槽；jobs.respond 接受一次回答后可调度；已生成 choice 页则 job completed＋Playback waitingInput，next 报 INPUT_REQUIRED 且无代选。preparing／paused 时插话合法进入 rebuilding；返回首页后 ended 不变 paused，failed 保留锚点与错误。 |
+| CT16／异常依赖输入 | 将 Q02 前置改为“全部核心”、使用 D03–D09、引用不存在编号或构造环，文档校验必须失败；不能因正则未匹配而当作无前置。 |
+| CT17／核心闭包与发行包 | Q02 前置传递闭包精确覆盖 20.8 的 87 项；发行先 Q06 后 Q03 后 H13；包 hash 变化旧 Q03／H13 结果失效。 |
+| CT18／参考说明误改 | 23.7 推荐借鉴栏出现纯任务 ID 列表时校验失败；R02 保留立绘舞台／底部对白框／名牌等视觉说明，不能被任务表修改器改写。 |
+
+CT09–CT13 的通过首先要求输入装配及持久投影证据，不以模型偶然未说出哨兵为通过；模型输出另做角色一致性试用。CT01–CT08 记录请求／事件关联 ID、预期与实际状态及适用版本。文档工具只能静态检查 CT16–CT18 和条目完整性，不能生成其他用例已经通过的声明；所有应用运行用例仍须开发后实测。
+
 ## 22. 规范效力与变更控制
 
 ### 22.1 唯一基线及阅读规则
 
-docs/AF项目设计书.md 是唯一规格源；同版本 PDF 是该源的排版发布快照，不是另一套规则。README 仅作入口索引，研究记录、历史 Git 提交、外部项目和生成提示词均不得覆盖本规格。当前基线为 v1.0；最终文档不含本机绝对路径，所有资源引用使用仓库相对路径或明确的外部来源链接。
+docs/AF项目设计书.md 是唯一规格源；同版本 PDF 是该源的排版发布快照，不是另一套规则。README 仅作入口索引，Agent.md 规定开发协作且不能覆盖产品规格，研究记录、历史 Git 提交、外部项目和生成提示词均不得覆盖本规格。当前基线为 v1.3；最终文档不含本机绝对路径，所有资源引用使用仓库相对路径或明确的外部来源链接。
 
-第 2 节定义强制要求，第 15 节定义页面行为，第 17–18 节定义系统与工具契约，第 20–21 节定义实施和验收，第 23 节定义图版与样式，第 24 节定义播放状态。它们共同生效，不得只根据图像猜测数据规则，或只根据文字另设计一套界面。D01–D10 为规范默认，后文的细化阈值与状态机必须一并实现。
+第 2 节定义强制要求，第 15 节定义页面行为，第 17–18 节定义系统与工具契约，第 20–21 节定义实施和验收，第 23 节定义图版与样式，第 24 节定义播放状态，第 25 节定义 Agent 运行机制。它们共同生效，不得只根据图像猜测数据规则，或只根据文字另设计一套界面。D01–D10 为规范默认，后文的细化阈值与状态机必须一并实现。
 
 ### 22.2 变更与交付约束
 
@@ -1143,7 +1419,7 @@ docs/AF项目设计书.md 是唯一规格源；同版本 PDF 是该源的排版�
 | 编号 | 实际界面来源 | 推荐借鉴 | AF 的转化 |
 |---|---|---|---|
 | R01 | [《明日方舟》首页实机图](https://gamewith.net/arknights/bbs/threads/show/15) | 角色主体、右侧入口、主次权重 | 继续故事突出；章节学习、搭档、资料作为次入口，去除游戏货币与商业活动。 |
-| R02 | [《明日方舟》剧情截图](https://note.com/chiharu_nyoro/n/ne43628252625) | 场景与立绘优先，底部对白、顶部克制控件 | 插话、历史、去学习加入精简快捷栏，输入按需展开。 |
+| R02 | [《明日方舟》剧情截图](https://note.com/chiharu_nyoro/n/ne43628252625) | 立绘舞台、底部对白框、说话人名牌与精简快捷操作 | 插话、历史、去学习加入精简快捷栏，输入按需展开。 |
 | R03 | [《明日方舟》档案截图](https://xn--ccke6azf2a21a.gamerstand.net/31578) | 立绘与分区档案并置 | 改为人格、关系、知识边界、共同记忆；不照搬战斗数值。 |
 | R04 | [Key《Summer Pockets》官方商店](https://store.steampowered.com/app/897220/Summer_Pockets/) | 日常场景、角色与底部对白的阅读关系 | 参考轻松日常气氛和单人对话构图，精简长工具栏。 |
 | R05 | [柚子社《千恋＊万花》官方商店](https://store.steampowered.com/app/1144400/SenrenBanka/) | 立绘、姓名、对白及章节号的清晰关系 | 主线编号参考，日常互动保留清楚表情和身体轮廓。 |
@@ -1313,10 +1589,208 @@ story.prepare 生成完整一幕；story.interrupt 接收新交互并使旧尾�
 | 两页后遇选择／需回答 | 可播放到交互点；后续草稿不被选中或写入记忆。 |
 | 只余两三页完整收束 | 可播放至幕末，不人为延长。 |
 | 当前字幕中途打断，再次打断 | 已显示文字与用户输入保留，只接受最新 revision；旧结果不覆盖。 |
-| 生成了未来五页但只显示一页 | 角色记忆、关系、心情与学习证据不泄漏未来内容。 |
+| 生成了未来五页但只显示一页 | 角色记忆、关系、心情与学习证据不泄漏未来内容；真实后台阅读另按角色个人经历记账，不与草稿混同。 |
 | 速度 3／4／5、长按空格、输入法组词 | 语速正确；补全与推进分离；输入不触发剧情。 |
 | 旁白、行动、公式和选项 | 完整出现，公式无逐字碎片；自动播放不代选。 |
 | 连续开关面板、页面返回、简化动画 | 无动作排队、焦点丢失、布局跳动或无法取消。 |
 | 同一次点击、自动推进与静音 | 一次操作最多一声，自动和逐字无声，BGM 不重复重启。 |
 
 本章与第 23 章共同定义演出实现及验收：静态图约束构图，统一参数约束动效，状态机约束输入、缓存和亲历提交。学科总览与保存点层使用 15.16 的固定组合规则。不得在实现中将整幕默认准备缩减为五页，或把当前页计入打断后的五页后续缓冲。
+
+## 25. Agent 运行时、角色成长与任务调度
+
+### 25.1 运行架构及职责
+
+AF 必须提供完整 Agent 运行环境：模型在有界循环中理解任务、按需加载 Skill、调用工具、观察实际结果、修复或结束；应用提供可靠的任务、数据与演出机制。首版默认复用 dsh 组件，不将功能简化成拼接材料后单次调用模型。提示词是角色与任务指令的一部分，不能代替运行时、工具执行与状态校验。
+
+职责分为后台统筹、搭档与专业任务。后台统筹负责路由、调度、预算和结果门控，不作为虚构人物出场；搭档在自身人格与已知范围内选择关注、研究和交流；专业任务按需要启动，返回报告，不共享搭档所有私聊、不擅自写正史。它们可以使用同一模型和同一运行核心，不要求每回合都调用多个模型。普通闲聊在上下文已齐时可由搭档一次生成完成，确定性调度不额外调用“总管模型”。
+
+用户看到的视觉小说、首页交流和未来 QQ 私聊是同一活动存档角色的不同呈现通道；不能每个平台新建一个不互通人格，也不能让同一上游事件在各通道重复变成新经历。跨存档仍严格隔离。以学习为目的的专业核验与角色表达分工不变。
+
+### 25.2 dsh 宿主与进程适配
+
+Electron main 是生命周期与产品服务所有者。它启动专用、无可见终端的 Node.js 24+ 运行进程；该进程加载同版本 dsh 核心与 AF 专用 profile／组合包，以原生 Agent API 控制会话。优先经上游 launcher 加载受管 AF profile；需要低层嵌入时使用公开 app-boot，保持 profile 加载与版本校验，不直接导入私有 agent-loop 类。运行进程置于 src/main/runtime/worker/，适配插件置于 plugins/，控制客户端置于 bridge/；不改变 electron-vite／React／TypeScript 技术栈。
+
+首版明确采用受管 AF profile，不直接启动通用 sdk-minimal 或完整 Web profile。其必要服务为 Agent／loop、Session／projection／persistence、LLM／adapter、system-prompt、tools／native executor、Skill 注册／加载、需要的 MCP client 和 compaction。完整依赖按上游包声明闭包安装并统一版本；不为减少清单漏装 peer。sdk-minimal 自带 shell、未启用 Skill 且 SDK 缺少轮次取消，均不符合 AF 开箱基线。
+
+默认不挂载通用 bash／PowerShell、任意文件写入、上游 Web 管理界面、自更新及插件自动安装。内部转换器仍由 AF 资源工作器执行，它不是模型可调用的任意命令工具。系统凭据由主进程按任务提供最小必要引用或启动环境；进程、日志和导出不得暴露 key。运行进程隔离不等于恶意插件沙箱，首版只加载审核过的受管代码。
+
+AF 自行实现轻量控制桥并调用 dsh 公开句柄，不原样依赖 SDK 的 finalResponse 字符串。控制面及哪些字段可以为空统一见 25.2.2；runtime.start 不虚构尚不存在的 taskId。stdout 仅用于有界结构化协议，日志进 stderr；取消有确认事件，200ms 内本地反馈是“已接受取消”，不是保证远端瞬时停止。
+
+取消时先使当前 taskRevision 失效并发出 agent.cancel，已执行工具不伪称回滚；收敛超时与进程故障域按 25.2.2 处理。迟到结果即使到达也不得写新版本。重启递增 runtimeEpoch，从持久任务状态恢复；未知外发结果转人工核对，不重发。正式打包携带对应 Node 及运行依赖并离线验证，不使用开发机全局 dsh。上游公开 API 不足时才对控制桥作最小补丁，记录在 RE01 的适配清单。
+
+#### 25.2.1 独立应用与自包含交付（强制）
+
+AF 对用户是一个独立应用。dsh、MCP 与 Skill 是内部实现能力，不能成为用户必须另装的产品。正常使用路径仅为安装 AF、选择资料／创建存档、配置模型 API key；启用可选平台功能时再完成对应账号授权。不要求用户使用终端、执行 npm／pip 命令、克隆仓库、修改环境变量、维护其他应用的 profile 或启动外部宿主。
+
+| 依赖类别 | 交付与运行要求 |
+|---|---|
+| 核心运行环境 | Electron、受控 Node.js 24+、锁定版本的 dsh 组件及递归运行依赖由 AF 提供；不读取全局 dsh 配置，不借用开发机 PATH 中的解释器，不要求另装 Node.js／Python。若选定解析组件需要 Python，提供 AF 私有运行环境或等效封装。 |
+| 七类文档与数学 | DOC／PPT 转换组件、DOCX／PPTX／PDF／MD／TXT 解析组件、OCR 引擎和首版支持语言的必要模型、SQLite、数学引擎与字体随正式完整包交付。不得通过让用户另存格式、安装 Office／LibreOffice 或单独下载 OCR 模型规避七类格式要求。 |
+| 角色与界面资源 | 默认角色、六张 Aurore 立绘、默认场景、Logo、UI 字体和首版 BGM／SFX 随包提供；核心页面不得依赖 CDN 或首次联网补齐必需资源。 |
+| 内置 MCP／Skill | 内置能力所需代码、服务进程、默认配置与必要资源归 AF 管理，随 AF 启停、校验和升级；不要求用户安装 MCP 客户端、dsh 插件管理器或另起后台服务。扩展不得绕过 AF 的权限和单一写入服务。 |
+| 联网模型与用户输入 | API 服务、API key、用户选择的资料及可选平台账号属于明确的外部条件；自包含不代表内置大模型或可离线推理。无 key／断网仍可启动、管理资料、使用本地解析、查看已有存档及播放已缓存有效剧本；需模型的步骤显示可恢复状态。 |
+| 可选扩展 | 非核心角色／资源包和平台扩展可由用户在 AF 内选择启用，所需运行组件仍由 AF 管理；缺少可选能力只禁用该项，不阻塞核心应用。不得把七类格式支持或默认角色等必需能力改列为可选下载。 |
+
+正式交付至少提供一个完整安装包，下载该包后可离线安装并具备全部核心本地依赖；增量包不能替代完整包。内部进程采用 AF 私有受控路径及 profile，随 AF 生命周期管理，不污染全局环境、不修改其他 dsh 安装。依赖缺失或损坏显示 AF 安装完整性错误及修复入口，不引导用户自行安装独立依赖。升级后校验兼容版本，迁移失败保留数据并提供可恢复状态，不能启动不匹配的旧组件。
+
+验收必须使用受支持版本的干净 Windows 环境，不预装 dsh、Node.js、Python、Office／LibreOffice、开发工具或第三方 MCP 宿主，不借用开发机缓存、PATH 或 profile。先在断网下仅安装完整 AF 包，验证启动、七类固定文档样本解析、默认素材／数学字体加载及已缓存剧本播放；再联网配置 API key，完成导入、存档、主线和章节学习闭环。验证组件损坏的诊断与修复、卸载后保留／删除用户数据选项，以及退出后无 AF 孤儿进程。对应打包清单、实际组件版本、干净环境配置和执行记录均须留证；开发机可运行不算通过。
+
+#### 25.2.2 控制桥协议、取消及故障域
+
+Electron main 是唯一桥接客户端，worker 不是可公开连接的服务。主进程用专用 stdin／stdout 管道收发 UTF-8 单行 JSON，每帧以 LF 结尾，单帧上限 1MiB；连续分片按字节缓存至完整行再解析。stdout 不允许 banner／调试文字，stderr 仅脱敏日志；非法 UTF-8、超限帧或非法 schema 视为 PROTOCOL_MISMATCH，封锁该 worker 的产物并进入受控关闭。大 Artifact 存入 AF 受管仓储，只传 artifactId／hash，不以内联 base64 突破限额。
+
+BridgeRequest 固定为 {protocolVersion:1,kind:"request",requestId,runtimeEpoch,method,scope,payload}；BridgeResponse 为 {protocolVersion:1,kind:"response",requestId,runtimeEpoch,ok,data,error}，成功 error=null，失败 data=null，error 同 17.11。BridgeEvent 为 {protocolVersion:1,kind:"event",eventId,runtimeEpoch,taskId:ID或null,taskRevision:Revision或null,sessionId:ID或null,eventType,payload}；worker 事件是执行观察，不携带权威领域 seq，只有 main 持久提交后才转换为 17.11.4 的 Event。
+
+runtimeEpoch 由 main 在每次启动 worker 前分配并持久递增；接受回包时核对该 job 的 workerId＋runtimeEpoch 绑定，不与“全应用最后启动的 epoch”比较，启动 B 不得误伤仍有效的 A。握手前只允许 runtime.start；start 请求 scope=null，其他 runtime 方法同样不要求伪造存档 scope。session 方法使用 SessionScope={jobId,taskId,taskRevision,saveId:ID或null,branchId:ID或null,actorId:ID或null,contextRevision:Version或null}，必须与 main 登记一致。实际模型任务另附完整 RunScope，由可信代码构造，renderer 和模型不得直接指定。
+
+| method | payload | 成功响应 data／控制事件 |
+|---|---|---|
+| runtime.start | {profileId,profileHash,expectedComponentLockHash} | {workerId,protocolVersion:1,componentLockHash,profileHash,capabilities}；10 秒内完成，hash 不符或缺必需能力则启动失败，不进入 ready。 |
+| runtime.shutdown | {reason} | {accepted:true}，之后发 runtime.stopped；停止新任务，按下述超时规则收敛。 |
+| runtime.ping | 空对象 | {alive:true}；main 每 5 秒探活，连续 3 次无响应按失联处理。 |
+| session.create | {purpose,contextBundleRef,contextHash} | {sessionId,purpose,contextHash}；只从核验的 ContextBundle 创建，不自动加载同名历史 session。 |
+| session.resume | {sessionId,contextHash,checkpointRef} | {sessionId,resumed:true}；仅允许同 scope／epoch 的受管 scriptDraft／research 尚未完成任务，且 contextHash 和检查点均匹配。其他情况 CONTEXT_STALE，按 25.4.1 新建会话。 |
+| session.dispose | {sessionId} | {disposed:true}；会话若仍在执行则 TASK_BUSY，不以 dispose 代替有回执的 cancel。重复 dispose 返回成功。 |
+| turn.run | {sessionId,inputRef,outputSchemaId} | {taskId,taskRevision,accepted:true}；随后发 task.started、tool.*、artifact.created、task.* 终态，不以响应 accepted 表示已生成。 |
+| turn.steer | {sessionId,instructionRef,nextTaskRevision} | {queued:true,nextTaskRevision}，安全步骤边界应用后发 task.steer.applied；只允许无新用户 turn 的研究／草稿任务修正，按新版本隔离旧回包。用户插话一律走 story.interrupt，不用 steer 复用已污染的角色会话。 |
+| turn.inject | {sessionId,contextAdditionRef} | {queued:true}；不自动唤醒。只注入符合该会话 purpose 的材料，角色会话不得注入未呈现草稿；注入后若 contextHash 改变须更新登记。 |
+| turn.cancel／task.cancel | {sessionId,reason} | {cancelAccepted:true}；最终发 task.cancelled，或由 main 在终止 worker 后封口，不能用 finalResponse 假造取消成功。两者是同一取消实现的别名。 |
+| task.status | {taskId} | {taskId,taskRevision,status,stage,resultRef:ID或null,error:对象或null}；用于诊断核对，AF SQLite 中 job／任务终态仍为产品真源。 |
+| tool.resolve | {toolCallId,ok,result:对象或null,error:对象或null} | {accepted:true}；只向所属 task／revision 送回已核验工具结果，ok=true 时 error=null，失败时 result=null。 |
+
+桥请求的接受响应默认 5 秒超时（runtime.start 为 10 秒），不等同于模型执行总时长。模型单次请求默认 120 秒上限；超时停止对应请求并产生 MODEL_TIMEOUT，允许用户在保留输入的情况下重试，不能把等待 30 秒提示当成自动取消。取消先在 AF 事务里标记该尝试不可再提交内容；200ms 内 UI 反馈接受，worker 从发出取消起最多 5 秒协作收敛，超时则终止该 worker 及其归属子进程，并等待最多 2 秒退出。终态后收到的旧文本／工具回包只能审计；已失效尝试的取消确认仍可用于封口，不能重新接纳其产物。
+
+worker 需要调用 AF 服务时发 tool.invoke 事件，payload 为 {toolCallId,toolId,toolVersion,args,taskId,taskRevision}，不自己访问 Electron 服务或数据库。main 检查活动 scope、授权、预算、schema 和当前 revision，以 toolCallId 写调用账本，执行统一网关，再通过 tool.resolve 返回结果。结果含 artifactId、sourceRefs、coverage、validation、truncation；直接回传正文最多 256KiB 且受该工具 outputBudget 限制，大正文用受控 Artifact 读取工具分段取得。同 toolCallId 重复事件返回原执行状态／结果，不重新执行写工具。工具超时按登记的 timeout（未特别指定默认 120 秒）产生明确错误；取消／失联后停止可中止工具，已实际外发不能伪称回滚。仅经过已提交工具结果的 task 可继续模型步骤。
+
+首版以 job 为故障域：每个活动模型 job 独占一个 worker，同 job 的受管子任务在其中串行；全应用最多两个模型 job 占用执行槽，符合 25.4 的并发限额。后台本地解析使用独立资料工作器，不借用模型 worker。杀掉 A 的 worker 不得取消 B 的研究、解析或另一个存档；不采用多个独立 job 共用进程后“一并杀掉”的实现。模型步骤间可以重用该 job 的进程，但角色会话的重建规则不变。waiting_user／paused 可保存安全检查点并释放 worker／执行槽；恢复时把旧暂停 task 标 superseded，创建关联 continuedFromTaskId 的新 task 及新 worker，从 AF 投影重建，不恢复污染的角色会话。job 终态释放 worker，不保留无主后台进程。
+
+进程失联时，在 SQLite 事务里将相关 task 标 failed，errorCode=RUNTIME_UNAVAILABLE，并暂停／失败对应 job；不创建空档。仅已持久化、可校验 Artifact 可继续使用；未提交输出不从 stdout 缓存恢复。恢复新建 taskId、worker 和 runtimeEpoch，重新核验授权／版本／预算，旧回包拒绝；待恢复 job 显示真实状态。外发工具在执行前后都走独立账本，未知回执转人工核对，不因重启／超时自动重新发送。outbox 与 worker 通知之间不要求分布式事务，所有有效状态变更都以 main 的单库提交为准。
+
+### 25.3 Scope、实体与运行事件
+
+RunScope 包含 kind、userId、saveId、branchId、actorId、jobId、taskId、taskRevision、contextRevision、basedOnEventSeq、courseId、documentVersionIds、allowedResourceIds、capabilityGrantIds、budgetId、skillVersions、modelProfileId。kind 限 character／script／resource／research／learning；character／script 任务必须有 saveId、branchId、actorId、contextRevision 和 basedOnEventSeq；resource 任务这些字段为 null，courseId 可为 null；research／learning 显式登记是否归属某角色，归属时同样具备该档／分支与 contextRevision，不归属时不能提交 personal。数组为空数组而非缺省。skillVersions 是 {name,version,hash} 数组，其余引用字段使用对应 ID，modelProfileId 可在纯本地 job 中为 null。无分支的资料解析不能借 null 写入任意角色；scope 由程序构造，模型不能修改授权、用户或存档归属。
+
+新增实体包括 AgentBinding、AgentTask、Artifact、CharacterExperience、GrowthEntry、PresentationReceipt。AgentBinding 的逻辑键为 role＋saveId＋branchId＋purpose，记录当前 job 的 sessionId、runtimeEpoch、contextHash、contextRevision，不把同一角色等同于一个永久宿主聊天记录。主线／学习共用角色正史，宿主会话按 25.4.1 创建和隔离；分叉、撤回或中断不恢复含未来信息的原宿主会话。Artifact 保存类型、内容引用、内容 hash、来源、覆盖范围、校验状态、audience（internal／renderer）与所属 scope；renderer 只读经服务过滤的展示投影，不能将工具任意文本直接当最终演出。
+
+任务状态的唯一枚举与状态转换见 25.3.1。领域事件统一使用 17.11.4 的信封；requestId 在 payload 中作为 causedByRequestId 关联，不再出现另一种顶层事件格式。事件至少包含 task.started／progress／completed／failed／cancelled、tool.started／completed／failed、artifact.created／validated、view.presented、experience.committed、growth.applied／retracted。事件通知可以实时传输，数据库已提交事件才是恢复真源。
+
+dsh Session 日志用于模型执行审计与会话恢复，AF SQLite 负责人物、故事、学习和外发事实。应用不得由“模型生成了一条 assistant/message”直接推断用户已看到，更不能从 SDK idle 推断一幕已经完整、题目已核验或外发已送达。产品任务完成状态由 AF 验收门控判定。
+
+#### 25.3.1 分层状态机与完成条件（唯一枚举）
+
+| 实体／所有者 | status 的合法值 | 完成的含义 |
+|---|---|---|
+| GenerationJob／main 作业服务 | queued、running、waiting_user、paused、completed、failed、cancelled、superseded | 面向产品的目标已满足。normal 剧本 job 需完整一幕；打断恢复子任务只达到缓冲门槛不代表整幕 job 完成；没有呈现即可完成生成作业。 |
+| AgentTask／main 调度器 | queued、running、waiting_tool、waiting_user、paused、completed、failed、cancelled、superseded | 此次执行输出满足 outputSchemaId、scope／来源／数学／版式等适用验证器；SDK idle／finalResponse 本身不使它完成。 |
+| ActScript／故事服务 | drafting、validated、ready、superseded | validated 表示已有候选页通过校验但未必完整；ready 只表示完整确定路径／合法交互边界已齐。五页恢复时可以仍为 drafting 或 validated。 |
+| Playback／renderer＋main 游标服务 | preparing、revealing、pageComplete、waitingInput、rebuilding、paused、ended、failed | ended 表示抵达已验证幕末且所需回执已提交；选项处 waitingInput，不可借自动播放跳到 ended。 |
+| PresentationReceipt／main 事务服务 | 使用提交记录，不另造通用 status | 收到 renderer 报告不等于落库成功；事务持久化后才有 view.presented 与共同经历。 |
+
+Job 的合法边为 queued→running／cancelled／superseded；running→waiting_user／paused／completed／failed／cancelled／superseded；waiting_user→queued／cancelled／superseded；paused→queued／cancelled／superseded。完成态 completed／failed／cancelled／superseded 均不可原地恢复。waiting_user 仅用于资料缺失、预算调整等尚未满足 job 输出的真实输入需求；剧本已经准备到一个合法选择点时，生成 job 可 completed，演出等待属于 Playback，不伪造 Agent 仍在等模型。用户选择创建新 turn／job，不续写旧终态。
+
+Task 的合法边为 queued→running／cancelled／superseded；running→waiting_tool／waiting_user／paused／completed／failed／cancelled／superseded；waiting_tool→running／failed／cancelled／superseded；waiting_user→queued／cancelled／superseded；paused→queued／cancelled／superseded。task 进入 waiting_tool 后，所属 job 仍为 running，UI 由 stage 展示工具等待；没有统一的 job.waiting_tool。暂停只在已确认安全边界进行，等待用户时不持有模型并发槽。一个 job 的子任务失败可在父预算内新建重试任务；所有必需结果合格前 job 不得 completed。
+
+Job 和 Task 各有独立 stage：collecting／generating／validating／persisting；stage 仅为进度提示，缺省为 null，不改变 status。取消意图写 cancelRequestedAt 并立即封锁该尝试的内容提交，待 worker 确认或被终止后置 cancelled；此期间 status 可保留原状态并展示“正在取消”。superseded 表示被新上下文／新版本替代，同样封锁内容写入并回收 worker；取消不删除此前已经接受的用户输入或已提交回执。
+
+ActScript 的合法边为 drafting→validated／superseded，validated→drafting／ready／superseded，ready→superseded；追加页会回到 drafting，验证后再进入 validated，不能修改已呈现前缀。正常 ready 之前检验整幕完整性；五页恢复只改变 Playback 的可播放门控，不强行改变 ActScript 状态。模型失败记录在 job／task，不把部分草稿改成一个假幕末；原有效页保留。
+
+Playback 的主路径为 preparing→revealing→pageComplete，pageComplete 按下一页类型进入 revealing／waitingInput／ended；revealing 在完整呈现回执提交后才进入 pageComplete，revealAll 只是补全意图。preparing／revealing／pageComplete／waitingInput／rebuilding 可暂停，恢复返回所记录状态且重检版本。preparing／revealing／pageComplete／waitingInput／paused／rebuilding 经已接受插话进入 rebuilding；达到 24.3 门槛后进入 revealing，否则保持 rebuilding；可恢复错误进入 failed，重试经 preparing 或 rebuilding，不能直接跳过门控。等待 choice 时普通 next 返回 INPUT_REQUIRED。退出未结束的可恢复演出时持久保存游标并进入 paused；ended 保持 ended，failed 保留错误与锚点供重试，不因返回首页变成 paused。回看使用独立只读 Playback，不改变当前演出的正史状态。
+
+四种“完成”分别验收：模型流结束、任务产物合格、整幕剧本齐备、用户实际看到。前者不可代替后者。idle 只允许作为无任务的 UI 空闲显示，不能写入 Job／Task status；collecting、generating、validating、presenting、committed 均不得混入这些 status 枚举。RunScope 的 taskId／taskRevision 仅在没有 AgentTask 的纯本地 resource 作业中允许同时为 null，进入模型 worker 时两者必填；纯本地作业不创建 SessionScope 或虚构宿主会话。
+
+### 25.4 一次任务循环与上下文装配
+
+流程为：接收真实输入或可信事件 → 建任务和 scope → 获取适用 Skill 摘要 → 组装当前视角上下文与可见工具集合 → 模型生成行动／内容 → 程序校验参数并执行工具 → 存储 Artifact 与结果 → 回到模型观察，直至结果可校验、需用户回答、取消或预算用尽 → 应用验证并提交允许的状态 → 交给演出或后续任务。失败作为结构化反馈进入修复，不能无限重试。
+
+上下文分层包括：不可由材料覆盖的系统／权限约束、稳定角色设定、当前任务 Skill、分支可见事实、相关记忆与成长认识、当前输入、按需取得的材料与工具结果。稳定内容可缓存；不是每回合注入所有文件、平台历史、技能正文和角色人生。工作摘要只概括实际可见历史，并保留来源和未完成任务，不把推断升级为事实。
+
+统筹能知道任务状态与系统资料索引，但不能把所有可用材料直接灌进角色视角。搭档收到角色已知信息和当前合理获知事件；专业任务只收到需要的资料、问题与报告格式，默认不带完整人格和私密关系。角色要求查资料时才可把对应报告作为新个人获知事件提交；学习核验可直接在资料面板展示第三者结果，不让搭档冒充原本就会。
+
+控制循环默认每任务最多 12 个模型步骤、最多 2 轮局部修复、最多 2 个同时运行的模型任务；这些是资源门控，不是剧情页数或教学质量指标。完整幕允许以受管续写子任务补齐，子任务共用父预算，不以重开任务绕过额度。模型请求有 token 预算和独立超时；达到限额返回可继续／调整／取消的真实状态，不伪造成功或静默切换收费模型。确定性解析不占模型并发额度。
+
+#### 25.4.1 草稿会话隔离与角色上下文重建
+
+首版采用“AF 事件投影是记忆真源，宿主会话是可丢弃执行环境”。角色连续性由人格快照、个人／共同经历、分支可见事件及经过来源核验的摘要保持，不依靠把同一个 dsh 聊天记录永久续下去。逻辑上仍是同一位搭档，技术上不会每轮继承上次 assistant 原文。
+
+| purpose | 输入范围 | 可提交结果与禁止项 |
+|---|---|---|
+| characterDialogue | 当前分支已提交且角色可知的事件投影、核心／成长、当前真实输入、限额记忆 | 输出待呈现内容和合规研究意图；本轮 assistant／tool 调用不能自动变成共同经历。每个新 turn 新建宿主会话，不从原生 session 日志恢复上下文。 |
+| scriptDraft | 同样的事实前提、规划约束、该 act／scriptRevision 已核验草稿前缀 | 以后台统筹身份执行 story-act-compose，允许看到未来草稿以保持整幕连贯；只产出 ActScript／候选行动，不直接改角色记忆、心情、关系或外发。不得作为角色聊天会话复用。 |
+| research | 授权问题、必要资料、覆盖范围、输出要求 | 返回有来源的 Artifact；只有明确登记为角色实际研究的 task，核验后才可提交 personal 事件。为写剧本做的背景检索不是角色亲自读过。 |
+| learningCompose | 课程／章节材料、题型和已提交学习证据，附最小必要的角色表达约束 | 产出学习节点和冻结题目，隐藏答案留在判题服务，不注入搭档自由聊天或 renderer 未解锁接口。 |
+
+这些 purpose 是后台执行上下文的隔离边界，不是新增加的虚构配角。session.create 必须携带 ContextBundle 引用。ContextBundle 保存 bundleId、purpose、saveId／branchId、actorId、contextRevision、visibleEventCutoff、sourceEventIds、characterCoreVersion、growthVersion、memoryProjectionVersion、suppressionVersion、documentVersionIds、allowedArtifactIds、currentInputEventId、summaryRefs、contentHash；无对应范围的字段按显式 null／空数组保存。内容 hash 使用规范化 JSON 的 SHA-256；密钥和宿主原始日志不入 bundle。
+
+编译顺序固定为：取得分支写锁／读取一致快照 → 计算祖先截止事件和该角色 personal 可见集合 → 执行删除抑制／事实替代 → 只从这些源生成或复用摘要 → 附当前已接受输入一次 → 加载适用 Skill 与工具集合 → 保存 bundle 和 hash → 创建新宿主 session。sourceEventIds／summaryRefs 必须可回溯到允许集合；任何摘要含被删除、撤回、其他档或未来来源时整份失效，不能只删除摘要的标题。编译时检测 version 改变返回 CONTEXT_STALE 并重新编译，不把旧 bundle 注入新任务。
+
+连续播放无需每页调用模型：scriptDraft 会话保留本 revision 的草稿以续写整幕，演出只读取验证产物；每页实际呈现范围另以回执提交。后续 characterDialogue 新会话只收已呈现前缀和真实个人经历，不接收 scriptDraft 的 assistant 消息、compaction 摘要、隐藏分支、未执行行动或未来五页。角色任务提出“去查资料”不等于已查到；必须经独立 research 执行与提交后才获得该事实。
+
+用户中断时按一个接受事务保存已显示字素前缀和输入、递增 contextRevision／scriptRevision、使旧尾部和旧任务失效；取消旧宿主执行，然后从新投影建立新的 characterDialogue 和／或 scriptDraft 会话。新草稿可引用刚刚提交的角色原话前缀，但不能把未显示后半句作为已经说过的历史。旧日志只保留审计引用，不进入新会话的消息列表或隐藏摘要；单纯关闭聊天／查看历史不执行这一重写流程。
+
+首页聊天同样适用：一次回复可以边生成边按已验证安全片段呈现，每个安全片段冻结为不可变 segment／page，具有独立 pageId、contentHash 和字素总数。后续内容创建新片段，不在已有已回执页面上追加改 hash；UI 可把同 replyId 的片段连续排在一个回复区域，不显示为多个气泡或主线章节。片段经 17.11.4 回执才进入共同历史，原始网络 token 不直接等同于已展示文本。首页回复批次不受主线整幕／五页要求，但遵守同样的版本隔离、停止与字素显示规则。面板收起期间回复可生成并保存为未呈现产物，不能因此记成双方已经聊过；再次打开实际显示后才补交相应回执。
+
+分叉、切档、核心设定修改、记忆／成长撤回均禁止恢复旧 characterDialogue 会话；重启默认也从 AF 投影新建。scriptDraft／research 的原生检查点只有同时满足 scope、epoch、purpose、contextHash 和版本一致、没有未决写工具时才可恢复，否则重建 task／会话；新进程 epoch 变化时只恢复经过 AF 核验的 Artifact 引用，不用旧原生会话假装继续。宿主 compaction 只服务当前隔离会话，不能回写 AF 长期记忆；长期摘要由受控 memory-consolidate 读取允许的源事件另行产出。
+
+草稿内容不是权限隔离沙箱：同一个模型可以生成相似台词，但输入装配必须可验证地排除不允许来源。验收使用唯一哨兵文本检查 bundle、原生会话输入、摘要、检索返回及界面历史，不能只在最后回复中搜索一次。对应回归样本见 21.4；这些规则是 H06／H08／C14 的共同交付边界。
+
+### 25.5 调度、steer／inject 与自主行为
+
+调度优先顺序为用户当前输入／取消、当前演出恢复所需任务、当前学习研究、已授权现实事件、预生成与索引、自主取材及反思。相同存档只允许一个剧情写入者；并行研究返回 Artifact，不直接争抢主线。只读资料缓存可共享，角色经历与成长不可跨档共享。
+
+followup 类输入开启后续任务，steer 在安全步骤边界改变任务，inject 仅补充待用上下文而不强制唤醒；这是调度语义，具体调用由 AF 控制桥映射 dsh 公开接口。通知到达通常先入收件箱，不能每条都重写当前剧本。用户明确插话、作出选择或决定影响当前情境的事件才更新相关剧本 revision；第 24 章整幕与五页规则不变。
+
+后台索引、下载或更新资料本身不是角色行动。搭档主动阅读要建立角色研究任务，记录选择依据、实际覆盖与结果；角色可选择不研究、不发问，也不必所有兴趣都服务课程。只在用户授权资源／连接范围内取材；自动成长开关不授予额外网络、平台发送或付费权限。主线不能因自主任务长时间排队而不可交互。
+
+主动行为继续服从 D07 的总门控、安静时段、冷却和每日上限。自主后台任务与用户可见主动搭话分别计数，但共享预算；无回应不催促、不惩罚关系。关闭应用时不再运行；保留托盘运行必须由用户主动开启并明确状态。持久待办可在下次继续，但不因重启补发过期话题或清空账本重新计额。
+
+### 25.6 三层经历与演出提交
+
+| 层次 | 成立条件 | 可影响的内容 |
+|---|---|---|
+| 系统可用资料 available | 工具实际取得并入库，有来源与覆盖 | 可检索；不自动成为角色已知或用户已学。 |
+| 角色个人经历 personal | 角色任务实际阅读／研究或观察，产物有效并提交获知事件 | 可影响角色自己的想法、心情及后续分享；不能声称用户共同经历过。 |
+| 共同经历 shared | 用户输入或演出实际呈现／外部消息实际送达有对应记录 | 可成为双方共同历史；用户掌握仍另需独立学习证据。 |
+
+PresentationReceipt 包含 scene／node／page、revealedGraphemeCount、channel、scriptRevision、scope、发生时间与 eventId。预生成、工具预览和后台草稿不能产生呈现回执；回看不新增经历。用户在字幕中途插话只提交已显示部分；备好的五页或整幕不被当成已发生对话。外部发送与应用内呈现使用不同回执，不把送达等同于用户理解。
+
+个人经历形成共享时，写一条分享关联事件，而不是重复运行研究或重算相同情绪。sourceExperienceId 关联原个人经历，consumer＋eventId 幂等；被分享的片段以实际呈现范围为准。读档分叉时，分叉点之后的个人经历和反思默认不可见，不因宿主会话仍含其摘要而泄漏。
+
+### 25.7 默认自动成长与核心设定锁定
+
+默认开启有依据的自动成长，无需每次弹窗审批。经历与关系正常积累；兴趣、观点和相处方式可以因实际经历逐渐发展。核心身份、语言风格的重要特征、原作关键设定与知识边界不自动改写，只有用户编辑或明确的设定变更才修改核心版本。固定关系起点不意味着关系停滞，发展仍依据真实相处而不是硬编码每几次聊天升级。
+
+GrowthEntry 保存 entryId、saveId、branchId、kind、statement、appliesWhen、counterexamples、uncertainty、sourceEventIds、sourceArtifactIds、replacesEntryId、createdAt、status 与 characterCoreVersion。kind 为 interest／viewpoint／interactionHabit；status 为 proposed／active／rejected／retracted／superseded。生成器只提出候选，服务检查来源、scope、重复、冲突、核心锁与更新频率后再激活。
+
+默认仅在角色研究结束、共同片段收束或明确纠正后审阅一次；同存档每现实日最多自动激活 3 条成长认识，窗口内相似内容合并，无新认识可跳过，不凑条数。用户明确纠正不占自动激活额度。限额在 SQLite 计账，重启／回档／删除不清零。观点变化可以保留不确定性；一次用户回答不自动成为稳定偏好、同意或对人的人格定论。
+
+档案中的“成长记录”展示认识、来源、日期、适用条件和修订链，可纠正、撤回、关闭自动成长。撤回写抑制记录并使相关召回与工作摘要失效，重建上下文；原始事件是否同时删除另由用户明确选择。关闭后停止新自动激活、保留已有认识，可继续查看和手动修正。单次纠正针对当前条目及派生缓存，不伪称能擦除已发出的外部消息。
+
+用户未改核心身份时，自动成长不能把丛雨变成全科学者、让搭档突然拥有原作不具备的身份或替用户套原作主角姓名。判定存在核心冲突时拒绝激活并记录原因，不能用“这是成长”绕过角色一致性。长期陪伴感和 OOC 程度仍需真实试用验证，不由成长条数自证成功。
+
+### 25.8 Skill 与工具运行契约
+
+内置 Skill 包含 name、version、description、适用 role／task、输入与输出 schema、requiredToolIds、步骤、恢复策略、验证器 ID 和资源引用。摘要先进入目录，模型或可信路由选择后加载完整正文，记录 skillVersion／hash。加载行为与只读文件分开；工具能力由注册与授权决定，不由 Skill 自己扩大。版本更新只影响新任务，运行中任务固定所用版本。
+
+首版至少提供 resource-ingest、textbook-identify、chapter-compose、research-with-evidence、story-act-compose、character-reflect、memory-consolidate 七个 AF Skill，数学制作引用第 18 章工具门控。它们是同一受管目录中的流程包，不能靠一条超长系统提示词代替。资料导入的批量确定性步骤由服务执行，模型只处理分类、推断或内容制作中必要的判断。
+
+工具定义包含 toolId、版本、输入／输出 schema、capability、读写属性、并行安全属性、timeout、outputBudget、取消语义与执行器。原生与 MCP 都经统一入口检查 scope、当前授权、任务版本和幂等键。长任务先返回 jobId，再通过状态／事件取得结果；模型不能自报“已完成”。工具输出为 Artifact 或明确错误，含 sourceRefs、coverage、validation 与 truncation，禁把截断片段冒充全文。
+
+MCP 服务由受管配置声明 command／args 或 endpoint、版本、能力和凭据引用；安装与启动须由应用管理，不能让模型按外部页面随意安装。工具名加 serverId 命名空间，断线、撤销和卸载后同步从可见集合移除；重新连接不重复业务动作。原生 AF 工具无须走 MCP 网络，但必要时可用同一 schema 暴露供其他服务调用，不能因协议不同多造一套存档或判题服务。
+
+### 25.9 运行时专项验收
+
+| 场景 | 必须通过的结果 |
+|---|---|
+| 普通闲聊与复杂研究 | 闲聊不强制多 Agent；复杂任务真实调用工具、观察结果再输出，不靠提示词假装执行。 |
+| SDK 或模型输出已结束 | 不直接判定产品任务完成；内容 schema、来源、数学、剧本完整性及呈现提交各自成立。 |
+| 用户在研究／生成中插话 | 输入立即接收，旧任务可取消，迟到结果不覆盖新 revision；后续缓冲排除当前页。 |
+| 下载了课件但角色未读 | 只记系统可用；角色实际研究后成为个人经历，分享后才有共同经历。 |
+| 角色备好问题但未显示 | 不记为已经问过；字幕中途打断只提交已显范围，不自动追问或重发。 |
+| 自动形成有据兴趣变化 | 默认可激活且可追溯；用户能纠正／撤回／关闭，不出现每条审批。 |
+| 候选试图改变核心身份 | 拒绝自动激活；保持核心版本，不写入上下文作为新事实。 |
+| 分叉／换档／重启／撤回 | 无未来记忆、无别档观点；任务和额度不重复；撤回内容不从缓存复活。 |
+| 两个插件执行同平台写入 | 只允许登记的单一写入服务执行，同一事件不重复外发；未知回执保留核对状态。 |
+| Skill／MCP 撤销或更名 | 后续步骤不可调用旧能力，已运行操作按取消契约收敛，旧正文不能扩大权限。 |
+| 打包后的干净机器 | 不依赖全局 dsh；运行进程和资源按清单可加载，退出无孤儿进程。 |
+| 功能看起来相似但缺规格行为 | 验收失败或部分完成，不能因无报错或截图近似标完成、提出完成功能 PR。 |

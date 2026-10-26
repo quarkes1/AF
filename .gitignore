@@ -2,6 +2,7 @@
 node_modules/
 /build/
 /tmp/
+/scripts/docs/
 /coverage/
 .cache/
 .venv/
