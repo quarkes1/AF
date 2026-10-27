@@ -1,0 +1,30 @@
+/* Local font resources. Layout, sizes and colours remain defined by the spec. */
+@font-face {
+  font-family: "Source Han Sans SC";
+  src: url("./source-han-sans/SourceHanSansSC-VF.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 250 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("./inter/InterVariable.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("./inter/InterVariable-Italic.woff2") format("woff2");
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+/* Latin/digits use Inter; Chinese falls back to the bundled Source Han Sans. */
+:root {
+  --af-font-ui: "Inter", "Source Han Sans SC", sans-serif;
+  --af-font-dialogue: "Inter", "Source Han Sans SC", sans-serif;
+}

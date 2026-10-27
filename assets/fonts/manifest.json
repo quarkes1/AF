@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "createdOn": "2026-10-27",
+  "status": "ready",
+  "css": "fonts.css",
+  "families": [
+    {
+      "id": "font.ui.cjk",
+      "family": "Source Han Sans SC",
+      "upstreamFamily": "Source Han Sans SC VF",
+      "version": "2.005",
+      "file": "source-han-sans/SourceHanSansSC-VF.ttf",
+      "format": "truetype",
+      "weights": [
+        250,
+        900
+      ],
+      "uiWeights": {
+        "body": 400,
+        "control": 500,
+        "heading": 700
+      },
+      "style": "normal",
+      "license": "OFL-1.1",
+      "licenseFile": "source-han-sans/OFL.txt",
+      "sha256": "68f866374d8ff04d2103c5b2907f1cab2dbec91ac0fb6ad0b801c6db0c1faa80"
+    },
+    {
+      "id": "font.ui.latin",
+      "family": "Inter",
+      "version": "4.1",
+      "file": "inter/InterVariable.woff2",
+      "format": "woff2",
+      "weights": [
+        100,
+        900
+      ],
+      "style": "normal",
+      "license": "OFL-1.1",
+      "licenseFile": "inter/OFL.txt",
+      "sha256": "693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3"
+    },
+    {
+      "id": "font.ui.latin.italic",
+      "family": "Inter",
+      "version": "4.1",
+      "file": "inter/InterVariable-Italic.woff2",
+      "format": "woff2",
+      "weights": [
+        100,
+        900
+      ],
+      "style": "italic",
+      "license": "OFL-1.1",
+      "licenseFile": "inter/OFL.txt",
+      "sha256": "e564f652916db6c139570fefb9524a77c4d48f30c92928de9db19b6b5c7a262a"
+    }
+  ],
+  "math": {
+    "engine": "KaTeX",
+    "requiredEngineVersion": "0.19.1",
+    "stylesheet": "katex/katex.min.css",
+    "fontDirectory": "katex/fonts",
+    "fontLicense": "OFL-1.1",
+    "fontLicenseFile": "katex/OFL.txt",
+    "fontNotices": "katex/font-notices.json",
+    "stylesheetLicense": "MIT",
+    "stylesheetLicenseFile": "katex/LICENSE",
+    "formats": [
+      "woff2",
+      "woff",
+      "ttf"
+    ],
+    "unmodified": true
+  },
+  "integrationNotes": [
+    "Load fonts.css locally; no CDN or dependence on installed system fonts.",
+    "Use font weights 400/500/700; avoid synthetic bold.",
+    "Wait for document.fonts.ready and verify the named FontFace before visual comparisons.",
+    "Import the math stylesheet only with the matching KaTeX engine; do not replace its font families with the UI font."
+  ],
+  "sourceRecords": "sources.json"
+}

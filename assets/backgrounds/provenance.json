@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "createdOn": "2026-10-27",
+  "tool": "built-in image_gen",
+  "records": [
+    {
+      "id": "background.library-hall-day",
+      "generationId": "exec-7c665a12-dc46-4c57-950e-045da7038732",
+      "generatedOn": "2026-10-27",
+      "reference": "docs/assets/af-ui-v04/01-home-idle-review.png",
+      "sourceReferenceSha256": "8ade923be5ce09dd68a89abc51b0462fc3b0fc1ccf1e5823ad7e08e7835890f6",
+      "promptSummary": "从已审核首页还原独立图书馆走廊背景，移除人物、Logo、文字、面板及控件；保留书架、窗户、灰石地面、绿植、校园钟楼和原有视角。",
+      "sha256": "e3d35bbf5c64802a34838011b67448ba2a8fdc438bb6e5552f4cef9b92d76f9e",
+      "provenance": "Project-generated reconstruction from approved AF references; not a third-party image pack.",
+      "approvedOn": "2026-10-27",
+      "approvedBy": "user",
+      "status": "approved"
+    },
+    {
+      "id": "background.library-reading-room-day",
+      "generationId": "exec-cb63600d-5184-496b-9f46-2cad278c4a7b",
+      "generatedOn": "2026-10-27",
+      "reference": "docs/assets/af-ui-v03/02-story-new-beginning.png",
+      "sourceReferenceSha256": "56557035196ce010bdd55c2562adf32db71cf7acec7284356ec7974c2ba3dfdf",
+      "promptSummary": "从已审核主线演出图还原独立阅览室背景，移除搭档、对白框和所有UI文字；保留左侧书架、右侧书桌与落地窗、日光和原场景透视，供独立立绘叠加。",
+      "sha256": "6a3cfc8c2d8fc6fc1c4d1c41c9cb39f2f18351719ede52a58bea5c62a1f648c0",
+      "provenance": "Project-generated reconstruction from approved AF references; not a third-party image pack.",
+      "approvedOn": "2026-10-27",
+      "approvedBy": "user",
+      "status": "approved"
+    },
+    {
+      "id": "background.campus-courtyard-day",
+      "generationId": "exec-24dd4439-607b-4545-836a-49c04e54c965",
+      "generatedOn": "2026-10-27",
+      "reference": "docs/assets/af-ui-v04/01-home-idle-review.png",
+      "sourceReferenceSha256": "8ade923be5ce09dd68a89abc51b0462fc3b0fc1ccf1e5823ad7e08e7835890f6",
+      "promptSummary": "还原首页继续故事卡中的校园庭院独立插画：浅色教学楼、右侧钟楼、绿树、石质步道和日间暖光；移除卡片、渐变、文字、人物和UI，左侧留出可叠加正文的相对安静区域。",
+      "sha256": "a29680e7b33775e3f74388956b89a8f0a6bdeb6a8776c7f2223ca54688a20006",
+      "provenance": "Project-generated reconstruction from approved AF references; not a third-party image pack.",
+      "approvedOn": "2026-10-27",
+      "approvedBy": "user",
+      "status": "approved"
+    },
+    {
+      "id": "background.sipailou-classroom-day",
+      "generationId": "exec-00713656-82fc-4403-9797-bc53695db519",
+      "generatedOn": "2026-10-27",
+      "reference": "assets/backgrounds/library-reading-room-day.png",
+      "sourceReferenceSha256": "6a3cfc8c2d8fc6fc1c4d1c41c9cb39f2f18351719ede52a58bea5c62a1f648c0",
+      "externalReferences": [
+        {
+          "pageUrl": "https://zwc.seu.edu.cn/_t3170/2023/0921/c4296a466345/pagem.psp",
+          "imageUrl": "https://zwc.seu.edu.cn/_upload/article/images/20/55/a77b22134cb3a8a988bc141a5a04/cf8f3bf0-9cb8-4ea8-9314-7b79578315e3_d.jpg",
+          "sha256": "8c37b58a5155b5bec8114f78c795986a32636d9040c97a0e71e54bfdc5cba66f",
+          "use": "Architectural reference only; original photo not included in shipped assets."
+        },
+        {
+          "pageUrl": "https://zwc.seu.edu.cn/_t3170/2023/0921/c4296a466345/pagem.psp",
+          "imageUrl": "https://zwc.seu.edu.cn/_upload/article/images/20/55/a77b22134cb3a8a988bc141a5a04/88eaeadf-9741-4c6a-9a9f-cc09a56d606b_d.jpg",
+          "sha256": "6ada49b8481e6dcc97bb8d8eb113b870e8d3b0393a9e4ad26250fe2fae2f3eb3",
+          "use": "Architectural reference only; original photo not included in shipped assets."
+        }
+      ],
+      "referenceAccuracy": "Photo-referenced teaching environment; not a claim of exact room-number reconstruction.",
+      "prompt": "Production asset: one single full-bleed landscape 16:9 visual-novel environment background, preferred 1920x1080 or the same 1672x941 framing as style reference. Image 1 is the APPROVED AF art-style reference ONLY, not a layout to copy: match its refined hand-painted anime environmental rendering, warm clear daytime sunlight, gently muted cream/gray/wood palette, calm fresh green foliage, subtle atmospheric depth, careful perspective, soft pale-blue sky when visible. Japanese visual novel / Blue Archive inspired high-end background painting, no live-action photographic texture. The remaining images are architectural/material references, not images to paste or reproduce as a photo. Paint a new scene without people. Background only, no characters, no silhouettes, no words or writing, no signs with legible text, no logos, no UI, no overlays, no borders, no watermark. Keep the lower quarter visually calm for a later dialogue overlay; leave an unobstructed foreground standing area for a separately composited character sprite. Keep the art visually consistent with approved AF backgrounds. Scene: a quiet empty Chinese university classroom inspired by Southeast University Sipailou campus's renovated Li Wenzheng teaching rooms. Image 2 supplies the front blackboard/teaching platform, cream white walls and dark brown wooden door; image 3 supplies the long medium-brown wood desks with gray metal frames and linked chair rows, pale tiled floor and tall aluminum-frame windows. Create a wide eye-level view from the rear-left aisle toward the front blackboard, with clear coherent desk rows receding to the front; tall daylight windows along the RIGHT side show leafy campus trees. At front a broad clean blank dark green/black chalkboard, a modest white-gray lectern on a shallow gray stone platform, simple ceiling lights, discreet projector. Keep the actual Chinese-university furniture language, not a Japanese high-school room, not a luxury lecture theatre. Blackboard completely blank, no formulas. Soft sunlight falls across desks and floor, the left/center foreground aisle gives room for a full-body sprite.",
+      "sha256": "b91fbf223529b0efd96714e0341ceec2a7d5de01903658d13223f1c5cf31521b",
+      "provenance": "Project-generated illustration using approved AF art style and cited campus photographs as references; original photographs remain outside shipped assets.",
+      "status": "approved",
+      "approvedOn": "2026-10-27",
+      "approvedBy": "user"
+    },
+    {
+      "id": "background.sipailou-teaching-corridor-day",
+      "generationId": "exec-880f048b-dd69-4df3-9c4b-d273b2cf6a85",
+      "generatedOn": "2026-10-27",
+      "reference": "assets/backgrounds/library-reading-room-day.png",
+      "sourceReferenceSha256": "6a3cfc8c2d8fc6fc1c4d1c41c9cb39f2f18351719ede52a58bea5c62a1f648c0",
+      "externalReferences": [
+        {
+          "pageUrl": "https://zwc.seu.edu.cn/_t3170/2023/0921/c4296a466345/pagem.psp",
+          "imageUrl": "https://zwc.seu.edu.cn/_upload/article/images/20/55/a77b22134cb3a8a988bc141a5a04/cf8f3bf0-9cb8-4ea8-9314-7b79578315e3_d.jpg",
+          "sha256": "8c37b58a5155b5bec8114f78c795986a32636d9040c97a0e71e54bfdc5cba66f",
+          "use": "Architectural reference only; original photo not included in shipped assets."
+        }
+      ],
+      "referenceAccuracy": "Campus-inspired corridor inferred from teaching-room materials; not an exact surveyed or photographed corridor.",
+      "prompt": "Production asset: one single full-bleed landscape 16:9 visual-novel environment background, preferred 1920x1080 or the same 1672x941 framing as style reference. Image 1 is the APPROVED AF art-style reference ONLY, not a layout to copy: match its refined hand-painted anime environmental rendering, warm clear daytime sunlight, gently muted cream/gray/wood palette, calm fresh green foliage, subtle atmospheric depth, careful perspective, soft pale-blue sky when visible. Japanese visual novel / Blue Archive inspired high-end background painting, no live-action photographic texture. The remaining images are architectural/material references, not images to paste or reproduce as a photo. Paint a new scene without people. Background only, no characters, no silhouettes, no words or writing, no signs with legible text, no logos, no UI, no overlays, no borders, no watermark. Keep the lower quarter visually calm for a later dialogue overlay; leave an unobstructed foreground standing area for a separately composited character sprite. Keep the art visually consistent with approved AF backgrounds. Scene: an original quiet teaching-building corridor inspired by Southeast University's Sipailou campus and the classroom materials in image 2. This is a plausible campus-inspired interior rather than a literal reconstruction of a particular corridor. Eye-level three-quarter perspective down a long spacious hallway: white/very light cream plaster walls, modest dark brown wooden classroom doors and narrow transom windows on LEFT, a long row of tall rectangular metal-frame windows on RIGHT revealing dense plane-tree foliage and glimpses of pale old campus buildings. Pale gray polished stone/terrazzo floor, simple white ceiling with understated rectangular lights, occasional restrained potted green plants near the far end. Warm midday sunlight makes long geometric window shadows across the floor; soft warm wooden door accents. No library shelves, no desks, no decorative arches, no hotel carpet, no excessive futuristic glass or sci-fi panels. The near left-center walkway remains clear for a character, bottom foreground is continuous clean floor. Blank door plaques if present.",
+      "sha256": "7219017329aeff911644b3d929bad6444023b5247ee21c9cdcc3da6e90e40fca",
+      "provenance": "Project-generated illustration using approved AF art style and cited campus photographs as references; original photographs remain outside shipped assets.",
+      "status": "approved",
+      "approvedOn": "2026-10-27",
+      "approvedBy": "user"
+    },
+    {
+      "id": "background.sipailou-auditorium-day",
+      "generationId": "exec-7acba401-6642-4a10-b633-fc767f7628f6",
+      "generatedOn": "2026-10-27",
+      "reference": "assets/backgrounds/library-reading-room-day.png",
+      "sourceReferenceSha256": "6a3cfc8c2d8fc6fc1c4d1c41c9cb39f2f18351719ede52a58bea5c62a1f648c0",
+      "externalReferences": [
+        {
+          "pageUrl": "https://mps.seu.edu.cn/2024/0809/c54993a499455/page.htm",
+          "imageUrl": "https://mps.seu.edu.cn/_upload/article/images/bc/0c/fe2a5400458fad42b3ee7be01bc4/45cbdd90-55ef-41ac-9aef-485a41fcea41.jpg",
+          "sha256": "5add89bf4dd664d2e632182fd6693b3b204a23c7185e20b2e7458dd04720bdec",
+          "use": "Architectural reference only; original photo not included in shipped assets."
+        },
+        {
+          "pageUrl": "https://tc.seu.edu.cn/cew2020/main.psp",
+          "imageUrl": "https://tc.seu.edu.cn/_upload/article/images/64/fa/e4f68b054a75926de5e8c77f0286/42bd7564-e6c5-4830-8ebc-1c0ae17fdea0.jpg",
+          "sha256": "330f5ebfb64045ca43bc328b73ce448ae845ec3054685b8e612923b744ab780c",
+          "use": "Architectural reference only; original photo not included in shipped assets."
+        }
+      ],
+      "referenceAccuracy": "Exterior architecture referenced from official SEU auditorium photographs; illustration adapts framing and season.",
+      "prompt": "Production asset: one single full-bleed landscape 16:9 visual-novel environment background, preferred 1920x1080 or the same 1672x941 framing as style reference. Image 1 is the APPROVED AF art-style reference ONLY, not a layout to copy: match its refined hand-painted anime environmental rendering, warm clear daytime sunlight, gently muted cream/gray/wood palette, calm fresh green foliage, subtle atmospheric depth, careful perspective, soft pale-blue sky when visible. Japanese visual novel / Blue Archive inspired high-end background painting, no live-action photographic texture. The remaining images are architectural/material references, not images to paste or reproduce as a photo. Paint a new scene without people. Background only, no characters, no silhouettes, no words or writing, no signs with legible text, no logos, no UI, no overlays, no borders, no watermark. Keep the lower quarter visually calm for a later dialogue overlay; leave an unobstructed foreground standing area for a separately composited character sprite. Keep the art visually consistent with approved AF backgrounds. Scene: Southeast University SIPAILOU CAMPUS GREAT AUDITORIUM (东南大学四牌楼大礼堂) exterior, recognizable from architectural references image 2 and image 3. Accurately retain its low broad segmented patinated COPPER-GREEN dome with a small red-brown octagonal glazed lantern, restrained low triangular classical pediment, gray-beige stone neoclassical front, tall slender Ionic columns across a two-storey portico above the ground-floor entrance, symmetrical wings and mature plane trees. Do NOT replace it with a tall Capitol dome, a clocktower, church steeple or fantasy academy. Wide eye-level view from the landscaped paved foreground near the reflecting fountain, the auditorium occupies upper center/right and is not cropped; a strip of pale stone paving across the near foreground allows a standing character, reflective blue-green fountain water in middle ground, calm mature plane trees frame both sides. Preserve the auditorium's real architectural proportions and character, while interpreting photo winter trees as soft leafy late-spring/early-autumn daytime to match the approved AF palette. Slight three-quarter front perspective, no people, no vehicles, no legible building inscriptions.",
+      "sha256": "90c994c10a45fff08b7c954cf4ced91e562ce8b08f23a20c7f8af8c1ccdd0695",
+      "provenance": "Project-generated illustration using approved AF art style and cited campus photographs as references; original photographs remain outside shipped assets.",
+      "status": "approved",
+      "approvedOn": "2026-10-27",
+      "approvedBy": "user"
+    },
+    {
+      "id": "background.sipailou-plane-tree-avenue-day",
+      "generationId": "exec-7e214113-645b-42b3-99a7-e2ac789fac26",
+      "generatedOn": "2026-10-27",
+      "reference": "assets/backgrounds/library-reading-room-day.png",
+      "sourceReferenceSha256": "6a3cfc8c2d8fc6fc1c4d1c41c9cb39f2f18351719ede52a58bea5c62a1f648c0",
+      "externalReferences": [
+        {
+          "pageUrl": "https://news.seu.edu.cn/2024/0730/c5485a499039/page.htm",
+          "imageUrl": "https://news.seu.edu.cn/_upload/article/images/b4/17/74edb3d34b5bb603f727b8ddcdb0/8b739693-402f-4be8-8ab0-8a817711233e.jpg",
+          "sha256": "874031275357c1878016d59cee8745d0f66f08a2da7517117198422e9fca7cde",
+          "use": "Architectural reference only; original photo not included in shipped assets."
+        }
+      ],
+      "referenceAccuracy": "Tree canopy and avenue structure referenced from official campus photo; scene redrawn with a quieter camera position.",
+      "prompt": "Production asset: one single full-bleed landscape 16:9 visual-novel environment background, preferred 1920x1080 or the same 1672x941 framing as style reference. Image 1 is the APPROVED AF art-style reference ONLY, not a layout to copy: match its refined hand-painted anime environmental rendering, warm clear daytime sunlight, gently muted cream/gray/wood palette, calm fresh green foliage, subtle atmospheric depth, careful perspective, soft pale-blue sky when visible. Japanese visual novel / Blue Archive inspired high-end background painting, no live-action photographic texture. The remaining images are architectural/material references, not images to paste or reproduce as a photo. Paint a new scene without people. Background only, no characters, no silhouettes, no words or writing, no signs with legible text, no logos, no UI, no overlays, no borders, no watermark. Keep the lower quarter visually calm for a later dialogue overlay; leave an unobstructed foreground standing area for a separately composited character sprite. Keep the art visually consistent with approved AF backgrounds. Scene: a peaceful broad plane-tree-lined avenue at Southeast University Sipailou campus in Nanjing, inspired by image 2. Keep its highly recognizable rows of mature French plane trees with mottled pale tan-gray bark and WHITE-PAINTED LOWER TRUNKS, interlocking leafy green branches forming a high arched canopy over a long straight quiet campus road, dappled patches of sunlight on gray paving, subtle narrow planted strips/stone curbs, glimpses of cream-gray historic academic buildings through greenery. A new eye-level composition from the edge of the pedestrian path looking toward a soft distant campus vanishing point, no need to invent a named landmark at the far end. Foreground path and left/center clear standing space for character dialogue; dense green leaves above and soft blue sky peeking through. Remove all people, cars, bicycles, temporary banners, lamp-post advertising, slogans and readable text. Gentle summer-to-early-autumn colors, no winter barrenness, no orange autumn exaggeration. Daily campus atmosphere, restrained detail, painterly clarity matching image 1.",
+      "sha256": "6fd5aab77726af615090c5dbce9cfa87dfcedeb64db68b54a7b730542c21fd83",
+      "provenance": "Project-generated illustration using approved AF art style and cited campus photographs as references; original photographs remain outside shipped assets.",
+      "status": "approved",
+      "approvedOn": "2026-10-27",
+      "approvedBy": "user"
+    }
+  ],
+  "updatedOn": "2026-10-27"
+}

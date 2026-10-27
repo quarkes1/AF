@@ -1,0 +1,16 @@
+# Resource hashes must remain stable across Windows, macOS and Linux checkouts.
+assets/**/*.svg text eol=lf
+assets/**/*.css text eol=lf
+assets/**/*.json text eol=lf
+assets/**/*.md text eol=lf
+
+# Preserve downloaded license bytes and font/image binaries verbatim.
+assets/**/*.txt -text
+assets/**/LICENSE -text
+assets/**/*.png binary
+assets/**/*.ttf binary
+assets/**/*.woff binary
+assets/**/*.woff2 binary
+assets/**/*.ogg binary
+assets/**/*.mid binary
+assets/**/*.mp3 binary
