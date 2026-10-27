@@ -2555,6 +2555,52 @@
       "file": "audio/brand/aurora-forge-02.mp3",
       "source": "audio/provenance.json#brand.startup.variant-02",
       "purpose": "brand.startup"
+    },
+    {
+      "id": "background.title-auditorium-dusk",
+      "file": "backgrounds/title-scene/auditorium-dusk.png",
+      "status": "approved",
+      "bytes": 2947715,
+      "sha256": "88dcb41c33e6bda9f2e9530984a5da25c6527de62f0ef8d470888c286f087861",
+      "kind": "background",
+      "width": 1672,
+      "height": 941,
+      "alpha": false,
+      "license": "LicenseRef-AF-Project-Art",
+      "source": "backgrounds/title-scene/manifest.json#background.title-auditorium-dusk",
+      "generatedOn": "2026-10-27",
+      "approvedBy": "user",
+      "approvedOn": "2026-10-27"
+    },
+    {
+      "id": "background.title-auditorium-night",
+      "file": "backgrounds/title-scene/auditorium-night.png",
+      "status": "approved",
+      "bytes": 2633824,
+      "sha256": "142c2c6dcd7729f07deea43d970eaa38fa9b072e369f5e7164e2c47a976dde2d",
+      "kind": "background",
+      "width": 1672,
+      "height": 941,
+      "alpha": false,
+      "license": "LicenseRef-AF-Project-Art",
+      "source": "backgrounds/title-scene/manifest.json#background.title-auditorium-night",
+      "generatedOn": "2026-10-27",
+      "approvedBy": "user",
+      "approvedOn": "2026-10-27"
+    },
+    {
+      "id": "texture.title-clouds",
+      "file": "backgrounds/title-scene/clouds.png",
+      "status": "approved",
+      "bytes": 883010,
+      "sha256": "8f6ea177168661383b3b733b79b7556cd6233d4d5fc4e2b49abcf7a8fb0d145d",
+      "kind": "texture",
+      "width": 1672,
+      "height": 941,
+      "alpha": true,
+      "license": "LicenseRef-AF-Project-Art",
+      "source": "backgrounds/title-scene/manifest.json#texture.title-clouds",
+      "generatedOn": "2026-10-27"
     }
   ],
   "pageBindings": {

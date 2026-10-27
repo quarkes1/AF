@@ -1,6 +1,7 @@
 # Dependencies and generated output
 node_modules/
 /build/
+/config/build/
 /tmp/
 /scripts/docs/
 /coverage/
@@ -26,5 +27,11 @@ __pycache__/
 *.swp
 .DS_Store
 Thumbs.db
+
+# Rejected music candidates and their source scores stay local.
+/assets/audio/bgm/a-new-beginning.ogg
+/assets/audio/bgm/a-place-beside-you.ogg
+/assets/audio/bgm/notes-in-the-afternoon.ogg
+/assets/audio/scores/
 
 # Keep final documentation, assets, configuration and package-manager lockfiles.

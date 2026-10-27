@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "status": "approved",
+  "sourceDayImage": "backgrounds/sipailou-auditorium-day.png",
+  "sourceDaySha256": "90c994c10a45fff08b7c954cf4ced91e562ce8b08f23a20c7f8af8c1ccdd0695",
+  "reviewCommand": "npm run title:review -- day|dusk|night",
+  "scope": "Title-scene art review only; no user approval inferred from successful generation or animation.",
+  "records": [
+    {
+      "id": "background.title-auditorium-dusk",
+      "file": "backgrounds/title-scene/auditorium-dusk.png",
+      "status": "approved",
+      "bytes": 2947715,
+      "sha256": "88dcb41c33e6bda9f2e9530984a5da25c6527de62f0ef8d470888c286f087861",
+      "kind": "background",
+      "width": 1672,
+      "height": 941,
+      "alpha": false,
+      "license": "LicenseRef-AF-Project-Art",
+      "source": "backgrounds/title-scene/manifest.json#background.title-auditorium-dusk",
+      "generatedOn": "2026-10-27",
+      "tool": "built-in image_gen",
+      "prompt": "Use case: lighting-weather. Edit target: the attached approved AF anime campus illustration. Produce ONE full-bleed background with EXACTLY the same framing, camera, architecture, trees, pool, basin, pavement, fountain and proportions as the source. This is a registered time-of-day variant for a layered animated game title screen, NOT a new composition. Change ONLY the illumination and sky to late dusk: warm amber low sun from left, rose-peach to muted blue sky, gentle warm rim light on leaves, cooler soft shadows on the stone courtyard, realistic warm/cool reflections in the pool. Keep the existing hand-painted Japanese visual-novel background aesthetic and the original image aspect ratio 1672:941. No people, no new objects, no text, no UI, no logos. Every roof corner, tree trunk, window frame and pool edge must remain aligned to the original. Do not zoom, crop, pan, redesign the building or alter the camera. Windows mostly unlit; very restrained warm light in a few windows may be starting. High quality illustration, subtle and calm.",
+      "approvedBy": "user",
+      "approvedOn": "2026-10-27"
+    },
+    {
+      "id": "background.title-auditorium-night",
+      "file": "backgrounds/title-scene/auditorium-night.png",
+      "status": "approved",
+      "bytes": 2633824,
+      "sha256": "142c2c6dcd7729f07deea43d970eaa38fa9b072e369f5e7164e2c47a976dde2d",
+      "kind": "background",
+      "width": 1672,
+      "height": 941,
+      "alpha": false,
+      "license": "LicenseRef-AF-Project-Art",
+      "source": "backgrounds/title-scene/manifest.json#background.title-auditorium-night",
+      "generatedOn": "2026-10-27",
+      "tool": "built-in image_gen",
+      "prompt": "Use case: precise-object-edit. Edit target: this exact night campus illustration. Change ONLY the interior illumination of the small octagonal lantern/cupola above the green dome, the ring of high windows at the very top of the central auditorium. ALL of those TOP CUPOLA WINDOWS MUST BE DARK / UNLIT, cool dark blue glass with only faint ambient night reflections. Remove their yellow light and any small local yellow glow caused by them. Keep the window frames, cupola shape, dome, antenna, camera, every building and tree position, foreground, pool, stars, original 1672:941 image aspect ratio, and all other elements absolutely unchanged. The lower main facade's existing sparse warm yellow windows and doorway lamps should remain as they are. Do not turn off the lower windows. Do not add new lights, outlines, objects, text, logo, arrows or markings. Preserve the same high-quality hand-painted visual-novel illustration. This is a localized lighting correction, not a new composition.",
+      "correction": "All high cupola/lantern windows above the dome remain unlit, per user correction. Window-light layer must exclude this region.",
+      "approvedBy": "user",
+      "approvedOn": "2026-10-27"
+    },
+    {
+      "id": "texture.title-clouds",
+      "file": "backgrounds/title-scene/clouds.png",
+      "status": "approved",
+      "bytes": 883010,
+      "sha256": "8f6ea177168661383b3b733b79b7556cd6233d4d5fc4e2b49abcf7a8fb0d145d",
+      "kind": "texture",
+      "width": 1672,
+      "height": 941,
+      "alpha": true,
+      "license": "LicenseRef-AF-Project-Art",
+      "source": "backgrounds/title-scene/manifest.json#texture.title-clouds",
+      "generatedOn": "2026-10-27",
+      "tool": "built-in image_gen",
+      "prompt": "Use case: background-extraction. Asset type: standalone transparent cloud overlay texture for a refined hand-painted Japanese visual-novel campus title screen. Generate one wide landscape canvas, approximately 16:9, with a few sparse delicate elongated wisps of high cirrus / thin soft cumulus clouds across the upper-middle portion. Soft warm-white and pale cool gray cloud strands, airy painted edges fading naturally to alpha, uneven natural gaps, no dense white wall, no hard outlines. Keep the lower half mostly empty transparent space. This is an atmospheric overlay to drift slowly over an existing sky, so the background MUST be actual transparent alpha: no blue sky, no ground, no architecture, no text, no UI, no checkerboard pattern, no opaque backdrop. Calm, realistic cloud structure rendered as an elegant anime background painting. Do not include a sun, moon or stars."
+    }
+  ],
+  "staticSceneApproval": {
+    "status": "approved",
+    "approvedBy": "user",
+    "approvedOn": "2026-10-27",
+    "scope": "Day, dusk and corrected night static appearance only; cloud texture and animation quality are not included."
+  },
+  "animationReview": {
+    "status": "approved",
+    "approvedBy": "user",
+    "approvedOn": "2026-10-27",
+    "scope": "Current stronger canopy and water motion with faster cloud drift; retain the accepted appearance and timing."
+  }
+}

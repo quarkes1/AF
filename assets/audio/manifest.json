@@ -884,7 +884,7 @@
     "selectionStatus": "confirmed",
     "loop": false,
     "scope": "Randomly choose one of the two brand pronunciation recordings each application launch and play it once when the splash logo appears. This is brand audio, not character voice.",
-    "implementationStatus": "Asset configuration only; splash animation and playback not implemented by this update.",
+    "implementationStatus": "Implemented in the frontend startup preview: random one-shot brand audio, cancellation, mute and silent failure. Complete application/release acceptance not claimed.",
     "selectionMode": "random-one-per-application-launch",
     "equalProbability": true,
     "probabilities": {
@@ -894,6 +894,7 @@
     "selectionConfirmedBy": "user",
     "selectionConfirmedOn": "2026-10-27",
     "playbackTrigger": "splash-logo-visible",
-    "maxPlaysPerApplicationLaunch": 1
+    "maxPlaysPerApplicationLaunch": 1,
+    "homeMusicHandoff": "Home BGM starts at the title/waiting screen, and the same audio instance continues when entering home without another play() call."
   }
 }
