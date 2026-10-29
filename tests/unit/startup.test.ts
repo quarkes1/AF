@@ -3,7 +3,7 @@ import { StartupController, chooseStartupVariant } from '../../src/renderer/feat
 
 function setup(prepare = Promise.resolve(), muted = false) {
   vi.useFakeTimers()
-  const audio = { playBrand: vi.fn(), stopBrand: vi.fn(), startHome: vi.fn(), playConfirm: vi.fn(), setMuted: vi.fn(), dispose: vi.fn() }
+  const audio = { playBrand: vi.fn(), stopBrand: vi.fn(), startHome: vi.fn(), playConfirm: vi.fn(), playUi:vi.fn(), setMuted: vi.fn(), dispose: vi.fn() }
   const controller = new StartupController({ prepare: () => prepare, audio, random: () => 0.7, muted, reducedMotion: false })
   return { controller, audio }
 }
@@ -100,7 +100,7 @@ describe('one startup lifecycle', () => {
   })
   it('uses a short fade with reduced motion without changing recording selection', async () => {
     vi.useFakeTimers()
-    const audio = { playBrand: vi.fn(), stopBrand: vi.fn(), startHome: vi.fn(), playConfirm: vi.fn(), setMuted: vi.fn(), dispose: vi.fn() }
+    const audio = { playBrand: vi.fn(), stopBrand: vi.fn(), startHome: vi.fn(), playConfirm: vi.fn(), playUi:vi.fn(), setMuted: vi.fn(), dispose: vi.fn() }
     const c = new StartupController({prepare: () => Promise.resolve(), audio, random: () => .1, muted: false, reducedMotion: true})
     c.start();await vi.advanceTimersByTimeAsync(450);c.skip();await vi.advanceTimersByTimeAsync(120)
     expect(c.getSnapshot().phase).toBe('waiting');expect(audio.playBrand).toHaveBeenCalledExactlyOnceWith('brand.startup.variant-01')

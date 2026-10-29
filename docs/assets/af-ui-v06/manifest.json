@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "generatedOn": "2026-10-27",
+  "tool": "built-in image_gen",
+  "status": "approved",
+  "scope": "Current library, dossier and editor layouts approved by user; superseded library-v1 remains historical only.",
+  "references": [
+    "../af-ui-v04/01-home-idle-review.png",
+    "../../../assets/characters/aurore/sprites/01-neutral.png"
+  ],
+  "notes": [
+    "Character copy and identity values are illustrative, not confirmed canonical personality.",
+    "Existing character artwork and canonical design specification were not replaced.",
+    "User review precedes implementation and incorporation into the canonical specification."
+  ],
+  "records": [
+    {
+      "id": "UI-COMPANION-LIBRARY-01",
+      "name": "搭档库",
+      "status": "superseded",
+      "width": 1672,
+      "height": 941,
+      "sha256": "3f92e5033059627db202f09cbf3e2f184f39ae49fac7e2cc8d3c81d2da5fc01d",
+      "supersededBy": "UI-COMPANION-LIBRARY-02",
+      "historicalFile": "01-companion-library-review.png",
+      "retention": "Metadata only; superseded draft is not distributed."
+    },
+    {
+      "id": "UI-COMPANION-LIBRARY-02",
+      "name": "搭档库：仅保留姓名与属性",
+      "file": "01-companion-library-review-v2.png",
+      "status": "approved",
+      "width": 1672,
+      "height": 941,
+      "sha256": "32f7f461c8c437771a8b0efae1bd09a482fcae9c95d70b5ae6d4842ec6395044",
+      "replaces": "UI-COMPANION-LIBRARY-01",
+      "changes": [
+        "Remove descriptions from companion cards.",
+        "Enlarge companion names; retain attribute tags and management control."
+      ],
+      "approvedBy": "user",
+      "approvedOn": "2026-10-28",
+      "additionalRequirement": "Horizontal scrolling when companion count exceeds visible card capacity."
+    },
+    {
+      "id": "UI-COMPANION-DOSSIER-01",
+      "name": "搭档详情",
+      "file": "02-companion-dossier-review.png",
+      "status": "approved",
+      "width": 1672,
+      "height": 941,
+      "sha256": "e975b7ace97fca3f80fc16902e024a1255ab0be3d7159dde4df78885c58b5f2c",
+      "approvedBy": "user",
+      "approvedOn": "2026-10-27"
+    },
+    {
+      "id": "UI-COMPANION-EDITOR-01",
+      "name": "创建／编辑搭档",
+      "file": "03-companion-editor-review.png",
+      "status": "approved",
+      "width": 1672,
+      "height": 940,
+      "sha256": "78914e1e7548e4c7731fc02fc388b5bb9ad7b937b28553e8795107b7c6f1ad00",
+      "approvedBy": "user",
+      "approvedOn": "2026-10-27"
+    }
+  ]
+}

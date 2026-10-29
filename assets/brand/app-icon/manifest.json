@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "name": "Aurore application icon",
+  "status": "approved",
+  "approvedOn": "2026-10-28",
+  "description": "SD Aurore, wink and inward V-sign, raised elbow; user-approved final artwork.",
+  "source": "Built-in image_gen; original Aurore character art with user-provided style and pose references.",
+  "license": "LicenseRef-AF-Project-Art",
+  "role": "Application/window/taskbar/favicon artwork; AF wordmark remains unchanged.",
+  "icoSizes": [
+    16,
+    24,
+    32,
+    48,
+    64,
+    128,
+    256
+  ],
+  "files": [
+    {
+      "file": "aurore-source.png",
+      "bytes": 1801129,
+      "sha256": "66f1673a62bdbcff7dde9fdf4cefcb270651368214f0d3c63624688725b69c2d"
+    },
+    {
+      "file": "aurore-256.png",
+      "bytes": 117594,
+      "sha256": "444e6c80e9a87b41e149129bd21f2be9bff393ded3b975c577596bbc95684194"
+    },
+    {
+      "file": "aurore-32.png",
+      "bytes": 2845,
+      "sha256": "bb5b4030da0f3fd5c1bc8db5fafa4dc2cfafdc0776ed91a7b5d3e700c7a91dd3"
+    },
+    {
+      "file": "aurore.ico",
+      "bytes": 175291,
+      "sha256": "46642ef7245c237c42ca138c70de88c40e9f830fd7547054263e4c7f3f88258b"
+    }
+  ]
+}

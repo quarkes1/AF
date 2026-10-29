@@ -28,6 +28,7 @@ export async function prepareRendererAssets(repository, output, reviewIds = []) 
     ['assets/fonts/katex/OFL.txt','assets/fonts/katex/OFL.txt'],
     ['assets/fonts/katex/LICENSE','assets/fonts/katex/LICENSE'],
     ['assets/icons/LICENSE','assets/licenses/ICONS-LICENSE'],
+    ['assets/licenses/fflate-LICENSE','assets/licenses/fflate-LICENSE'],
     ['assets/audio/licenses/GeneralUser-GS-LICENSE.txt','assets/licenses/audio/GeneralUser-GS-LICENSE.txt'],
   ]
   for(const [source,file] of notices) {

@@ -9,12 +9,11 @@ export function TitleScene({resources,reducedMotion}:{resources:ResourceCatalog;
   const [scene,setScene]=useState<{current:TitlePeriod;previous:TitlePeriod|null}>(()=>({current:resolvePeriod(requested),previous:null}))
   const [playing,setPlaying]=useState(false)
   useEffect(()=>{
-    const media=window.matchMedia('(prefers-reduced-motion: reduce)')
-    const refresh=()=>{setPlaying(!reducedMotion&&!media.matches&&!document.hidden);setRequested(requestedTitlePeriod(new Date()))}
+    const refresh=()=>{setPlaying(!reducedMotion&&!document.hidden);setRequested(requestedTitlePeriod(new Date()))}
     refresh()
     const timer=setInterval(refresh,60000)
-    document.addEventListener('visibilitychange',refresh);window.addEventListener('focus',refresh);media.addEventListener('change',refresh)
-    return()=>{clearInterval(timer);document.removeEventListener('visibilitychange',refresh);window.removeEventListener('focus',refresh);media.removeEventListener('change',refresh)}
+    document.addEventListener('visibilitychange',refresh);window.addEventListener('focus',refresh)
+    return()=>{clearInterval(timer);document.removeEventListener('visibilitychange',refresh);window.removeEventListener('focus',refresh)}
   },[reducedMotion])
   useEffect(()=>{
     const period=resolvePeriod(requested)

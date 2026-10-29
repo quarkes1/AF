@@ -6,6 +6,7 @@ import { projectRoot, checkedResources } from '../scripts/check-assets.mjs'
 import { prepareRendererAssets } from '../scripts/prepare-assets.mjs'
 import titleReviewAssets from './title-review-assets.json'
 import { developmentAssets } from './dev-assets'
+import {pdfSupportFiles,copyPdfSupport} from './pdf-assets'
 
 export const preparedPublicDir = resolve(projectRoot, 'build/compiled/resources/ui')
 export function assetsPlugin(): Plugin {
@@ -17,8 +18,9 @@ export function assetsPlugin(): Plugin {
     },
     async configResolved(config) {
       const reviewIds=process.env.VITE_TITLE_ART_REVIEW==='1'?titleReviewAssets:[]
-      if(config.command==='serve')devResources=await checkedResources(projectRoot,reviewIds)
-      else await prepareRendererAssets(projectRoot,preparedPublicDir,reviewIds)
+      const pdfFiles=await pdfSupportFiles(projectRoot)
+      if(config.command==='serve')devResources=[...await checkedResources(projectRoot,reviewIds),...pdfFiles]
+      else {await prepareRendererAssets(projectRoot,preparedPublicDir,reviewIds);await copyPdfSupport(pdfFiles,preparedPublicDir)}
     },
     configureServer(server) {
       server.middlewares.use(developmentAssets(devResources))

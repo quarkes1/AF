@@ -26,7 +26,7 @@ researched dependency has already been installed or distributed.
 - Both upstream WOFF2 files are redistributed unmodified.
 - Exact retrieval URLs and SHA-256: `assets/fonts/sources.json`.
 
-## KaTeX 0.19.1 font and stylesheet resources
+## KaTeX 0.19.1 rendering engine, fonts and stylesheet
 
 - Stylesheet copyright: Khan Academy and other contributors. Font-binary
   notices identify Design Science, Inc. and Khan Academy.
@@ -39,11 +39,12 @@ researched dependency has already been installed or distributed.
   OpenType name records 13 and 14. The license and reserved font names are
   reproduced in `assets/fonts/katex/OFL.txt`; original embedded notices are
   preserved in `assets/fonts/katex/font-notices.json`.
-- The stylesheet and its complete TTF/WOFF/WOFF2 font set are redistributed
-  unmodified from the verified package archive. This asset preparation does
-  not install or claim to implement the KaTeX rendering engine. Future engine
-  integration must use this same version, or update the fonts and stylesheet
-  together with their source records.
+- The rendering engine is pinned to `katex@0.19.1` in the npm manifest and
+  lockfile under its MIT license. The stylesheet and complete TTF/WOFF/WOFF2
+  font set are redistributed unmodified from the matching verified archive.
+  Engine, stylesheet and font versions must be updated together. Rendering
+  a formula does not establish mathematical correctness or service-level
+  verification of generated teaching content.
 - Package integrity and per-file SHA-256: `assets/fonts/sources.json`.
 
 ## Project resources
@@ -111,3 +112,15 @@ not grant additional redistribution or relicensing rights.
 - Intended for a later splash-logo sequence, not character dialogue. The user selected equal-probability random playback of one
   variant per application launch at logo appearance; no runtime TTS dependency added.
 - Full records: `assets/audio/provenance.json#brandSpeech`.
+
+## PDF.js 6.4.299
+
+- Source: https://github.com/mozilla/pdf.js / npm `pdfjs-dist`, exact version locked.
+- License: Apache-2.0. Distributed license: `assets/vendor/pdfjs/LICENSE` in renderer output; includes required CMap and standard-font notices from the package.
+- Used for local PDF page rendering with its bundled worker and local font/CMap support files. No remote document upload or CDN dependency.
+
+## fflate 0.8.3
+
+- Source: https://github.com/101arrowz/fflate, exact version locked.
+- License: MIT; copy retained in `assets/licenses/fflate-LICENSE` and renderer distribution notices.
+- Used for bounded ZIP extraction of actual DOCX/PPTX text and images for content preview; not a substitute for full Office conversion or teaching ingestion.

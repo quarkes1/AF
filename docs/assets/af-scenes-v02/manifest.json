@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "generatedOn": "2026-10-29",
+  "tool": "built-in image_gen",
+  "status": "approved",
+  "styleReference": "assets/backgrounds/sipailou-teaching-corridor-day.png",
+  "notes": [
+    "Six independently generated visual-novel scene paintings; no character, UI or watermark.",
+    "Photographs are location/composition references; original downloaded reference photos are not runtime resources.",
+    "Current six scene versions approved by user on 2026-10-29 and copied to runtime assets; earlier versions remain superseded. Canonical design specification unchanged."
+  ],
+  "records": [
+    {
+      "id": "background.nanjing-metro-platform-day",
+      "label": "地铁站台",
+      "file": "01-metro-platform-day.png",
+      "status": "approved",
+      "generationId": "exec-8d44b986-0d22-450d-ba8b-1ef2f05ff9f8",
+      "width": 1672,
+      "height": 941,
+      "bytes": 2371899,
+      "sha256": "9ef38a63ddaccad3f4345b70faac9409f5032d8eeb52136028ab32ed160031ea",
+      "reference": "user-supplied platform screenshot",
+      "referencePage": null,
+      "approvedOn": "2026-10-29",
+      "approvedBy": "user",
+      "runtimeFile": "assets/backgrounds/nanjing-metro-platform-day.png"
+    },
+    {
+      "id": "background.riverside-lighthouse-dusk",
+      "label": "灯塔黄昏",
+      "file": "02-lighthouse-dusk.png",
+      "status": "approved",
+      "generationId": "exec-855ffe04-7708-4a90-92aa-6d2cdfe36501",
+      "width": 1672,
+      "height": 941,
+      "bytes": 2157070,
+      "sha256": "b65e3eb0873d1df62683ce96d3216b1df20ddf6666ee1ce39daaaace72a94dbc",
+      "reference": "user-supplied lighthouse sunset photograph",
+      "referencePage": null,
+      "approvedOn": "2026-10-29",
+      "approvedBy": "user",
+      "runtimeFile": "assets/backgrounds/riverside-lighthouse-dusk.png"
+    },
+    {
+      "id": "background.nanjing-jiming-temple-day",
+      "label": "鸡鸣寺",
+      "file": "03-jiming-temple-day.png",
+      "status": "approved",
+      "generationId": "exec-e94cfa95-357d-404f-a301-d6eb7ca8bacc",
+      "width": 1672,
+      "height": 941,
+      "bytes": 3301652,
+      "sha256": "31438c7ba418db01c6d079189bd385830b7de63df7101ad6f50e5a20be0525ca",
+      "reference": "location photo reference",
+      "referencePage": "https://www.e-yangming.com/articles/baike/20231204/121216.html",
+      "approvedOn": "2026-10-29",
+      "approvedBy": "user",
+      "runtimeFile": "assets/backgrounds/nanjing-jiming-temple-day.png"
+    },
+    {
+      "id": "background.nanjing-xuanwu-lake-day",
+      "label": "玄武湖·白天",
+      "file": "04-xuanwu-lake-day.png",
+      "status": "approved",
+      "generationId": "exec-a1c4d241-c867-4c17-844d-1749a1a23490",
+      "width": 1672,
+      "height": 941,
+      "bytes": 2937419,
+      "sha256": "e9cfea12d5b15fca72d8aa572897e3c4e25ac3310e71e6ae1bf0cd6c2e76b009",
+      "reference": "location photo reference",
+      "referencePage": "https://k.sina.cn/article_1618025001_60711a29001008r2d.html",
+      "approvedOn": "2026-10-29",
+      "approvedBy": "user",
+      "runtimeFile": "assets/backgrounds/nanjing-xuanwu-lake-day.png"
+    },
+    {
+      "id": "background.nanjing-qinhuai-river-night",
+      "label": "秦淮河·夜景",
+      "file": "05-qinhuai-river-night-v3.png",
+      "status": "approved",
+      "generationId": "exec-667dd85b-2c2b-406d-a8ca-c95f95ae43ee",
+      "width": 1672,
+      "height": 941,
+      "bytes": 2583128,
+      "sha256": "c8bcac309e9bfa32d05ba3a176cb3f890e21c9bc3d381f0f6f2e73f67fda751d",
+      "reference": "location photo reference",
+      "referencePage": "https://bbs.zol.com.cn/dcbbs/d167_418941.html",
+      "previousVersions": [
+        {
+          "sha256": "1a37b03f690c887e8d148f3e413601765c527a5233376b89eedfdd130cc4b22e",
+          "status": "superseded",
+          "historicalFile": "05-qinhuai-river-night.png",
+          "retention": "Metadata only; superseded draft is not distributed."
+        },
+        {
+          "sha256": "e2d11b88a1f7cc61f0fedab6f7bf83dd6808678eb89fbfc1780a1fe0674e4c28",
+          "status": "superseded",
+          "historicalFile": "05-qinhuai-river-night-v2.png",
+          "retention": "Metadata only; superseded draft is not distributed."
+        }
+      ],
+      "correction": "Airy Blue Archive-inspired anime repaint, restrained pastel amber lights, reduced saturation and contrast; preserve arched bridge viewpoint and architecture.",
+      "approvedOn": "2026-10-29",
+      "approvedBy": "user",
+      "runtimeFile": "assets/backgrounds/nanjing-qinhuai-river-night.png"
+    },
+    {
+      "id": "background.seu-liwenzheng-library-day",
+      "label": "李文正图书馆",
+      "file": "06-liwenzheng-library-day-v2.png",
+      "status": "approved",
+      "generationId": "exec-4c4fa723-76e8-4a6c-becd-b93dff8ee433",
+      "width": 1672,
+      "height": 941,
+      "bytes": 2630448,
+      "sha256": "4b57ec1b142221c77ae7cb6d09cde778fd93ef8b8979e31805b92c57919249b7",
+      "reference": "SEU official location photo reference",
+      "referencePage": "https://seuef.seu.edu.cn/1012/list.htm",
+      "previousVersions": [
+        {
+          "sha256": "7849e1dc14e03d4acc1ff11847c88e6843b894885fe8f3bdf46c6ba5678657f4",
+          "status": "superseded",
+          "historicalFile": "06-liwenzheng-library-day.png",
+          "retention": "Metadata only; superseded draft is not distributed."
+        }
+      ],
+      "correction": "Plaque corrected using official SEU entrance photograph; dark plaque and gold brush calligraphy, traditional text 李文正圖書館.",
+      "plaqueReference": "https://seuef.seu.edu.cn/_upload/article/e1/be/dbb117df4696ac9a2ce13849d158/5b67cf9a-e34b-4168-b520-d4626227dd02.jpg",
+      "approvedOn": "2026-10-29",
+      "approvedBy": "user",
+      "runtimeFile": "assets/backgrounds/seu-liwenzheng-library-day.png"
+    }
+  ]
+}

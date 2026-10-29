@@ -15,8 +15,6 @@ export function Splash({ state, controller, resources, onMute }: {
         <Icon name={state.muted ? 'volume-off' : 'volume'} resources={resources} />
         <span>{state.muted ? '声音已关闭' : '声音已开启'}</span>
       </button>
-      <span className="splash__hint" role="status">{state.phase === 'black' ? '正在准备本地内容…' : '空格 / Enter 跳过'}</span>
-      <button className="quiet-button splash__skip" onClick={() => controller.skip()} aria-label="跳过开屏">跳过 <Icon name="arrow-right" resources={resources} /></button>
     </footer>
   </section>
 }

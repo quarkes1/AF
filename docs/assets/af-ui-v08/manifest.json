@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "status": "approved",
+  "approvedOn": "2026-10-28",
+  "tool": "built-in image_gen",
+  "records": [
+    {
+      "id": "UI-MATERIALS-01",
+      "file": "01-materials-approved.png",
+      "state": "学习资料：已选中并展开详情"
+    },
+    {
+      "id": "UI-RESOURCES-01",
+      "file": "02-resources-approved.png",
+      "state": "应用资源／背景图：已选中并展开详情"
+    }
+  ],
+  "notes": [
+    "选择后详情向右展开，左侧分类和中间内容同步略左移；关闭时反向复位。",
+    "预览使用真实导入文件；参考图示例内容不能作为运行时预览底图。",
+    "界面遵循现有 AF 半透明深色面板、青色强调及切角规范。"
+  ]
+}

@@ -1,5 +1,8 @@
 export const STARTUP_VARIANTS = ['brand.startup.variant-01', 'brand.startup.variant-02'] as const
 export type BrandVariant = typeof STARTUP_VARIANTS[number]
+export type UiCue='press'|'confirm'|'back'
+import type {AudioPreferences} from '../../pages/settings/model'
+import {EMPTY_HOME_PLAYBACK,type HomePlayback} from '../../audio/home-playback'
 export type StartupPhase = 'black' | 'logo' | 'fadingOut' | 'waiting' | 'enteringHome' | 'home'
 export interface StartupSnapshot {
   phase: StartupPhase
@@ -14,7 +17,15 @@ export interface StartupAudio {
   stopBrand(): void
   startHome(): void
   playConfirm(): void
+  playUi(cue:UiCue):void
   setMuted(muted: boolean): void
+  configure?(preferences:AudioPreferences):void
+  setFocused?(focused:boolean):void
+  switchHome?(id:string):Promise<boolean>
+  getHomePlayback?:()=>HomePlayback
+  subscribeHome?:(listener:()=>void)=>()=>void
+  toggleHome?:()=>Promise<boolean>
+  seekHome?:(seconds:number)=>boolean
   dispose(): void
 }
 interface Options {
@@ -112,6 +123,18 @@ export class StartupController {
     this.options.audio.setMuted(muted)
     this.update({ muted })
   }
+  playUi(cue:UiCue='press') {
+    if(this.disposed||this.state.phase!=='home')return
+    try{this.options.audio.playUi(cue)}catch{/* Missing SFX never blocks the requested action. */}
+  }
+  setReducedMotion(reducedMotion:boolean){this.update({reducedMotion})}
+  configureAudio(preferences:AudioPreferences){this.options.audio.configure?.(preferences)}
+  setFocused(focused:boolean){this.options.audio.setFocused?.(focused)}
+  switchHomeMusic(id:string){return this.options.audio.switchHome?.(id)??Promise.resolve(false)}
+  getHomePlayback=()=>this.options.audio.getHomePlayback?.()??EMPTY_HOME_PLAYBACK
+  subscribeHome=(listener:()=>void)=>this.options.audio.subscribeHome?.(listener)??(()=>{})
+  toggleHomeMusic=()=>this.options.audio.toggleHome?.()??Promise.resolve(false)
+  seekHomeMusic=(seconds:number)=>this.options.audio.seekHome?.(seconds)??false
   dispose() {
     if (this.disposed) return
     this.disposed = true

@@ -1,13 +1,9 @@
 /** Frontend-review preferences only; not the product's future SQLite store. */
-const KEY = 'af.frontend-preview.preferences.v1'
-export interface PreviewPreferences { muted: boolean; reducedMotion: boolean }
+import {loadPreferences,savePreferences,type SettingsPreferences} from '../pages/settings/model'
+export type PreviewPreferences=SettingsPreferences
 export function readPreviewPreferences(): PreviewPreferences {
-  const systemReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  try {
-    const value = JSON.parse(localStorage.getItem(KEY) ?? '{}')
-    return { muted: value.muted === true, reducedMotion: systemReduced || value.reducedMotion === true }
-  } catch { return { muted: false, reducedMotion: systemReduced } }
+  return loadPreferences()
 }
-export function writePreviewPreferences(value: PreviewPreferences) {
-  try { localStorage.setItem(KEY, JSON.stringify(value)) } catch { /* A restricted preview can still run. */ }
+export function writePreviewPreferences(value: Partial<PreviewPreferences>) {
+  return savePreferences({...loadPreferences(),...value})
 }

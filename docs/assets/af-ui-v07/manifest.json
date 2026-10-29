@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "generatedOn": "2026-10-28",
+  "tool": "built-in image_gen",
+  "status": "approved",
+  "scope": "Approved compact homepage music-player layout; user approval 2026-10-28. Runtime character assets are unchanged.",
+  "records": [
+    {
+      "id": "UI-HOME-MUSIC-PLAYER-01",
+      "file": "01-home-music-player-review.png",
+      "status": "approved",
+      "layout": "Left: current track, previous/play-pause/next and progress. Right: vertical playlist. Lower-right chamfer matches home tiles."
+    },
+    {
+      "id": "UI-HOME-MUSIC-PLAYER-01-DRAFT",
+      "status": "superseded",
+      "supersededBy": "UI-HOME-MUSIC-PLAYER-01",
+      "historicalFile": "01-home-music-player-review-v1.png",
+      "retention": "Metadata only; superseded draft is not distributed."
+    }
+  ],
+  "notes": [
+    "Approval exception: remove leading music-note icons from playlist rows; the player panel itself participates in mouse parallax.",
+    "Static playback time is illustrative; actual implementation must use media duration and currentTime.",
+    "Keep home parallax, hover and press feedback enabled when the music player is open.",
+    "No canonical specification or runtime character image is replaced by this reference."
+  ]
+}

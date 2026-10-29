@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "bundleId": "af-ui-baseline",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "preparedOn": "2026-10-27",
   "specBaseline": "1.3",
   "statusMeaning": {
@@ -2601,6 +2601,117 @@
       "license": "LicenseRef-AF-Project-Art",
       "source": "backgrounds/title-scene/manifest.json#texture.title-clouds",
       "generatedOn": "2026-10-27"
+    },
+    {
+      "id": "brand.app-icon",
+      "kind": "brand",
+      "file": "brand/app-icon/aurore-256.png",
+      "status": "approved",
+      "approvedOn": "2026-10-28",
+      "bytes": 117594,
+      "sha256": "444e6c80e9a87b41e149129bd21f2be9bff393ded3b975c577596bbc95684194",
+      "source": "user-approved Aurore SD icon; raised elbow and inward V-sign",
+      "license": "LicenseRef-AF-Project-Art"
+    },
+    {
+      "id": "brand.favicon",
+      "kind": "brand",
+      "file": "brand/app-icon/aurore-32.png",
+      "status": "approved",
+      "approvedOn": "2026-10-28",
+      "bytes": 2845,
+      "sha256": "bb5b4030da0f3fd5c1bc8db5fafa4dc2cfafdc0776ed91a7b5d3e700c7a91dd3",
+      "source": "user-approved Aurore SD icon; raised elbow and inward V-sign",
+      "license": "LicenseRef-AF-Project-Art"
+    },
+    {
+      "id": "brand.app-icon.windows",
+      "kind": "brand",
+      "file": "brand/app-icon/aurore.ico",
+      "status": "approved",
+      "approvedOn": "2026-10-28",
+      "bytes": 175291,
+      "sha256": "46642ef7245c237c42ca138c70de88c40e9f830fd7547054263e4c7f3f88258b",
+      "source": "user-approved Aurore SD icon; raised elbow and inward V-sign",
+      "license": "LicenseRef-AF-Project-Art"
+    },
+    {
+      "id": "background.nanjing-metro-platform-day",
+      "kind": "background",
+      "file": "backgrounds/nanjing-metro-platform-day.png",
+      "status": "approved",
+      "bytes": 2371899,
+      "sha256": "9ef38a63ddaccad3f4345b70faac9409f5032d8eeb52136028ab32ed160031ea",
+      "source": "user-approved project-generated scene illustration",
+      "license": "LicenseRef-AF-Project-Art",
+      "width": 1672,
+      "height": 941,
+      "alpha": false
+    },
+    {
+      "id": "background.riverside-lighthouse-dusk",
+      "kind": "background",
+      "file": "backgrounds/riverside-lighthouse-dusk.png",
+      "status": "approved",
+      "bytes": 2157070,
+      "sha256": "b65e3eb0873d1df62683ce96d3216b1df20ddf6666ee1ce39daaaace72a94dbc",
+      "source": "user-approved project-generated scene illustration",
+      "license": "LicenseRef-AF-Project-Art",
+      "width": 1672,
+      "height": 941,
+      "alpha": false
+    },
+    {
+      "id": "background.nanjing-jiming-temple-day",
+      "kind": "background",
+      "file": "backgrounds/nanjing-jiming-temple-day.png",
+      "status": "approved",
+      "bytes": 3301652,
+      "sha256": "31438c7ba418db01c6d079189bd385830b7de63df7101ad6f50e5a20be0525ca",
+      "source": "user-approved project-generated scene illustration",
+      "license": "LicenseRef-AF-Project-Art",
+      "width": 1672,
+      "height": 941,
+      "alpha": false
+    },
+    {
+      "id": "background.nanjing-xuanwu-lake-day",
+      "kind": "background",
+      "file": "backgrounds/nanjing-xuanwu-lake-day.png",
+      "status": "approved",
+      "bytes": 2937419,
+      "sha256": "e9cfea12d5b15fca72d8aa572897e3c4e25ac3310e71e6ae1bf0cd6c2e76b009",
+      "source": "user-approved project-generated scene illustration",
+      "license": "LicenseRef-AF-Project-Art",
+      "width": 1672,
+      "height": 941,
+      "alpha": false
+    },
+    {
+      "id": "background.nanjing-qinhuai-river-night",
+      "kind": "background",
+      "file": "backgrounds/nanjing-qinhuai-river-night.png",
+      "status": "approved",
+      "bytes": 2583128,
+      "sha256": "c8bcac309e9bfa32d05ba3a176cb3f890e21c9bc3d381f0f6f2e73f67fda751d",
+      "source": "user-approved project-generated scene illustration",
+      "license": "LicenseRef-AF-Project-Art",
+      "width": 1672,
+      "height": 941,
+      "alpha": false
+    },
+    {
+      "id": "background.seu-liwenzheng-library-day",
+      "kind": "background",
+      "file": "backgrounds/seu-liwenzheng-library-day.png",
+      "status": "approved",
+      "bytes": 2630448,
+      "sha256": "4b57ec1b142221c77ae7cb6d09cde778fd93ef8b8979e31805b92c57919249b7",
+      "source": "user-approved project-generated scene illustration",
+      "license": "LicenseRef-AF-Project-Art",
+      "width": 1672,
+      "height": 941,
+      "alpha": false
     }
   ],
   "pageBindings": {

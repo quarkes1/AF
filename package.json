@@ -5,22 +5,34 @@
   "description": "Aurora Forge — 在互动中自然学习",
   "type": "module",
   "main": "build/compiled/main/index.js",
-  "engines": { "node": ">=24.0.0" },
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "scripts": {
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "preview": "electron-vite preview",
     "dev:browser": "vite --config config/vite.preview.ts",
     "title:review": "node scripts/title-review.mjs",
+    "save:review": "node scripts/save-review.mjs",
+    "learning:review": "node scripts/learning-review.mjs",
+    "companion:review": "node scripts/companion-review.mjs",
     "build:title-review": "node scripts/title-review.mjs --build",
     "test:title-review": "node scripts/test-title-review.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --config config/vitest.config.ts",
     "test:e2e": "playwright test --config config/playwright.config.ts",
     "check:assets": "node scripts/check-assets.mjs",
-    "check:boundaries": "node scripts/check-boundaries.mjs"
+    "check:boundaries": "node scripts/check-boundaries.mjs",
+    "assets:icons": "electron scripts/prepare-app-icons.cjs"
   },
-  "dependencies": { "react": "19.3.1", "react-dom": "19.3.1" },
+  "dependencies": {
+    "fflate": "0.8.3",
+    "katex": "0.19.1",
+    "pdfjs-dist": "6.4.299",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
   "devDependencies": {
     "@playwright/test": "1.64.1",
     "@types/node": "26.6.5",

@@ -10,7 +10,6 @@ export function useHomeParallax(enabled: boolean) {
     let frame=0
     let active=true
     let target={x:0,y:0}
-    const reduced=window.matchMedia('(prefers-reduced-motion: reduce)')
     const apply=()=>{
       frame=0
       if(!active)return
@@ -21,7 +20,7 @@ export function useHomeParallax(enabled: boolean) {
     reset()
     if(!enabled)return
     const move=(event:PointerEvent)=>{
-      if(event.pointerType!=='mouse' || reduced.matches)return
+      if(event.pointerType!=='mouse')return
       target=normalizeHomePointer(event.clientX,event.clientY,root.getBoundingClientRect())
       if(!frame)frame=requestAnimationFrame(apply)
     }
@@ -32,13 +31,12 @@ export function useHomeParallax(enabled: boolean) {
     window.addEventListener('blur',reset)
     window.addEventListener('resize',reset)
     document.addEventListener('visibilitychange',visibility)
-    reduced.addEventListener('change',reset)
     return ()=>{
       active=false;cancelAnimationFrame(frame)
       root.style.setProperty('--home-pointer-x','0');root.style.setProperty('--home-pointer-y','0')
       root.removeEventListener('pointermove',move);root.removeEventListener('pointerleave',reset);root.removeEventListener('pointercancel',reset)
       window.removeEventListener('blur',reset);window.removeEventListener('resize',reset)
-      document.removeEventListener('visibilitychange',visibility);reduced.removeEventListener('change',reset)
+      document.removeEventListener('visibilitychange',visibility)
     }
   },[enabled])
   return ref

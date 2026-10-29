@@ -141,7 +141,170 @@
       "status": "approved",
       "approvedOn": "2026-10-27",
       "approvedBy": "user"
+    },
+    {
+      "id": "background.nanjing-metro-platform-day",
+      "label": "地铁站台",
+      "generationId": "exec-8d44b986-0d22-450d-ba8b-1ef2f05ff9f8",
+      "width": 1672,
+      "height": 941,
+      "sha256": "9ef38a63ddaccad3f4345b70faac9409f5032d8eeb52136028ab32ed160031ea",
+      "file": "nanjing-metro-platform-day.png",
+      "status": "approved",
+      "approvedOn": "2026-10-29",
+      "approvedBy": "user",
+      "generatedOn": "2026-10-29",
+      "tool": "built-in image_gen",
+      "alpha": false,
+      "role": "home background, visual novel scene, Illustration library",
+      "reference": "docs/assets/af-scenes-v02/01-metro-platform-day.png",
+      "framing": {
+        "fit": "cover",
+        "position": "center center"
+      },
+      "provenance": "Project-generated anime environment painting; photographs used only as location/composition references, not shipped.",
+      "promptSummary": "Consistent AF anime visual-novel environment painting using the approved style and location reference."
+    },
+    {
+      "id": "background.riverside-lighthouse-dusk",
+      "label": "灯塔黄昏",
+      "generationId": "exec-855ffe04-7708-4a90-92aa-6d2cdfe36501",
+      "width": 1672,
+      "height": 941,
+      "sha256": "b65e3eb0873d1df62683ce96d3216b1df20ddf6666ee1ce39daaaace72a94dbc",
+      "file": "riverside-lighthouse-dusk.png",
+      "status": "approved",
+      "approvedOn": "2026-10-29",
+      "approvedBy": "user",
+      "generatedOn": "2026-10-29",
+      "tool": "built-in image_gen",
+      "alpha": false,
+      "role": "home background, visual novel scene, Illustration library",
+      "reference": "docs/assets/af-scenes-v02/02-lighthouse-dusk.png",
+      "framing": {
+        "fit": "cover",
+        "position": "center center"
+      },
+      "provenance": "Project-generated anime environment painting; photographs used only as location/composition references, not shipped.",
+      "promptSummary": "Consistent AF anime visual-novel environment painting using the approved style and location reference."
+    },
+    {
+      "id": "background.nanjing-jiming-temple-day",
+      "label": "鸡鸣寺",
+      "generationId": "exec-e94cfa95-357d-404f-a301-d6eb7ca8bacc",
+      "width": 1672,
+      "height": 941,
+      "sha256": "31438c7ba418db01c6d079189bd385830b7de63df7101ad6f50e5a20be0525ca",
+      "file": "nanjing-jiming-temple-day.png",
+      "status": "approved",
+      "approvedOn": "2026-10-29",
+      "approvedBy": "user",
+      "generatedOn": "2026-10-29",
+      "tool": "built-in image_gen",
+      "alpha": false,
+      "role": "home background, visual novel scene, Illustration library",
+      "reference": "docs/assets/af-scenes-v02/03-jiming-temple-day.png",
+      "framing": {
+        "fit": "cover",
+        "position": "center center"
+      },
+      "provenance": "Project-generated anime environment painting; photographs used only as location/composition references, not shipped.",
+      "promptSummary": "Consistent AF anime visual-novel environment painting using the approved style and location reference.",
+      "externalReferences": [
+        {
+          "pageUrl": "https://www.e-yangming.com/articles/baike/20231204/121216.html",
+          "use": "Location/composition reference only; original photograph not shipped."
+        }
+      ]
+    },
+    {
+      "id": "background.nanjing-xuanwu-lake-day",
+      "label": "玄武湖·白天",
+      "generationId": "exec-a1c4d241-c867-4c17-844d-1749a1a23490",
+      "width": 1672,
+      "height": 941,
+      "sha256": "e9cfea12d5b15fca72d8aa572897e3c4e25ac3310e71e6ae1bf0cd6c2e76b009",
+      "file": "nanjing-xuanwu-lake-day.png",
+      "status": "approved",
+      "approvedOn": "2026-10-29",
+      "approvedBy": "user",
+      "generatedOn": "2026-10-29",
+      "tool": "built-in image_gen",
+      "alpha": false,
+      "role": "home background, visual novel scene, Illustration library",
+      "reference": "docs/assets/af-scenes-v02/04-xuanwu-lake-day.png",
+      "framing": {
+        "fit": "cover",
+        "position": "center center"
+      },
+      "provenance": "Project-generated anime environment painting; photographs used only as location/composition references, not shipped.",
+      "promptSummary": "Consistent AF anime visual-novel environment painting using the approved style and location reference.",
+      "externalReferences": [
+        {
+          "pageUrl": "https://k.sina.cn/article_1618025001_60711a29001008r2d.html",
+          "use": "Location/composition reference only; original photograph not shipped."
+        }
+      ]
+    },
+    {
+      "id": "background.nanjing-qinhuai-river-night",
+      "label": "秦淮河·夜景",
+      "generationId": "exec-667dd85b-2c2b-406d-a8ca-c95f95ae43ee",
+      "width": 1672,
+      "height": 941,
+      "sha256": "c8bcac309e9bfa32d05ba3a176cb3f890e21c9bc3d381f0f6f2e73f67fda751d",
+      "file": "nanjing-qinhuai-river-night.png",
+      "status": "approved",
+      "approvedOn": "2026-10-29",
+      "approvedBy": "user",
+      "generatedOn": "2026-10-29",
+      "tool": "built-in image_gen",
+      "alpha": false,
+      "role": "home background, visual novel scene, Illustration library",
+      "reference": "docs/assets/af-scenes-v02/05-qinhuai-river-night-v3.png",
+      "framing": {
+        "fit": "cover",
+        "position": "center center"
+      },
+      "provenance": "Project-generated anime environment painting; photographs used only as location/composition references, not shipped.",
+      "promptSummary": "Airy Blue Archive-inspired anime repaint, restrained pastel amber lights, reduced saturation and contrast; preserve arched bridge viewpoint and architecture.",
+      "externalReferences": [
+        {
+          "pageUrl": "https://bbs.zol.com.cn/dcbbs/d167_418941.html",
+          "use": "Location/composition reference only; original photograph not shipped."
+        }
+      ]
+    },
+    {
+      "id": "background.seu-liwenzheng-library-day",
+      "label": "李文正图书馆",
+      "generationId": "exec-4c4fa723-76e8-4a6c-becd-b93dff8ee433",
+      "width": 1672,
+      "height": 941,
+      "sha256": "4b57ec1b142221c77ae7cb6d09cde778fd93ef8b8979e31805b92c57919249b7",
+      "file": "seu-liwenzheng-library-day.png",
+      "status": "approved",
+      "approvedOn": "2026-10-29",
+      "approvedBy": "user",
+      "generatedOn": "2026-10-29",
+      "tool": "built-in image_gen",
+      "alpha": false,
+      "role": "home background, visual novel scene, Illustration library",
+      "reference": "docs/assets/af-scenes-v02/06-liwenzheng-library-day-v2.png",
+      "framing": {
+        "fit": "cover",
+        "position": "center center"
+      },
+      "provenance": "Project-generated anime environment painting; photographs used only as location/composition references, not shipped.",
+      "promptSummary": "Plaque corrected using official SEU entrance photograph; dark plaque and gold brush calligraphy, traditional text 李文正圖書館.",
+      "externalReferences": [
+        {
+          "pageUrl": "https://seuef.seu.edu.cn/1012/list.htm",
+          "use": "Location/composition reference only; original photograph not shipped."
+        }
+      ],
+      "plaqueReference": "https://seuef.seu.edu.cn/_upload/article/e1/be/dbb117df4696ac9a2ce13849d158/5b67cf9a-e34b-4168-b520-d4626227dd02.jpg"
     }
   ],
-  "updatedOn": "2026-10-27"
+  "updatedOn": "2026-10-29"
 }
