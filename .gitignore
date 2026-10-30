@@ -35,3 +35,5 @@ Thumbs.db
 /assets/audio/scores/
 
 # Keep final documentation, assets, configuration and package-manager lockfiles.
+
+LOCALKEEP.md

@@ -4,9 +4,10 @@ import workerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 
 GlobalWorkerOptions.workerSrc=workerUrl
 
-export function PdfPreview({blob,onResult}:{blob:Blob;onResult:(error:string|null)=>void}){
+export function PdfPreview({blob,onResult,sourcePage}:{blob:Blob;onResult:(error:string|null)=>void;sourcePage?:number}){
   const [pdf,setPdf]=useState<PDFDocumentProxy|null>(null),[page,setPage]=useState(1),[error,setError]=useState<string|null>(null),[passwordNeeded,setPasswordNeeded]=useState(false),[password,setPassword]=useState(''),[rendered,setRendered]=useState(false),[renderedPage,setRenderedPage]=useState(0)
   const canvas=useRef<HTMLCanvasElement>(null),host=useRef<HTMLDivElement>(null),unlock=useRef<((value:string)=>void)|null>(null),renderTask=useRef<RenderTask|null>(null)
+  useEffect(()=>{if(pdf&&sourcePage)setPage(Math.min(pdf.numPages,Math.max(1,sourcePage)))},[pdf,sourcePage])
   useEffect(()=>{
     let active=true,task:PDFDocumentLoadingTask|undefined
     setPdf(null);setError(null);setPage(1);setPasswordNeeded(false);setPassword('');setRendered(false)

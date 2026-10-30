@@ -1,8 +1,12 @@
+import type {MaterialContentProfile} from '../../../shared/contracts/materials'
 export type LibraryKind='document'|'background'|'music'
 export interface LibraryItem{
   id:string;kind:LibraryKind;name:string;filename:string;extension:string;mime:string;size:number;blob:Blob
   addedAt:number;updatedAt:number;subject:string;textbook:string;chapter:string
   width?:number;height?:number;duration?:number;position:number
+  courseIds?:string[];manualOverride?:boolean;state?:string;error?:string|null;blocks?:number;classificationEvidence?:string[];stateVersion?:number
+  sourceVersion?:number;previousVersionId?:string
+  contentProfile?:MaterialContentProfile
 }
 export const DOCUMENT_EXTENSIONS=['doc','docx','ppt','pptx','pdf','md','txt']
 const supported={document:DOCUMENT_EXTENSIONS,background:['png','jpg','jpeg','webp'],music:['mp3','wav','ogg','flac','m4a']}

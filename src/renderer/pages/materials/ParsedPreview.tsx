@@ -1,0 +1,9 @@
+import {useEffect,useState} from 'react'
+import {BackendClient} from './backend-client'
+import type {ContentBlock} from '../../../shared/contracts/materials'
+export function ParsedPreview({id,revision}:{id:string;revision?:number}){
+ const [blocks,setBlocks]=useState<ContentBlock[]>([]),[images,setImages]=useState<Record<string,string>>({}),[page,setPage]=useState(1),[error,setError]=useState('')
+ useEffect(()=>{let active=true;const urls:string[]=[];const client=new BackendClient();void(async()=>{const result=await client.call<ContentBlock[]>('resource.blocks',{documentVersionId:id});if(!active)return;setBlocks(result);const values:Record<string,string>={};for(const block of result.filter(b=>b.imageId).slice(0,50)){const bytes=await client.call<Uint8Array>('resource.image',{documentVersionId:id,imageId:block.imageId});if(!active)return;const url=URL.createObjectURL(new Blob([new Uint8Array(bytes)]));urls.push(url);values[block.imageId!]=url}if(active)setImages(values)})().catch(reason=>{if(active)setError(reason instanceof Error?reason.message:'解析内容暂不可用。')});return()=>{active=false;urls.forEach(URL.revokeObjectURL)}},[id,revision])
+ const pages=[...new Set(blocks.map(b=>b.page))].sort((a,b)=>a-b)
+ return <div className="document-office">{error&&<p className="materials-error">{error}</p>}{!blocks.length&&!error&&<p>正在转换或解析原文件…</p>}{pages.length>1&&<div className="document-page-controls"><button aria-label="上一个解析页" disabled={page<=1} onClick={()=>setPage(p=>p-1)}>‹</button><span>{page} / {pages.length}</span><button aria-label="下一个解析页" disabled={page>=pages.length} onClick={()=>setPage(p=>p+1)}>›</button></div>}<article>{blocks.filter(b=>b.page===pages[page-1]).map(b=>b.kind==='image'?images[b.imageId!]&&<img key={b.id} src={images[b.imageId!]} alt="原文件图像"/>:b.kind==='heading'?<h3 key={b.id}>{b.text}</h3>:<p key={b.id} style={{whiteSpace:'pre-wrap'}}>{b.text}{b.quality==='review'&&<small>（需核对）</small>}</p>)}</article></div>
+}

@@ -26,3 +26,5 @@
 
 /* Reserve both scrollbars: PDF height must never change its available width. */
 .document-pdf__canvas,.materials-detail__scroll{scrollbar-gutter:stable}
+
+.materials-sources{flex:0 0 auto;max-height:35%;overflow:auto;padding:10px 16px;border-bottom:1px solid #bfccd744;font-size:.875rem;line-height:1.65}.materials-sources>summary{cursor:pointer;color:#dce6ef}.materials-sources>div{margin:8px 0}.materials-sources button{margin:4px;padding:6px 10px;background:#19233088;border:1px solid #afbecb88;clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,0 100%)}.materials-sources ul{max-height:180px;overflow:auto;padding-left:20px}.materials-field input[type=checkbox]{min-height:0;width:18px;align-self:flex-start}.materials-screen__tools{flex-wrap:wrap;justify-content:flex-end;min-width:0}.provider-settings>p{color:#c3cfda;line-height:1.65}.provider-settings a{color:var(--cyan)}

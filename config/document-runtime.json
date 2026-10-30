@@ -1,0 +1,24 @@
+{
+  "platform": "win32-x64",
+  "records": [
+    {
+      "id": "eng",
+      "source": "https://raw.githubusercontent.com/naptha/tessdata/gh-pages/4.0.0_fast/eng.traineddata.gz",
+      "bytes": 1984273,
+      "sha256": "18c1ac52b75e35d44735fb6c2a60acfaf23033524653200738e98f0243edb75b"
+    },
+    {
+      "id": "chi_sim",
+      "source": "https://raw.githubusercontent.com/naptha/tessdata/gh-pages/4.0.0_fast/chi_sim.traineddata.gz",
+      "bytes": 1730011,
+      "sha256": "3aa140069a09796b8cb8d3ccd0c052e8ed67f20cddb24b70ffa3344b3b94346b"
+    },
+    {
+      "id": "libreoffice",
+      "version": "26.2.6",
+      "source": "https://download.documentfoundation.org/libreoffice/stable/26.2.6/win/x86_64/LibreOffice_26.2.6_Win_x86-64.msi",
+      "bytes": 373252096,
+      "sha256": "f9877032fd908beb9c0ddf06df4af5c2e85f419c42e14876c4cce5aae5fb2660"
+    }
+  ]
+}

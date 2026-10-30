@@ -124,3 +124,13 @@ not grant additional redistribution or relicensing rights.
 - Source: https://github.com/101arrowz/fflate, exact version locked.
 - License: MIT; copy retained in `assets/licenses/fflate-LICENSE` and renderer distribution notices.
 - Used for bounded ZIP extraction of actual DOCX/PPTX text and images for content preview; not a substitute for full Office conversion or teaching ingestion.
+
+## Material backend and managed document runtime
+
+- DeepSeek Harness packages: npm `@deepseek-ai/dsh-*` 0.2.1-rc.3 and Cordis 4.0.5, MIT. Source: https://github.com/deepseek-ai/deepseek-harness . Exact tarball integrity is in package-lock.json; license retained as assets/licenses/deepseek-harness-MIT. AF uses the published agent-loop/tool runtime and Skill registry with per-task read-only capabilities. The published release executes native tools inside agent-loop; AF does not vendor a separate native executor or use an installed dsh application.
+- Zod 4.6.7: MIT. A consistent patched version is enforced through npm overrides for dsh dependencies.
+- `@xmldom/xmldom` 0.9.12: MIT; license retained in assets/licenses/xmldom-LICENSE. Used for inert XML parsing, with entity declarations rejected.
+- `@napi-rs/canvas` 1.0.13: MIT and upstream native rendering notices; retained license in assets/licenses/napi-rs-canvas-LICENSE. Native package notices remain with its runtime dependencies.
+- Tesseract.js 7.0.0 and tesseract.js-core: Apache-2.0. Licenses retained in assets/licenses/tesseract-js-LICENSE and tesseract-core-LICENSE. Source: https://github.com/naptha/tesseract.js . OCR language data sources and hashes are pinned in config/document-runtime.json, separate from project art licensing.
+- LibreOffice 26.2.6 Windows x64: MPL-2.0 / LGPL-v3+ and component-specific notices. Official distribution: https://www.libreoffice.org/ ; source: https://git.libreoffice.org/core/ . Its unmodified extracted LICENSE.html, license.txt and component notices remain in the managed runtime. The official installer SHA-256 is pinned and verified before extraction; binaries and downloads remain outside Git.
+- API protocol reference: https://api-docs.deepseek.com/api/create-chat-completion/ . No API credential is included in source or distributions.

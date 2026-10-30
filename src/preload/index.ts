@@ -1,3 +1,3 @@
-// Startup needs no privileged renderer API. Keep this bridge empty until a
-// typed, validated application command is implemented against spec 17.11.
-export {}
+import {contextBridge,ipcRenderer} from 'electron'
+import type {BackendRequest} from '../shared/contracts/materials'
+contextBridge.exposeInMainWorld('afMaterials',Object.freeze({request:(request:BackendRequest)=>ipcRenderer.invoke('af:materials',request)}))

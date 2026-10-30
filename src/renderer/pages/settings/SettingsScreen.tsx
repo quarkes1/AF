@@ -4,6 +4,7 @@ import {Icon} from '../../components/Icon'
 import {focusWhenVisible} from '../../components/focus'
 import {DEFAULT_PREFERENCES,SETTINGS_SECTIONS,type SettingsPreferences,type SettingsSection} from './model'
 import './settings.css'
+import {ProviderSettings} from './ProviderSettings'
 
 function Row({title,description,children,scope='全局'}:{title:string;description?:string;children:ReactNode;scope?:string}){
   return <div className="settings-row"><div className="settings-row__label"><h3>{title}<small>{scope}</small></h3>{description&&<p>{description}</p>}</div><div className="settings-row__control">{children}</div></div>
@@ -90,11 +91,13 @@ export function SettingsScreen({open,resources,preferences:p,onChange,onBack,onC
       </section>
       <section id="settings-model" className="settings-section" aria-label="模型与预算">
         {heading('model','配置模型服务与消耗边界；本地存储不等于本地推理。')}
-        <Unavailable>模型调用与安全凭据保管尚未接入，暂不接收或保存真实 API Key。</Unavailable>
+        {typeof window!=='undefined'&&window.afMaterials?<ProviderSettings/>:<>
+        <Unavailable>浏览器预览不提供模型调用与安全凭据保管，请使用桌面应用。</Unavailable>
         <Row title="模型服务"><select aria-label="模型服务" disabled defaultValue="deepseek"><option value="deepseek">DeepSeek</option><option value="custom">其他兼容服务</option></select></Row>
         <Row title="API Key" description="正式接入后由安全凭据服务保管，不写入日志或导出包。"><input type="password" aria-label="API Key" placeholder="安全凭据服务未接入" autoComplete="off" disabled/></Row>
         <Row title="主模型" description="预设配置；连接后仍需测试实际能力。"><input aria-label="主模型" defaultValue="deepseek-flash" disabled/><button className="save-secondary" disabled>测试连接</button></Row>
         <Row title="自定义服务地址"><input aria-label="自定义服务地址" placeholder="其他服务的 Base URL" disabled/></Row>
+        </>}
         <Row title="用量与预算" description="费用以实际用量或明确的估算区间显示。"><span>暂无调用记录</span><input aria-label="消耗上限" placeholder="消耗上限 · 未接入" disabled/></Row>
         <details className="settings-details"><summary>高级：扩展能力与工具权限</summary><p>MCP、Skill 和模型工具由 AF 统一管理。正式接入后可检查能力状态、启停与权限；用户无需另外安装 dsh 或独立宿主。</p><button className="save-secondary" disabled>管理扩展能力</button></details>
       </section>

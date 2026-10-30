@@ -1,7 +1,9 @@
 import type {LibraryItem} from './model'
+import {NativeMaterialStorage} from './backend-client'
 
 // User-selected file copies only. No access to arbitrary filesystem paths.
 export class LibraryStorage{
+  readonly native=typeof window!=='undefined'&&window.afMaterials?new NativeMaterialStorage():null
   private database?:Promise<IDBDatabase>
   private open(){
     return this.database??=new Promise<IDBDatabase>((resolve,reject)=>{
@@ -13,11 +15,19 @@ export class LibraryStorage{
     })
   }
   async all():Promise<LibraryItem[]>{
+    if(this.native){
+      const old=await this.legacyAll()
+      for(const item of old){const migrated=await this.native.put(item);if(migrated.id!==item.id)for(const key of ['af.frontend-preview.home-background.v1','af.frontend-preview.home-music.v1'])try{if(localStorage.getItem(key)===item.id)localStorage.setItem(key,migrated.id)}catch{/* The migrated copy remains available even if a preference is blocked. */}await this.write(store=>store.delete(item.id))}
+      return this.native.all()
+    }
+    return this.legacyAll()
+  }
+  private async legacyAll():Promise<LibraryItem[]>{
     const database=await this.open()
     return new Promise((resolve,reject)=>{const transaction=database.transaction('items','readonly'),request=transaction.objectStore('items').getAll();request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(new Error('无法读取本地资源库。'))})
   }
-  async put(item:LibraryItem){return this.write(store=>store.put(item))}
-  async remove(id:string){return this.write(store=>store.delete(id))}
+  async put(item:LibraryItem):Promise<LibraryItem|void>{if(this.native)return this.native.put(item);await this.write(store=>store.put(item));return item}
+  async remove(id:string,deleteCopy=false){if(this.native)return this.native.remove(id,deleteCopy);return this.write(store=>store.delete(id))}
   private async write(action:(store:IDBObjectStore)=>void){
     const database=await this.open()
     return new Promise<void>((resolve,reject)=>{

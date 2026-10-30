@@ -1,12 +1,14 @@
 import {lazy,Suspense,useEffect,useState,useCallback} from 'react'
 import {decodeText,type LibraryItem} from './model'
 import {readOffice,type OfficeContent} from './office-preview'
+import {ParsedPreview} from './ParsedPreview'
 
 const PdfPreview=lazy(()=>import('./PdfPreview').then(module=>({default:module.PdfPreview})))
 
-export function DocumentPreview({item,retry,encoding,onResult}:{item:LibraryItem;retry:number;encoding:string;onResult:(id:string,error:string|null)=>void}){
+export function DocumentPreview({item,retry,encoding,onResult,sourcePage}:{item:LibraryItem;retry:number;encoding:string;onResult:(id:string,error:string|null)=>void;sourcePage?:number}){
   const [text,setText]=useState(''),[office,setOffice]=useState<OfficeContent|null>(null),[images,setImages]=useState<string[]>([]),[error,setError]=useState<string|null>(null),[busy,setBusy]=useState(false),[page,setPage]=useState(0)
   const legacy=['doc','ppt'].includes(item.extension)
+  useEffect(()=>{if(sourcePage)setPage(Math.max(0,sourcePage-1))},[sourcePage])
   const reportPdf=useCallback((message:string|null)=>onResult(item.id,message),[item.id,onResult])
   useEffect(()=>{
     let active=true;const urls:string[]=[]
@@ -26,8 +28,9 @@ export function DocumentPreview({item,retry,encoding,onResult}:{item:LibraryItem
     }).catch(reason=>{if(active){const message=reason instanceof Error?reason.message:'内容无法预览。';setError(message);onResult(item.id,message)}}).finally(()=>{if(active)setBusy(false)})
     return()=>{active=false;urls.forEach(URL.revokeObjectURL)}
   },[item.id,item.blob,retry,encoding,legacy,onResult])
-  if(legacy)return <div className="document-unavailable"><h3>原文件已保存</h3><p>旧版 {item.extension.toUpperCase()} 的转换器尚未接入，当前无法在应用内预览。</p><p>可下载原文件查看；不会将此文件标记为已解析或可学习。</p></div>
-  if(item.extension==='pdf')return <Suspense fallback={<p>正在加载 PDF 预览…</p>}><PdfPreview key={retry} blob={item.blob} onResult={reportPdf}/></Suspense>
+  if(legacy&&window.afMaterials)return item.state==='failed'?<div className="document-unavailable"><h3>原文件已保存</h3><p>{item.error??'此文件转换失败，请重试或检查原件。'}</p></div>:<ParsedPreview id={item.id} revision={item.blocks}/>
+  if(legacy)return <div className="document-unavailable"><h3>原文件已保存</h3><p>浏览器预览不提供旧版 {item.extension.toUpperCase()} 的本地转换，请使用 AF 桌面应用。</p></div>
+  if(item.extension==='pdf')return <Suspense fallback={<p>正在加载 PDF 预览…</p>}><PdfPreview key={retry} blob={item.blob} onResult={reportPdf} sourcePage={sourcePage}/></Suspense>
   if(busy)return <p role="status">正在读取文件内容…</p>
   if(error)return <p role="status" className="materials-error">{error}</p>
   if(office)return <div className="document-office">

@@ -16,7 +16,10 @@ for (const path of await files(resolve(root,'src'))) {
     if(rel.startsWith('src/shared/') && /^(node:|electron|react|fs$|path$)/.test(name))errors.push(`${rel}: shared runtime import ${name}`)
     if(rel.startsWith('src/main/') && (/react/.test(name)||/renderer/.test(name)))errors.push(`${rel}: main imports UI ${name}`)
   }
-  if (rel.startsWith('src/shared/') && /\b(document|window|localStorage)\b/.test(text))errors.push(`${rel}: DOM in shared`)
+  if(rel.startsWith('src/shared/')){
+    const runtimeText=text.replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\/\*[\s\S]*?\*\/|\/\/[^\n]*/g,'')
+    if(/\b(document|window|localStorage)\b/.test(runtimeText))errors.push(`${rel}: DOM in shared`)
+  }
 }
 if(errors.length)throw new Error(errors.join('\n'))
 console.log('Import boundaries checked: renderer/preload/main separation; shared runtime independence.')

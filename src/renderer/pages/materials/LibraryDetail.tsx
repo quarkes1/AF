@@ -5,16 +5,21 @@ import {formatBytes,type LibraryItem} from './model'
 import {formatMusicTime} from '../../audio/home-playback'
 import type {IllustrationRole} from './application-resources'
 import type {SettingsPreferences} from '../settings/model'
+import type {MaterialLibrary} from './library'
+import type {NameReview} from '../../../shared/contracts/materials'
+import {DocumentTools} from './DocumentTools'
 
 export type PreviewAudioPreferences=Pick<SettingsPreferences,'muted'|'masterVolume'|'bgmVolume'|'attenuateOnBlur'>
 
 export interface ResourceView{ id:string;name:string;kind:'background'|'music';builtIn:boolean;role?:IllustrationRole;item?:LibraryItem }
-interface Props{entry:LibraryItem|ResourceView;resources:ResourceCatalog;url:string;active:boolean;audioPreferences:PreviewAudioPreferences;onUpdate:(patch:Partial<Pick<LibraryItem,'name'|'subject'|'textbook'|'chapter'|'position'>>)=>Promise<void>;onClose:()=>void;onRename:()=>void;onRemove:()=>void;onUse:()=>Promise<boolean>;onPreview:()=>void;onResult:(id:string,error:string|null)=>void;onAudition:(active:boolean,resume?:boolean)=>void}
-export function LibraryDetail({entry,resources,url,active,audioPreferences,onUpdate,onClose,onRename,onRemove,onUse,onPreview,onResult,onAudition}:Props){
+interface Props{library?:MaterialLibrary;entry:LibraryItem|ResourceView;resources:ResourceCatalog;url:string;active:boolean;audioPreferences:PreviewAudioPreferences;onUpdate:(patch:Partial<Pick<LibraryItem,'name'|'subject'|'textbook'|'chapter'|'position'>>)=>Promise<void>;onClose:()=>void;onRename:()=>void;onRemove:()=>void;onUse:()=>Promise<boolean>;onPreview:()=>void;onResult:(id:string,error:string|null)=>void;onAudition:(active:boolean,resume?:boolean)=>void}
+export function LibraryDetail({library,entry,resources,url,active,audioPreferences,onUpdate,onClose,onRename,onRemove,onUse,onPreview,onResult,onAudition}:Props){
   const artRole='role'in entry?entry.role??'background':'background'
   const document=entry.kind==='document',custom='blob'in entry?entry:entry.item
   const [retry,setRetry]=useState(0),[encoding,setEncoding]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState<string|null>(null),[position,setPosition]=useState(custom?.position??50)
   const [subject,setSubject]=useState(custom?.subject??''),[textbook,setTextbook]=useState(custom?.textbook??''),[chapter,setChapter]=useState(custom?.chapter??'')
+  const [review,setReview]=useState<NameReview|null>(null),[dirty,setDirty]=useState(false)
+  useEffect(()=>{if(!dirty)setSubject(custom?.subject??'')},[custom?.subject,dirty])
   const audio=useRef<HTMLAudioElement>(null)
   useEffect(()=>{const element=audio.current;return()=>{element?.pause();onAudition(false)}},[entry.id,onAudition])
   const volumeLimit=()=>audioPreferences.masterVolume/100*audioPreferences.bgmVolume/100*(audioPreferences.attenuateOnBlur&&!window.document.hasFocus()?.25:1)
@@ -26,21 +31,32 @@ export function LibraryDetail({entry,resources,url,active,audioPreferences,onUpd
   useEffect(()=>{setPosition(custom?.position??50)},[custom?.position])
   const run=async(action:()=>Promise<unknown>)=>{setBusy(true);setError(null);try{await action()}catch(reason){setError(reason instanceof Error?reason.message:'操作失败，请重试。')}finally{setBusy(false)}}
   const use=()=>run(async()=>{onAudition(false,false);audio.current?.pause();if(!await onUse())throw new Error('暂时无法应用此资源，请检查文件。')})
+  const save=async(decision?:'existing'|'new')=>{
+    if(library?.backend&&custom){
+      if(subject.trim()&&subject.trim()!==custom.subject){
+        if(!decision){const suggestion=await library.reviewName(subject.trim());if(suggestion&&(!suggestion.reviewed||suggestion.existing&&suggestion.existing.name!==subject.trim())){setReview(suggestion);return}}
+        await library.assign(custom.id,subject.trim(),decision??'direct',review?.existing?.id??null)
+      }
+      await onUpdate({textbook:textbook.trim(),chapter:chapter.trim()});setDirty(false);setReview(null)
+    }else await onUpdate({subject:subject.trim(),textbook:textbook.trim(),chapter:chapter.trim()})
+  }
   return <>
     <header className="materials-detail__header"><h2>{document?'资料详情':'资源详情'}</h2><button className="quiet-button" aria-label="收起详情" data-ui-sound="back" onClick={onClose}>×</button></header>
     <div className="materials-detail__scroll">
       <h3 className="materials-detail__name" title={entry.name}>{entry.name}</h3>
       {document&&custom?<>
-        <DocumentPreview item={custom} retry={retry} encoding={encoding} onResult={onResult}/>
+        <DocumentPreview item={custom} retry={retry} encoding={encoding} onResult={onResult} sourcePage={library?.getSnapshot().sourceAnchor?.id===custom.id?library.getSnapshot().sourceAnchor?.page:undefined}/>
         {['txt','md'].includes(custom.extension)&&<label className="materials-field">文本编码<select aria-label="文本编码" value={encoding} onChange={event=>setEncoding(event.target.value)}><option value="">自动检测</option><option value="utf-8">UTF-8</option><option value="gb18030">GB18030</option><option value="utf-16le">UTF-16 LE</option></select></label>}
         <div className="materials-detail__facts"><span>文件格式 <b>{custom.extension.toUpperCase()}</b></span><span>文件大小 <b>{formatBytes(custom.size)}</b></span></div>
-        <form className="materials-metadata" onSubmit={event=>{event.preventDefault();void run(()=>onUpdate({subject:subject.trim(),textbook:textbook.trim(),chapter:chapter.trim()}))}}>
-          <label className="materials-field">所属科目<input aria-label="所属科目" placeholder="待归类" maxLength={80} value={subject} onChange={event=>setSubject(event.target.value)}/></label>
+        <form className="materials-metadata" onSubmit={event=>{event.preventDefault();void run(()=>save())}}>
+          <label className="materials-field">所属科目<input aria-label="所属科目" placeholder="待归类" maxLength={80} value={subject} onChange={event=>{setSubject(event.target.value);setDirty(true);setReview(null)}}/></label>
           <label className="materials-field">教材版本<input aria-label="教材版本" placeholder="未指定" maxLength={160} value={textbook} onChange={event=>setTextbook(event.target.value)}/></label>
           <label className="materials-field">关联章节<input aria-label="关联章节" placeholder="未指定" maxLength={160} value={chapter} onChange={event=>setChapter(event.target.value)}/></label>
-          <p className="materials-hint">以上为手动整理信息。教材识别、目录映射与教学解析尚未接入。</p>
+          <p className="materials-hint">{library?.backend?'手动分类优先保留；新名称保存前会检查已有科目与别名。':'浏览器模式仅保存手动整理信息。'}</p>
           <button disabled={busy} type="submit">保存分类信息</button>
         </form>
+        {review&&<div className="materials-metadata" role="alert"><p>{review.existing?`已有相似科目“${review.existing.name}”，是否使用已有类名？`:'当前未完成语义去重检查，是否仍新建此科目？'}</p><p>{review.reason}</p>{review.existing&&<button disabled={busy} onClick={()=>void run(()=>save('existing'))}>使用“{review.existing.name}”</button>}<button disabled={busy} onClick={()=>void run(()=>save('new'))}>仍新建“{review.name}”</button><button disabled={busy} onClick={()=>setReview(null)}>返回修改</button></div>}
+        {library&&<DocumentTools item={custom} library={library}/>}
       </>:entry.kind==='background'?<>
         <div className="materials-image-preview" data-art-role={artRole}><img src={url} alt={`${entry.name}原图预览`} style={{objectPosition:`${position}% center`}}/></div>
         <div className="materials-detail__facts"><span>资源来源 <b>{custom?'自定义':'内置'}</b></span><span>分辨率 <b>{custom?.width&&custom.height?`${custom.width} × ${custom.height}`:'随原图'}</b></span>{custom&&<span>文件格式 <b>{custom.extension.toUpperCase()}</b></span>}<span>使用位置 <b>{artRole==='portrait'?'搭档立绘':artRole==='texture'?'场景图层':'首页'}</b></span></div>

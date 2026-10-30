@@ -20,7 +20,7 @@ test('settings are one continuous page with sticky anchors, real local preferenc
     expect(await page.evaluate(()=>(window as any).__media.filter((audio:HTMLMediaElement)=>audio.src.includes('/sfx/')).at(-1).volume)).toBeCloseTo(.51)
     await settings.getByRole('checkbox',{name:'静音',exact:true}).check();await expect(settings.getByRole('button',{name:'试听操作音',exact:true})).toBeDisabled();await settings.getByRole('checkbox',{name:'静音',exact:true}).uncheck()
     await nav.getByRole('button',{name:'模型与预算',exact:true}).click();await expect(nav.getByRole('button',{name:'模型与预算',exact:true})).toHaveAttribute('aria-current','location')
-    await expect(settings.getByLabel('API Key',{exact:true})).toBeDisabled();expect((await nav.boundingBox())!.y).toBeCloseTo(navY,1)
+    await expect(settings.getByLabel('API Key',{exact:true})).toBeEnabled();expect((await nav.boundingBox())!.y).toBeCloseTo(navY,1)
     await expect(nav.getByRole('button',{name:'模型与预算',exact:true})).toHaveCSS('border-bottom-color','rgb(53, 197, 237)');await page.screenshot({path:'build/reports/screenshots/settings/model.png'})
     await nav.getByRole('button',{name:'搭档与互动',exact:true}).click();await settings.getByRole('textbox',{name:'用户姓名',exact:true}).fill('新同学');await page.keyboard.press('Tab');await expect(settings.getByText('姓名牌：新同学',{exact:true})).toBeVisible()
     await settings.getByRole('button',{name:/打开搭档档案/}).click();await expect(page.getByTestId('companion-screen')).toBeVisible();await page.getByRole('button',{name:'返回设置',exact:true}).click();await expect(settings).toBeVisible();await expect(settings.getByRole('button',{name:/打开搭档档案/})).toBeFocused()

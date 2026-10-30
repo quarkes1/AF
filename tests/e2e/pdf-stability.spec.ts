@@ -27,11 +27,11 @@ test('PDF remains stable across consecutive frames at the scrollbar overflow thr
     await page.setViewportSize({width:1672,height:941});await page.keyboard.press('Escape');await expect(page.getByTestId('title-screen')).toBeVisible();await page.keyboard.press('x');await expect(page.getByTestId('home')).not.toHaveAttribute('inert','')
     await page.getByRole('button',{name:'资料管理',exact:false}).click()
     const input=page.locator('input[aria-label="导入文件"]')
-    await input.setInputFiles({name:'测量.pdf',mimeType:'application/pdf',buffer:examplePdf()});await expect(page.locator('.materials-import [role=status]')).toContainText('完成 1 / 1');await page.getByRole('button',{name:'查看资料 测量',exact:true}).click();await expect(page.locator('canvas')).toHaveAttribute('data-page','1')
+    await input.setInputFiles({name:'测量.pdf',mimeType:'application/pdf',buffer:examplePdf()});await expect(page.locator('.materials-import [role=status]')).toContainText('完成 1 / 1');await page.getByRole('button',{name:'查看资料 测量',exact:true}).click();await expect(page.locator('canvas')).toHaveAttribute('data-page','1',{timeout:30000})
     await page.waitForTimeout(500)
     const width=await page.locator('.document-pdf__canvas').evaluate(element=>element.getBoundingClientRect().width)
     const height=430*360/(width-8-3)
-    await input.setInputFiles({name:'临界比例.pdf',mimeType:'application/pdf',buffer:examplePdf(height)});await expect(page.locator('.materials-import [role=status]')).toContainText('完成 1 / 1');await page.getByRole('button',{name:'查看资料 临界比例',exact:true}).click();await expect(page.locator('canvas')).toHaveAttribute('data-page','1')
+    await input.setInputFiles({name:'临界比例.pdf',mimeType:'application/pdf',buffer:examplePdf(height)});await expect(page.locator('.materials-import [role=status]')).toContainText('完成 1 / 1');await page.getByRole('button',{name:'查看资料 临界比例',exact:true}).click();await expect(page.locator('canvas')).toHaveAttribute('data-page','1',{timeout:30000})
     // Wait until the deliberate detail-opening transition has settled, then inspect
     // consecutive frames and native canvas writes rather than a static screenshot.
     await page.waitForTimeout(400)

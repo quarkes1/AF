@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "skills": [
+    {
+      "name": "resource-ingest",
+      "version": "1.0.0",
+      "file": "resource-ingest/1.0.0/SKILL.md",
+      "sha256": "33da241b9b3e077765a507cfc1c493d4c6107216e68e76823f3930e845594d07",
+      "purpose": [
+        "resourceClassify",
+        "resourceReconcile",
+        "courseNameReview",
+        "textbookIdentify"
+      ],
+      "requiredToolIds": [
+        "course_catalog",
+        "read_document"
+      ],
+      "validator": "af-material-proposals-v2",
+      "status": "ready"
+    }
+  ]
+}

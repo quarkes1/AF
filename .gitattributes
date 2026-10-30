@@ -7,6 +7,7 @@ assets/**/*.md text eol=lf
 # Preserve downloaded license bytes and font/image binaries verbatim.
 assets/**/*.txt -text
 assets/**/LICENSE -text
+assets/licenses/* -text whitespace=-blank-at-eof
 assets/**/*.png binary
 assets/**/*.ttf binary
 assets/**/*.woff binary
