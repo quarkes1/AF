@@ -122,3 +122,7 @@
 
   [data-motion="reduced"] .save-screen, [data-motion="reduced"] .home-layer { transition-duration: 120ms,120ms,0s; }
   [data-motion="reduced"] .save-detail__content { animation-duration: 120ms; }
+
+.save-dialog--create{max-height:85vh;overflow-y:auto;scrollbar-gutter:stable}.save-dialog--create label{display:grid;gap:6px;margin-top:12px}.save-dialog--create select,.save-dialog--create textarea{width:100%;box-sizing:border-box;background:#17232f;color:var(--text);border:1px solid #9ab2c3;padding:12px;font:inherit}.save-dialog--create textarea{min-height:70px;resize:vertical}
+
+.save-dialog--create{scrollbar-color:#6b8596 transparent;scrollbar-width:thin}.save-dialog--create select:focus,.save-dialog--create textarea:focus{outline:1px solid var(--cyan)}.save-dialog--create::-webkit-scrollbar{width:6px}.save-dialog--create::-webkit-scrollbar-track{background:transparent}.save-dialog--create::-webkit-scrollbar-thumb{background:#6b8596}.save-dialog--create::-webkit-scrollbar-button{display:none}

@@ -3,6 +3,8 @@ import type { ResourceCatalog } from '../../app/resources'
 import { Icon } from '../../components/Icon'
 import { canResume,displayTime,paginate,renameError,sortStories,storyModifiedAt,type CheckpointView,type StoryView } from './model'
 import './saves.css'
+import {CreateStoryDialog,type NewStoryValues} from './CreateStoryDialog'
+import type {CompanionView} from '../companions/model'
 
 function Thumbnail({resources,id}:{resources:ResourceCatalog;id?:string}){
   const [missing,setMissing]=useState(false)
@@ -10,8 +12,8 @@ function Thumbnail({resources,id}:{resources:ResourceCatalog;id?:string}){
   return <div className="save-thumbnail">{id&&resources.has(id)&&!missing?<img src={resources.url(id)} alt="存档演出截图" onError={()=>setMissing(true)}/>:<><Icon name="file-empty" resources={resources}/><span>暂无演出截图</span></>}</div>
 }
 
-export function SaveScreen({open,resources,onBack,stories,onStoriesChange,resumeRequest,review=false,createRequest=0,selectedCompanion=null,onEnterStory,backLabel='返回首页'}:{
-  open:boolean;resources:ResourceCatalog;onBack:()=>void;stories:StoryView[];onStoriesChange:Dispatch<SetStateAction<StoryView[]>>;resumeRequest?:{id:string;sequence:number};review?:boolean;createRequest?:number;selectedCompanion?:string|null;onEnterStory:(story:StoryView)=>boolean;backLabel?:string
+export function SaveScreen({open,resources,onBack,stories,onStoriesChange,resumeRequest,review=false,createRequest=0,selectedCompanion=null,onEnterStory,backLabel='返回首页',onCreate,onRename,onDelete,companions=[],selectedCompanionId='af-guide',activeStoryId=null}:{
+  open:boolean;resources:ResourceCatalog;onBack:()=>void;stories:StoryView[];onStoriesChange:Dispatch<SetStateAction<StoryView[]>>;resumeRequest?:{id:string;sequence:number};review?:boolean;createRequest?:number;selectedCompanion?:string|null;onEnterStory:(story:StoryView)=>boolean|Promise<boolean>;backLabel?:string;onCreate?:(values:NewStoryValues)=>Promise<StoryView>;onRename?:(story:StoryView,name:string)=>Promise<StoryView>;onDelete?:(story:StoryView)=>Promise<void>;companions?:CompanionView[];selectedCompanionId?:string;activeStoryId?:string|null
 }){
   const setStories=onStoriesChange
   const handledResume=useRef(0)
@@ -23,15 +25,18 @@ export function SaveScreen({open,resources,onBack,stories,onStoriesChange,resume
   const [notice,setNotice]=useState<string|null>(null)
   const [dialog,setDialog]=useState<'rename'|'delete'|null>(null)
   const [name,setName]=useState(''),[error,setError]=useState<string|null>(null)
+  const [creating,setCreating]=useState(false),[mutating,setMutating]=useState(false)
+  const mutation=useRef(false),activation=useRef(0)
   const back=useRef<HTMLButtonElement>(null),modal=useRef<HTMLDialogElement>(null),field=useRef<HTMLInputElement>(null)
   const previousFocus=useRef<HTMLElement|null>(null)
   const storyPage=useRef(0),handledCreate=useRef(0)
   const orderedStories=sortStories(stories)
+  useEffect(()=>{if(!open||storyId&&stories.some(s=>s.id===storyId)||!stories.length)return;const ordered=sortStories(stories),chosen=ordered.find(s=>s.id===activeStoryId)??ordered[0];setStoryId(chosen.id);setPage(Math.floor(ordered.findIndex(s=>s.id===chosen.id)/6))},[open,stories,activeStoryId,storyId])
   const story=stories.find(s=>s.id===storyId)
   const checkpoints=story?.checkpoints.filter(c=>c.kind===filter)??[]
   const listing=paginate<StoryView|CheckpointView>(view==='stories'?orderedStories:checkpoints,page,view==='stories')
   const checkpoint=checkpoints.find(c=>c.id===checkpointId)
-  const create=()=>setNotice(selectedCompanion?`已选择搭档 ${selectedCompanion}。故事创建服务尚未接入，当前未创建故事或修改已有存档。`:'搭档、身份与关系设置将在下一步接入；当前未创建故事，聊天草稿仍保留。')
+  const create=()=>{if(onCreate){setCreating(true);setNotice(null)}else setNotice(selectedCompanion?`已选择搭档 ${selectedCompanion}。故事创建服务尚未接入，当前未创建故事或修改已有存档。`:'搭档、身份与关系设置将在下一步接入；当前未创建故事，聊天草稿仍保留。')}
   const leaveLayer=()=>{
     if(view==='checkpoints'){setView('stories');setPage(storyPage.current);setCheckpointId(null);setNotice(null)}
     else onBack()
@@ -45,14 +50,14 @@ export function SaveScreen({open,resources,onBack,stories,onStoriesChange,resume
   useEffect(()=>{
     if(!open)return
     const key=(event:KeyboardEvent)=>{
-      if(event.key!=='Escape'||event.defaultPrevented||event.isComposing||event.keyCode===229||dialog)return
+      if(event.key!=='Escape'||event.defaultPrevented||event.isComposing||event.keyCode===229||dialog||creating)return
       event.preventDefault()
       if(notice)setNotice(null)
       else leaveLayer()
     }
     window.addEventListener('keydown',key)
     return()=>window.removeEventListener('keydown',key)
-  },[open,dialog,notice,view,onBack])
+  },[open,dialog,creating,notice,view,onBack])
   useEffect(()=>{
     if(!dialog)return
     previousFocus.current=document.activeElement as HTMLElement
@@ -71,10 +76,11 @@ export function SaveScreen({open,resources,onBack,stories,onStoriesChange,resume
     if(view==='stories')setStoryId((result.items[0] as StoryView|undefined)?.id??null)
     else setCheckpointId(null)
   }
-  const restoreStory=(target:StoryView)=>{
+  const restoreStory=async(target:StoryView)=>{
+    const sequence=++activation.current
     if(!canResume(target)){setNotice(target.status==='corrupt'?'存档损坏，需通过备份恢复。':'存档迁移中，完成后才可继续。');return}
-    if(!onEnterStory(target)){setNotice('存档对应的搭档或默认立绘不可用，当前搭档未改变。');return}
-    setNotice(`已将首页搭档切换为 ${target.companionSnapshot?.name??target.partner}。演出模块尚未接入，当前未读取真实剧情或改写存档。`)
+    try{const entered=await onEnterStory(target);if(sequence!==activation.current)return;if(!entered){setNotice('存档对应的搭档或默认立绘不可用，当前搭档未改变。');return}
+    setNotice(onCreate?`已激活故事“${target.name}”，首页使用此档的搭档快照。主线演出尚未接入。`:`已将首页搭档切换为 ${target.companionSnapshot?.name??target.partner}。演出模块尚未接入，当前未读取真实剧情或改写存档。`)}catch(reason){if(sequence===activation.current)setNotice(reason instanceof Error?reason.message:'激活失败，原故事未改变。')}
   }
   const resume=()=>{if(story&&!checkpoint?.corrupt)restoreStory(story)}
   useEffect(()=>{
@@ -84,23 +90,29 @@ export function SaveScreen({open,resources,onBack,stories,onStoriesChange,resume
     if(!target){setNotice('该存档已不存在，请重新选择。');return}
     setView('stories');setStoryId(target.id);setCheckpointId(null);setPage(Math.floor(index/6));restoreStory(target)
   },[open,resumeRequest])
-  const previewAction=(action:string)=>setNotice(`${action}需要存档服务与演出模块；当前仅预览界面，不读写真实故事。`)
+  const previewAction=(action:string)=>setNotice(onCreate?`${action}需要后续的检查点与演出实现，当前故事未改变。`:`${action}需要存档服务与演出模块；当前仅预览界面，不读写真实故事。`)
   const showDialog=(kind:'rename'|'delete')=>{
     if(!story)return
     setName(kind==='rename'?story.name:'');setError(null);setDialog(kind)
   }
-  const confirmDialog=()=>{
-    if(!story||!review)return
+  const confirmDialog=async()=>{
+    if(!story||mutation.current||!review&&!onRename&&!onDelete)return
+    mutation.current=true
+    setMutating(true)
+    try{
     if(dialog==='rename'){
       const validation=renameError(name)
       if(validation){setError(validation);return}
-      setStories(old=>old.map(s=>s.id===story.id?{...s,name:name.trim(),modifiedAt:new Date().toISOString()}:s));setPage(0)
+      const updated=onRename?await onRename(story,name):{...story,name:name.trim(),modifiedAt:new Date().toISOString()}
+      setStories(old=>old.map(s=>s.id===story.id?updated:s));setPage(0)
     }else{
       if(name!==story.name){setError('请输入完整故事名称以确认。');return}
+      await onDelete?.(story)
       const remaining=orderedStories.filter(s=>s.id!==story.id)
       setStories(remaining);setPage(paginate(remaining,page,true).page);setStoryId(null)
     }
-    setDialog(null);setNotice('已更新本次演示，未写入磁盘。')
+    setDialog(null);setNotice(onRename||onDelete?'已保存到本机。':'已更新本次演示，未写入磁盘。')
+    }catch(reason){setError(reason instanceof Error?reason.message:'操作失败，原存档未改变。')}finally{mutation.current=false;setMutating(false)}
   }
   const selected= view==='stories'?story:checkpoint
   const stateLabel=story?.status==='corrupt'?'存档损坏，需通过备份恢复。':story?.status==='migrating'?'存档迁移中，完成后才可继续。':story?.sourceMissing?'部分来源文件缺失，已有演出仍可恢复。':null
@@ -154,7 +166,8 @@ export function SaveScreen({open,resources,onBack,stories,onStoriesChange,resume
     </aside>
     {notice&&<div className="save-screen__notice" role="status"><p>{notice}</p><button className="quiet-button" onClick={()=>setNotice(null)} aria-label="关闭存档提示"><Icon name="close" resources={resources}/></button></div>}
     <dialog ref={modal} className="save-dialog" onCancel={event=>{event.preventDefault();setDialog(null)}} aria-labelledby="save-dialog-title">
-      <form onSubmit={event=>{event.preventDefault();confirmDialog()}}><h2 id="save-dialog-title">{dialog==='rename'?'重命名故事':'删除故事'}</h2><p>{dialog==='rename'?'名称长度为 1–64 个字。':'请输入完整故事名称以确认；只影响所选演示故事。'}</p>{dialog==='delete'&&<strong>{story?.name}</strong>}<label htmlFor="save-name">{dialog==='rename'?'故事名称':'确认故事名称'}</label><input id="save-name" ref={field} value={name} onChange={event=>{setName(event.target.value);setError(null)}} autoComplete="off"/>{error&&<p role="alert">{error}</p>}<small>仅修改本次演示，不写入磁盘。</small><div><button type="button" className="save-secondary" onClick={()=>setDialog(null)}>取消</button><button className="save-primary" type="submit">{dialog==='rename'?'保存名称':'确认删除'}</button></div></form>
+      <form onSubmit={event=>{event.preventDefault();confirmDialog()}}><h2 id="save-dialog-title">{dialog==='rename'?'重命名故事':'删除故事'}</h2><p>{dialog==='rename'?'名称长度为 1–64 个字。':'请输入完整故事名称以确认；只影响所选故事。'}</p>{dialog==='delete'&&<strong>{story?.name}</strong>}<label htmlFor="save-name">{dialog==='rename'?'故事名称':'确认故事名称'}</label><input id="save-name" ref={field} value={name} onChange={event=>{setName(event.target.value);setError(null)}} autoComplete="off"/>{error&&<p role="alert">{error}</p>}<small>{onRename||onDelete?'操作写入本机，仅影响当前故事。':'仅修改本次演示，不写入磁盘。'}</small><div><button type="button" className="save-secondary" onClick={()=>setDialog(null)}>取消</button><button className="save-primary" type="submit">{dialog==='rename'?'保存名称':'确认删除'}</button></div></form>
     </dialog>
+    {creating&&onCreate&&<CreateStoryDialog companions={companions} selectedId={selectedCompanionId} onClose={()=>setCreating(false)} onCreate={async values=>{const created=await onCreate(values);setStories(old=>[created,...old.filter(s=>s.id!==created.id)]);setCreating(false);setView('stories');setStoryId(created.id);setPage(0);setNotice('故事已创建并保存在本机，可点击“继续故事”激活；主线剧本尚未生成。')}}/>}
   </section>
 }

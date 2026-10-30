@@ -46,7 +46,7 @@ async function launch(review=false){
   return {page,errors,close:async()=>{await app.close();await server?.close();if(old===undefined)delete process.env.VITE_SAVE_REVIEW;else process.env.VITE_SAVE_REVIEW=old}}
 }
 
-test('empty saves page preserves home draft, announces unavailable creation and keeps BGM instance',async()=>{
+test('empty saves page preserves home draft, cancels real creation without a save and keeps BGM instance',async()=>{
   test.setTimeout(60000)
   const {page,errors,close}=await launch()
   try{
@@ -62,8 +62,10 @@ test('empty saves page preserves home draft, announces unavailable creation and 
     await expect(page.getByText('请先选择一个故事，再查看它的保存点。')).toBeVisible()
     await page.keyboard.press('Escape')
     await page.locator('.save-card--create').click()
-    await expect(page.getByText(/故事创建服务尚未接入/)).toBeVisible()
+    const creation=page.getByRole('dialog',{name:'新建故事'})
+    await expect(creation).toBeVisible();await expect(creation.getByRole('textbox',{name:'故事名称',exact:true})).toHaveValue('全新的起点')
     await page.keyboard.press('Escape')
+    await expect(creation).not.toBeVisible();await expect(page.getByRole('heading',{name:'还没有故事存档'})).toBeVisible()
     await mkdir('build/reports/screenshots/saves',{recursive:true})
     await page.screenshot({path:'build/reports/screenshots/saves/empty.png',animations:'disabled'})
     await page.getByRole('button',{name:'返回首页'}).click()

@@ -12,8 +12,8 @@ import {homeStorySummary} from './summary'
 import {HomeMedia,type MediaPanel,type MediaChoices} from './HomeMedia'
 
 /** No fabricated save: this is the real empty home of the first frontend slice. */
-export function Home({ background,backgroundPosition,backgrounds,musics,onBackground,onOpenMaterials,playback,onToggleMusic,onSeekMusic,stories,onContinueStory,musicId,onMusic, companion, resources, assetWarning, muted, onMute, onOpenSaves, onOpenLearning, onOpenCompanions, onOpenSettings, covered=false, entryFromTitle = false, transitioning = false, reducedMotion = false }: {
-  background:string;backgroundPosition:number;backgrounds:MediaChoices;musics:MediaChoices;onBackground:(id:string)=>void;onOpenMaterials:()=>void;playback:HomePlayback;onToggleMusic:()=>Promise<boolean>;onSeekMusic:(seconds:number)=>boolean;stories:readonly StoryView[];onContinueStory:(id:string)=>void;musicId:string;onMusic:(id:string)=>Promise<boolean>;companion:CompanionView;resources: ResourceCatalog; assetWarning: string | null; muted: boolean; onMute: () => void; onOpenSaves:(create?:boolean)=>void;onOpenLearning:()=>void;onOpenCompanions:()=>void;onOpenSettings:()=>void;covered?:boolean;entryFromTitle?: boolean; transitioning?: boolean; reducedMotion?: boolean
+export function Home({ activeStoryId=null,background,backgroundPosition,backgrounds,musics,onBackground,onOpenMaterials,playback,onToggleMusic,onSeekMusic,stories,onContinueStory,musicId,onMusic, companion, resources, assetWarning, muted, onMute, onOpenSaves, onOpenLearning, onOpenCompanions, onOpenSettings, covered=false, entryFromTitle = false, transitioning = false, reducedMotion = false }: {
+  activeStoryId?:string|null;background:string;backgroundPosition:number;backgrounds:MediaChoices;musics:MediaChoices;onBackground:(id:string)=>void;onOpenMaterials:()=>void;playback:HomePlayback;onToggleMusic:()=>Promise<boolean>;onSeekMusic:(seconds:number)=>boolean;stories:readonly StoryView[];onContinueStory:(id:string)=>void;musicId:string;onMusic:(id:string)=>Promise<boolean>;companion:CompanionView;resources: ResourceCatalog; assetWarning: string | null; muted: boolean; onMute: () => void; onOpenSaves:(create?:boolean)=>void;onOpenLearning:()=>void;onOpenCompanions:()=>void;onOpenSettings:()=>void;covered?:boolean;entryFromTitle?: boolean; transitioning?: boolean; reducedMotion?: boolean
 }) {
   const summary=homeStorySummary(stories)
   const [mediaPanel,setMediaPanel]=useState<MediaPanel>(null)
@@ -83,7 +83,7 @@ export function Home({ background,backgroundPosition,backgrounds,musics,onBackgr
       </div>
     </section>
     <div className="home__greeting" hidden={chatOpen}><span /><p><b>{companion.name}</b>：今天想接着聊，还是一起看看课本？</p></div>
-    <HomeChat open={chatOpen} focusRequest={chatFocusRequest} partnerId={companion.id} partnerName={companion.name} resources={resources} onClose={closeChat} onCreateStory={()=>openSaves(portrait.current,true)}/>
+    <HomeChat activeStoryId={activeStoryId} open={chatOpen} focusRequest={chatFocusRequest} partnerId={companion.id} partnerName={companion.name} resources={resources} onClose={closeChat} onCreateStory={()=>openSaves(portrait.current,true)}/>
     {assetWarning && <div className="home__asset-warning" role="status">{assetWarning}</div>}
     {notice && <div className="home__notice" role="status"><span>{notice}</span><button className="quiet-button" onClick={() => setNotice(null)} aria-label="关闭提示">×</button></div>}
     </div>

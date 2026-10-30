@@ -8,8 +8,9 @@ import './companions.css'
 
 const tabNames=['人物档案','相处设定','外观资源','故事记录'] as const
 type Tab=typeof tabNames[number]
-export function CompanionScreen({open,resources,onBack,onSelect,items,onItemsChange,selectedCompanionId,backLabel='返回首页'}:{open:boolean;resources:ResourceCatalog;onBack:()=>void;onSelect:(companion:CompanionView)=>boolean;items:CompanionView[];onItemsChange:Dispatch<SetStateAction<CompanionView[]>>;selectedCompanionId:string;backLabel?:string}){
+export function CompanionScreen({open,resources,onBack,onSelect,items,onItemsChange,selectedCompanionId,backLabel='返回首页',onPersist,onDelete}:{open:boolean;resources:ResourceCatalog;onBack:()=>void;onSelect:(companion:CompanionView)=>boolean|Promise<boolean>;items:CompanionView[];onItemsChange:Dispatch<SetStateAction<CompanionView[]>>;selectedCompanionId:string;backLabel?:string;onPersist?:(item:CompanionView)=>Promise<CompanionView>;onDelete?:(item:CompanionView)=>Promise<void>}){
   const [imageBusy,setImageBusy]=useState(false)
+  const mutation=useRef(false)
   const setItems=onItemsChange
   const [view,setView]=useState<'library'|'detail'|'editor'>('library'),[selectedId,setSelectedId]=useState('af-guide'),[tab,setTab]=useState<Tab>('人物档案')
   const [filter,setFilter]=useState<'all'|'preset'|'custom'>('all'),[search,setSearch]=useState(''),[pose,setPose]=useState<PoseId|null>(null)
@@ -64,14 +65,17 @@ export function CompanionScreen({open,resources,onBack,onSelect,items,onItemsCha
     };window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key)
   },[open,view,notice,dialog,editor,editorBase,editorReturn,onBack])
   const showDetail=(id:string)=>{setSelectedId(id);setTab('人物档案');setPose(null);setNotice(null);setView('detail')}
-  const save=(draft:boolean)=>{
+  const save=async(draft:boolean)=>{
     if(!editor)return
     if(imageBusy){setError('正在读取立绘，请完成后保存。');return}
     const message=validateCompanion(editor,draft);if(message){setError(message);return}
     if(!draft&&editor.sprites[editor.defaultPose]&&!editor.sprites[editor.defaultPose]!.startsWith('data:image/png;base64,')&&!resources.has(editor.sprites[editor.defaultPose]!)){setError('默认立绘资源不可用，请重新添加或保存草稿。');return}
-    const next={...editor,name:editor.name.trim(),draft,sprites:{...editor.sprites},poses:editor.poses.map(tag=>({...tag,label:tag.label.trim()}))}
+    if(mutation.current)return
+    mutation.current=true
+    let next={...editor,name:editor.name.trim(),draft,sprites:{...editor.sprites},poses:editor.poses.map(tag=>({...tag,label:tag.label.trim()}))}
+    try{if(onPersist)next=await onPersist(next)}catch(reason){setError(reason instanceof Error?reason.message:'保存失败，原档案未改变。');return}finally{mutation.current=false}
     setItems(old=>old.some(item=>item.id===next.id)?old.map(item=>item.id===next.id?next:item):[...old,next])
-    setEditor(null);setError(null);showDetail(next.id);setNotice('已保存到本次前端预览。重启后不保留，可导出预览包。')
+    setEditor(null);setError(null);showDetail(next.id);setNotice(onPersist?'搭档已保存到本机，已有故事保持原角色快照。':'已保存到本次前端预览。重启后不保留，可导出预览包。')
   }
   const exportItem=(item:CompanionView)=>{
     const url=URL.createObjectURL(new Blob([encodeCompanion(item)],{type:'application/json'}))
@@ -79,13 +83,16 @@ export function CompanionScreen({open,resources,onBack,onSelect,items,onItemsCha
     setNotice('已生成搭档 JSON 预览包；不包含故事经历、凭据或模型配置。')
   }
   const importItem=async(file:File)=>{
-    try{if(file.size>MAX_COMPANION_BYTES)throw new Error('请选择不超过 64MB 的搭档预览包。');const item=decodeCompanion(await file.text(),crypto.randomUUID());for(const image of Object.values(item.sprites)){if(!image)continue;if(image.startsWith('data:image/png;base64,')){const decoded=new Image();decoded.src=image;await decoded.decode()}else if(!resources.has(image))throw new Error('搭档包引用了不可用的立绘，请先补齐资源。')}if(!location.current.open||location.current.view!=='library')return;setItems(old=>[...old,item]);showDetail(item.id);setNotice('搭档已导入本次预览，不覆盖已有模板或故事。')}
+    try{if(file.size>MAX_COMPANION_BYTES)throw new Error('请选择不超过 64MB 的搭档预览包。');let item=decodeCompanion(await file.text(),crypto.randomUUID());for(const image of Object.values(item.sprites)){if(!image)continue;if(image.startsWith('data:image/png;base64,')){const decoded=new Image();decoded.src=image;await decoded.decode()}else if(!resources.has(image))throw new Error('搭档包引用了不可用的立绘，请先补齐资源。')}if(!location.current.open||location.current.view!=='library')return;if(onPersist)item=await onPersist(item);setItems(old=>[...old,item]);showDetail(item.id);setNotice(onPersist?'搭档已导入本机，不覆盖已有模板或故事。':'搭档已导入本次预览，不覆盖已有模板或故事。')}
     catch(reason){setNotice(reason instanceof Error?reason.message:'导入失败，原有搭档未改变。')}
   }
   const manageDelete=(item:CompanionView)=>{setDeleteId(item.id);setConfirmName('');setError(null);setDialog('delete')}
-  const confirmedDelete=()=>{
+  const confirmedDelete=async()=>{
     if(!deleting||deleting.builtIn)return
     if(confirmName!==deleting.name){setError('请输入完整搭档姓名以确认。');return}
+    if(mutation.current)return
+    mutation.current=true
+    try{await onDelete?.(deleting)}catch(reason){setError(reason instanceof Error?reason.message:'删除失败。');return}finally{mutation.current=false}
     setItems(old=>old.filter(item=>item.id!==deleting.id));setDialog(null);setView('library');setSelectedId('af-guide');setNotice('已从本次搭档库移除；已有故事不受影响。')
   }
   return <section ref={root} className="companion-screen" data-open={open} data-testid="companion-screen" inert={!open} aria-hidden={!open} aria-label="搭档档案">
@@ -108,7 +115,7 @@ export function CompanionScreen({open,resources,onBack,onSelect,items,onItemsCha
         <div className="companion-dossier__content" id="companion-tabpanel" role="tabpanel" aria-labelledby={`companion-tab-${tabNames.indexOf(tab)}`}>
           {tab==='人物档案'?<><h2>关于 {selected.name}</h2><div className="companion-facts"><p><Icon name="file-text" resources={resources}/><span>来源</span>{selected.sourceWork||'原创 / 自设'}</p><p><Icon name="folder" resources={resources}/><span>背景</span>{selected.background||'未指定'}</p></div><section><h3><Icon name="chat" resources={resources}/>性格与表达{selected.examples&&<small>设定示例</small>}</h3><p>{selected.personality||'尚未填写人物设定。'}</p></section><section><h3><Icon name="book-open" resources={resources}/>知识范围</h3><p>{selected.knowledge||'尚未指定。仅依据实际经历和获知的信息回应。'}</p></section><section><h3><Icon name="file-text" resources={resources}/>档案说明</h3><p>相同搭档在不同故事中的经历分别保存。</p></section></>:tab==='相处设定'?<><h2>与你的相处</h2><dl className="companion-relations">{[['搭档身份',selected.partnerIdentity],['用户身份',selected.userIdentity],['对用户的称呼',selected.address||'未指定，使用“你”等自然称呼'],['关系起点',selected.relationship],['现实背景',selected.background],['主动性',selected.initiative]].map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value||'未指定'}</dd></div>)}</dl><p className="companion-muted">这些是新故事的默认设定。用户姓名在全局设置中单独管理，不沿用原作主角姓名。</p></>:tab==='外观资源'?<><h2>立绘资源</h2><div className="companion-pose-grid">{selected.poses.map(({id,label})=><button key={id} aria-label={label} aria-pressed={selectedPose===id} onClick={()=>setPose(id)}><CompanionPortrait image={selected.sprites[id]} resources={resources} name={label}/><span>{label}{id===selected.defaultPose?' · 默认':''}{selected.sprites[id]?'':' · 未添加'}</span></button>)}</div>{!selected.sprites[selectedPose]&&<p role="status">此标签尚未添加图片，左侧使用默认立绘预览。</p>}</>:<div className="companion-history-empty"><Icon name="history" resources={resources}/><h2>暂无关联故事</h2><p>每个故事拥有独立的关系、约定和共同经历。故事与记忆服务尚未接入，不会用模板设定冒充相处记录。</p></div>}
         </div>
-        <footer className="companion-dossier__footer"><div><button className="save-secondary" onClick={()=>edit(selected)}>编辑搭档</button><button className="save-primary" disabled={selected.draft} aria-pressed={selectedCompanionId===selected.id} data-ui-sound="confirm" onClick={()=>{if(onSelect(selected))setNotice(`已选中 ${selected.name}，返回首页即可查看。`);else setNotice('搭档设定或默认立绘不可用，请先完成编辑。')}}>{selectedCompanionId===selected.id?'已选中':'选中'}</button></div><p>{selected.builtIn?'编辑预置搭档会创建副本，保留原始模板。':'模板修改不覆盖已有故事。'}</p></footer>
+        <footer className="companion-dossier__footer"><div><button className="save-secondary" onClick={()=>edit(selected)}>编辑搭档</button><button className="save-primary" disabled={selected.draft} aria-pressed={selectedCompanionId===selected.id} data-ui-sound="confirm" onClick={()=>{void Promise.resolve(onSelect(selected)).then(ok=>setNotice(ok?`已选中 ${selected.name}，返回首页即可查看。`:'搭档设定或默认立绘不可用，请先完成编辑。')).catch(reason=>setNotice(reason instanceof Error?reason.message:'选择失败。'))}}>{selectedCompanionId===selected.id?'已选中':'选中'}</button></div><p>{selected.builtIn?'编辑预置搭档会创建副本，保留原始模板。':'模板修改不覆盖已有故事。'}</p></footer>
       </section>
     </div>:null}
     {notice&&<div className="companion-notice" role="status"><p>{notice}</p><button className="quiet-button" data-ui-sound="back" aria-label="关闭搭档提示" onClick={()=>{setNotice(null);focusBack()}}><Icon name="close" resources={resources}/></button></div>}

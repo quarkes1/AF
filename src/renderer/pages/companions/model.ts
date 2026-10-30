@@ -5,6 +5,7 @@ export const MAX_COMPANION_BYTES=64*1024*1024
 export interface SpriteTag {id:PoseId;label:string}
 const defaultPoses=():SpriteTag[]=>POSES.map(([id,label])=>({id,label}))
 export interface CompanionView {
+  templateVersion?:number
   id:string;name:string;builtIn:boolean;sourceKind:'original'|'existing';sourceWork:string;personality:string;partnerIdentity:string;userIdentity:string;address:string;background:string;knowledge:string;speech:string;relationship:string;initiative:string;immutable:string;events:string;poses:SpriteTag[];defaultPose:PoseId;sprites:Partial<Record<PoseId,string>>;draft:boolean;examples:boolean
 }
 export const blankCompanion=(id:string):CompanionView=>({id,name:'未命名搭档',builtIn:false,sourceKind:'original',sourceWork:'',personality:'',partnerIdentity:'',userIdentity:'',address:'',background:'现实校园',knowledge:'',speech:'',relationship:'刚认识不久',initiative:'跟随用户设置',immutable:'',events:'',poses:defaultPoses(),defaultPose:'01-neutral',sprites:{},draft:true,examples:false})
@@ -32,7 +33,7 @@ const fields=['name','sourceWork','personality','partnerIdentity','userIdentity'
 const isRecord=(value:unknown):value is Record<string,unknown>=>!!value&&typeof value==='object'&&!Array.isArray(value)
 export const validSprite=(value:string)=>/^character\.[A-Za-z0-9._-]+$/.test(value)||(/^data:image\/png;base64,[A-Za-z0-9+/=\r\n]+$/.test(value)&&value.length<7*1024*1024)
 export function encodeCompanion(value:CompanionView){
-  const {id:_,builtIn:__,...template}=value
+  const {id:_,builtIn:__,templateVersion:___,...template}=value
   return JSON.stringify({format:'af-companion-preview',version:2,template},null,2)
 }
 export function decodeCompanion(text:string,id:string):CompanionView{

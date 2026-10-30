@@ -232,6 +232,8 @@ test('home chat unfolds upward, retains drafts, guards IME and closes downward w
     await page.getByRole('button',{name:'发送消息'}).click()
     await page.getByRole('button',{name:'新建故事'}).click()
     await expect(panel).toBeHidden();await expect(page.getByTestId('save-screen')).toBeVisible()
+    await expect(page.getByRole('dialog',{name:'新建故事'})).toBeVisible();await page.keyboard.press('Escape')
+    await expect(page.getByRole('dialog',{name:'新建故事'})).not.toBeVisible()
     await page.getByRole('button',{name:'返回首页'}).click()
     await expect(page.getByTestId('save-screen')).toBeHidden();await expect(portrait).toBeFocused()
     await portrait.press('Enter');await expect(input).toHaveValue('明天见')

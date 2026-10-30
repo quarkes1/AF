@@ -3,17 +3,18 @@ import type { ResourceCatalog } from '../../app/resources'
 import { Icon } from '../../components/Icon'
 
 /** No-save composer: drafts are local to this mounted home, never a fabricated conversation. */
-export function HomeChat({open,focusRequest,partnerId,partnerName,resources,onClose,onCreateStory}:{
-  open:boolean;focusRequest:number;partnerId:string;partnerName:string;resources:ResourceCatalog;onClose:()=>void;onCreateStory:()=>void
+export function HomeChat({open,focusRequest,partnerId,partnerName,resources,onClose,onCreateStory,activeStoryId=null}:{
+  open:boolean;focusRequest:number;partnerId:string;partnerName:string;resources:ResourceCatalog;onClose:()=>void;onCreateStory:()=>void;activeStoryId?:string|null
 }) {
   const input=useRef<HTMLTextAreaElement>(null)
   const composing=useRef(false)
   const [drafts,setDrafts]=useState<Record<string,string>>({})
-  const draft=drafts[partnerId]??''
-  const setDraft=(value:string)=>setDrafts(old=>({...old,[partnerId]:value}))
+  const draftKey=activeStoryId?`save:${activeStoryId}`:`template:${partnerId}`
+  const draft=drafts[draftKey]??''
+  const setDraft=(value:string)=>setDrafts(old=>({...old,[draftKey]:value}))
   const [needsStory,setNeedsStory]=useState(false)
   const heading=useId(),hint=useId()
-  useEffect(()=>setNeedsStory(false),[partnerId])
+  useEffect(()=>setNeedsStory(false),[partnerId,activeStoryId])
   useEffect(()=>{
     if(!open){setNeedsStory(false);return}
     const frame=requestAnimationFrame(()=>input.current?.focus({preventScroll:true}))
@@ -48,9 +49,9 @@ export function HomeChat({open,focusRequest,partnerId,partnerName,resources,onCl
     </header>
     <div className="home-chat__reply" role="status" aria-live="polite">
       {needsStory?<div className="home-chat__onboarding">
-        <strong>先创建一个故事</strong>
-        <p>让这段对话有一个存档。刚才输入的内容会保留。</p>
-        <button className="home-chat__create" onClick={onCreateStory}>新建故事 <span aria-hidden="true">›</span></button>
+        <strong>{activeStoryId?'聊天服务尚未接入':'先创建一个故事'}</strong>
+        <p>{activeStoryId?'当前故事已经就绪，刚才输入的内容仍作为草稿保留，没有发送给模型。':'让这段对话有一个存档。刚才输入的内容会保留。'}</p>
+        {!activeStoryId&&<button className="home-chat__create" onClick={onCreateStory}>新建故事 <span aria-hidden="true">›</span></button>}
       </div>:<p>我在。今天有什么<br/>想和我聊的吗？</p>}
     </div>
     <form className="home-chat__composer" onSubmit={event=>{event.preventDefault();submit()}}>

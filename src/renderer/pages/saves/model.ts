@@ -4,6 +4,7 @@ export interface CheckpointView {
   id:string;name:string;kind:'manual'|'auto'|'quick';chapter:string;savedAt:string;branch:string;corrupt?:boolean;thumbnailId?:string
 }
 export interface StoryView {
+  branchId?:string
   id:string;name:string;partner:string;partnerId:string;companionSnapshot?:CompanionView;chapter:string;chapterName?:string;lastLine?:string;savedAt:string;modifiedAt?:string;status:'ready'|'corrupt'|'migrating';sourceMissing?:boolean;thumbnailId?:string;checkpoints:CheckpointView[]
 }
 export const storyModifiedAt=(story:StoryView)=>story.modifiedAt??story.savedAt
