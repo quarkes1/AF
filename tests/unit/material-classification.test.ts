@@ -18,6 +18,16 @@ function setup(worker:any){
  return{repo,service,document,finish}
 }
 function proposal(doc:any,name:string,basis='course'){return{documentId:doc.id,name,categoryBasis:basis,materialType:basis==='topic'?'综述论文':'课件',summary:doc.blocks[0].text,topics:[name],evidenceBlockIds:[doc.blocks[0].id],certainty:'supported',reason:'资料内容支持此类别。'}}
+it('queues every document in configurable batches, defaults to twenty and persists the setting',async()=>{
+ const worker=async(_entry:any,input:any)=>input.purpose==='resourceClassify'?{assignments:input.documents.map((doc:any)=>proposal(doc,'电路'))}:{groups:[{documentIds:input.input.proposals.map((p:any)=>p.documentId),courseId:input.catalog[0]?.id??null,name:'电路',reason:'同一科目。'}]}
+ const {repo,service,document,finish}=setup(worker),ids=Array.from({length:45},(_,i)=>document(`lecture-${i}.txt`,`电路资料 ${i}`))
+ expect(service.processingSettings().classificationBatchSize).toBe(20)
+ const accepted=service.classify(ids);expect(accepted.jobIds).toHaveLength(3);expect(accepted.jobIds.map(id=>repo.job(id).total)).toEqual([20,20,5])
+ for(const id of accepted.jobIds)expect((await finish(id)).status).toBe('completed')
+ expect(repo.list().every(d=>d.subject==='电路')).toBe(true)
+ service.configureProcessing({classificationBatchSize:35});expect(new MaterialService(repo,{} as any,{} as any).processingSettings().classificationBatchSize).toBe(35)
+ expect(()=>service.configureProcessing({classificationBatchSize:0})).toThrow()
+})
 
 it('creates categories from one circuit deck and a topic paper without a pre-existing course label',async()=>{
  const seen:any[]=[]

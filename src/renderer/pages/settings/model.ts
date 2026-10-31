@@ -1,3 +1,4 @@
+import {graphemeCount} from '../../../shared/graphemes'
 export interface AudioPreferences {masterVolume:number;bgmVolume:number;sfxVolume:number;attenuateOnBlur:boolean}
 export interface SettingsPreferences extends AudioPreferences {muted:boolean;reducedMotion:boolean;uiScale:100|125|150;typewriter:boolean;subtitleSpeed:number;userName:string}
 export const DEFAULT_PREFERENCES:SettingsPreferences={muted:false,reducedMotion:false,uiScale:100,typewriter:true,subtitleSpeed:4,masterVolume:60,bgmVolume:35,sfxVolume:70,attenuateOnBlur:false,userName:'我'}
@@ -8,7 +9,7 @@ export function normalizePreferences(raw:unknown):SettingsPreferences{
   const data=raw&&typeof raw==='object'?raw as Record<string,unknown>:{}
   const range=(key:keyof SettingsPreferences,low:number,high:number)=>typeof data[key]==='number'&&Number.isFinite(data[key])?Math.max(low,Math.min(high,data[key] as number)):DEFAULT_PREFERENCES[key] as number
   const userName=typeof data.userName==='string'?data.userName.trim():''
-  return {muted:data.muted===true,reducedMotion:data.reducedMotion===true,uiScale:data.uiScale===125||data.uiScale===150?data.uiScale:100,typewriter:data.typewriter!==false,subtitleSpeed:range('subtitleSpeed',3,5),masterVolume:range('masterVolume',0,100),bgmVolume:range('bgmVolume',0,100),sfxVolume:range('sfxVolume',0,100),attenuateOnBlur:data.attenuateOnBlur===true,userName:userName&&[...userName].length<=64?userName:'我'}
+  return {muted:data.muted===true,reducedMotion:data.reducedMotion===true,uiScale:data.uiScale===125||data.uiScale===150?data.uiScale:100,typewriter:data.typewriter!==false,subtitleSpeed:range('subtitleSpeed',3,5),masterVolume:range('masterVolume',0,100),bgmVolume:range('bgmVolume',0,100),sfxVolume:range('sfxVolume',0,100),attenuateOnBlur:data.attenuateOnBlur===true,userName:userName&&graphemeCount(userName)<=32?userName:'我'}
 }
 export function updatePreferences(current:SettingsPreferences,patch:Partial<SettingsPreferences>):SettingsPreferences{
   return normalizePreferences({...current,...patch})

@@ -1,3 +1,6 @@
+import {MaterialBatchSettings} from './MaterialBatchSettings'
+import type {BackendClient} from '../materials/backend-client'
+import {graphemeCount} from '../../../shared/graphemes'
 import {useEffect,useRef,useState,type ReactNode,type MouseEvent} from 'react'
 import type {ResourceCatalog} from '../../app/resources'
 import {Icon} from '../../components/Icon'
@@ -16,8 +19,8 @@ function Unavailable({children}:{children:ReactNode}){return <p className="setti
 function Volume({name,value,onChange}:{name:string;value:number;onChange:(value:number)=>void}){
   return <label className="settings-volume"><input type="range" min="0" max="100" step="1" aria-label={name} aria-valuetext={`${value}%`} value={value} onChange={event=>onChange(Number(event.target.value))}/><output>{value}%</output></label>
 }
-interface Props{open:boolean;resources:ResourceCatalog;preferences:SettingsPreferences;onChange:(patch:Partial<SettingsPreferences>)=>void;onBack:()=>void;onCompanions:()=>void;onSaves:()=>void;onPreviewSound:()=>void;companionName:string;storageWarning:string|null}
-export function SettingsScreen({open,resources,preferences:p,onChange,onBack,onCompanions,onSaves,onPreviewSound,companionName,storageWarning}:Props){
+interface Props{materialClient?:BackendClient|null;open:boolean;resources:ResourceCatalog;preferences:SettingsPreferences;onChange:(patch:Partial<SettingsPreferences>)=>void;onBack:()=>void;onCompanions:()=>void;onSaves:()=>void;onPreviewSound:()=>void;companionName:string;storageWarning:string|null}
+export function SettingsScreen({materialClient=null,open,resources,preferences:p,onChange,onBack,onCompanions,onSaves,onPreviewSound,companionName,storageWarning}:Props){
   const root=useRef<HTMLElement>(null),scroll=useRef<HTMLDivElement>(null),back=useRef<HTMLButtonElement>(null),returnFocus=useRef<HTMLElement|null>(null),composing=useRef(false)
   const [active,setActive]=useState<SettingsSection>('display'),[name,setName]=useState(p.userName),[nameError,setNameError]=useState<string|null>(null)
   useEffect(()=>{setName(p.userName);setNameError(null)},[open,p.userName])
@@ -44,7 +47,7 @@ export function SettingsScreen({open,resources,preferences:p,onChange,onBack,onC
       event.preventDefault();onBack()
     };window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key)
   },[open,onBack])
-  const commitName=()=>{const value=name.trim();if(!value||[...value].length>64){setNameError('姓名需为 1–64 个字，当前全局姓名未改变。');return}setNameError(null);if(value!==p.userName)onChange({userName:value})}
+  const commitName=()=>{const value=name.trim();if(!value||graphemeCount(value)>32){setNameError('姓名需为 1–32 个字，当前全局姓名未改变。');return}setNameError(null);if(value!==p.userName)onChange({userName:value})}
   const child=(event:MouseEvent<HTMLButtonElement>,action:()=>void)=>{returnFocus.current=event.currentTarget;action()}
   const heading=(id:SettingsSection,description:string,restore?:()=>void)=><header className="settings-section__heading"><div><h2>{SETTINGS_SECTIONS.find(([key])=>key===id)?.[1]}</h2><p>{description}</p></div>{restore&&<button className="settings-text-button" onClick={restore}>恢复本组默认</button>}</header>
   return <section ref={root} className="settings-screen" data-open={open} inert={!open} aria-hidden={!open} aria-label="设置" data-testid="settings-screen" onCompositionStart={()=>{composing.current=true}} onCompositionEnd={()=>{composing.current=false}}>
@@ -72,7 +75,7 @@ export function SettingsScreen({open,resources,preferences:p,onChange,onBack,onC
       </section>
       <section id="settings-companion" className="settings-section" aria-label="搭档与互动">
         {heading('companion','全局姓名与搭档管理；故事内的互动设置单独标注作用域。',()=>onChange({userName:DEFAULT_PREFERENCES.userName}))}
-        <Row title="用户姓名" description="默认为“我”；身份等效不沿用原作主角姓名。"><input aria-label="用户姓名" maxLength={64} value={name} onChange={event=>setName(event.target.value)} onBlur={commitName} onKeyDown={event=>{if(event.key==='Enter'&&!event.nativeEvent.isComposing&&!composing.current){event.preventDefault();commitName()}}}/><small>姓名牌：{p.userName}</small>{nameError&&<p className="settings-error" role="alert">{nameError}</p>}</Row>
+        <Row title="用户姓名" description="默认为“我”；身份等效不沿用原作主角姓名。"><input aria-label="用户姓名" maxLength={128} value={name} onChange={event=>setName(event.target.value)} onBlur={commitName} onKeyDown={event=>{if(event.key==='Enter'&&!event.nativeEvent.isComposing&&!composing.current){event.preventDefault();commitName()}}}/><small>姓名牌：{p.userName}</small>{nameError&&<p className="settings-error" role="alert">{nameError}</p>}</Row>
         <Row title="当前搭档" description="人格、身份、立绘及标签在搭档档案中编辑。"><strong>{companionName}</strong><button className="save-secondary" onClick={event=>child(event,onCompanions)}>打开搭档档案 <span aria-hidden="true">→</span></button></Row>
         <Unavailable>主动互动服务尚未接入，当前不会自动搭话或读取现实信息。</Unavailable>
         <Row title="主动搭话" scope="当前存档" description="学习、答题、输入和设置期间不抢屏。"><Toggle label="主动搭话" value={false} disabled/></Row>
@@ -81,8 +84,8 @@ export function SettingsScreen({open,resources,preferences:p,onChange,onBack,onC
         <Row title="后台运行" description="完全退出应用后不运行；常驻能力未接入。"><Toggle label="后台运行" value={false} disabled/></Row>
       </section>
       <section id="settings-sources" className="settings-section" aria-label="资料与来源">
-        {heading('sources','管理资料入口与外部信息的访问范围。')}
-        <Unavailable>本地资料可在资料管理中导入；自动监测、教学内容解析及账号连接尚未接入。未授权来源不会被读取。</Unavailable>
+        {heading('sources','管理资料入口与外部信息的访问范围。')}<MaterialBatchSettings client={materialClient} open={open}/>
+        <Unavailable>本地资料的导入、解析和整理可在资料管理中操作。账号连接尚未接入，未授权来源不会被读取。</Unavailable>
         <Row title="资料文件夹" description="支持 doc/docx、ppt/pptx、PDF、Markdown 和 TXT。"><input aria-label="资料文件夹" placeholder="尚未关联文件夹" disabled/><button className="save-secondary" disabled>选择文件夹</button></Row>
         <Row title="自动检查资料更新" description="仅检查已授权的文件夹。"><Toggle label="自动检查资料更新" value={false} disabled/></Row>
         <Row title="联网检索" description="查找补充资料前明确发送范围和来源。"><Toggle label="联网检索" value={false} disabled/></Row>

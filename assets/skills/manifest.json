@@ -18,6 +18,77 @@
       ],
       "validator": "af-material-proposals-v2",
       "status": "ready"
+    },
+    {
+      "name": "character-dialogue",
+      "version": "1.0.0",
+      "file": "character-dialogue/1.0.0/SKILL.md",
+      "sha256": "021ddac167f653c30cb07c8754cdd919a8b902fcbf16b27bed8994f61429b5b2",
+      "purpose": [
+        "characterDialogue"
+      ],
+      "requiredToolIds": [
+        "get_character_profile",
+        "recall_shared_history"
+      ],
+      "validator": "af-home-dialogue-v1",
+      "status": "ready"
+    },
+    {
+      "name": "story-act-compose",
+      "version": "1.0.0",
+      "file": "story-act-compose/1.0.0/SKILL.md",
+      "sha256": "748c618a9fb014082c64976ee0590660b75eeb3c5fcb4b895cfa86f868e95668",
+      "purpose": [
+        "scriptDraft"
+      ],
+      "requiredToolIds": [
+        "get_task_context",
+        "math_validate",
+        "math_render",
+        "layout_check",
+        "view_preview"
+      ],
+      "validator": "af-act-v1",
+      "status": "ready"
+    },
+    {
+      "name": "chapter-compose",
+      "version": "1.0.0",
+      "file": "chapter-compose/1.0.0/SKILL.md",
+      "sha256": "eb79f92dad24c4a66609a7d561614611a51627cbb1b2014bcbebb28fd177c71d",
+      "purpose": [
+        "learningCompose"
+      ],
+      "requiredToolIds": [
+        "get_task_context",
+        "source_retrieve",
+        "math_validate",
+        "math_render",
+        "layout_check",
+        "view_preview"
+      ],
+      "validator": "af-lesson-v1",
+      "status": "ready"
+    },
+    {
+      "name": "research-with-evidence",
+      "version": "1.0.0",
+      "file": "research-with-evidence/1.0.0/SKILL.md",
+      "sha256": "77974a1e0177caca9023f52ae07d948ab44873c5925ad78698fcefde3c799573",
+      "purpose": [
+        "research"
+      ],
+      "requiredToolIds": [
+        "get_task_context",
+        "source_retrieve",
+        "math_validate",
+        "math_render",
+        "layout_check",
+        "view_preview"
+      ],
+      "validator": "af-evidence-v1",
+      "status": "ready"
     }
   ]
 }

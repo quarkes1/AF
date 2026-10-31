@@ -1,0 +1,12 @@
+import type {StoryStore} from './store'
+import type {ActRecord,Attempt,ExperienceContext,ExperienceJob,LearningSession,LessonArtifact} from '../../../shared/contracts/experience'
+
+interface Rows{act:ActRecord;job:ExperienceJob;bundle:ExperienceContext;lesson:LessonArtifact;learning:LearningSession;attempt:Attempt;aid:{aidEventId:string;learningSessionId:string;questionId:string;level:'hint'|'answer';content:import('../../../shared/contracts/experience').RichBlock[]};checkpoint:{checkpointId:string;saveId:string;branchId:string;label:string;createdAt:string;act:ActRecord|null;learningSessionId:string|null};receipt:{hash:string;result:unknown};discussion:{learningSessionId:string;kind:'reading'|'discussion';page:import('../../../shared/contracts/experience').ScriptPage}}
+export class ExperienceStore{
+ constructor(readonly story:StoryStore){story.db.exec(`CREATE TABLE IF NOT EXISTS experience_records(kind TEXT NOT NULL,id TEXT NOT NULL,save_id TEXT NOT NULL REFERENCES saves(id) ON DELETE CASCADE,branch_id TEXT NOT NULL,data TEXT NOT NULL,PRIMARY KEY(kind,id));CREATE INDEX IF NOT EXISTS experience_scope ON experience_records(save_id,branch_id,kind);`)}
+ get<K extends keyof Rows>(kind:K,id:string):Rows[K]{const row=this.story.db.prepare('SELECT data FROM experience_records WHERE kind=? AND id=?').get(kind,id) as {data:string}|undefined;if(!row)throw new Error('NOT_FOUND');return JSON.parse(row.data)}
+ has(kind:keyof Rows,id:string){return !!this.story.db.prepare('SELECT 1 FROM experience_records WHERE kind=? AND id=?').get(kind,id)}
+ put<K extends keyof Rows>(kind:K,id:string,scope:{saveId:string;branchId:string},value:Rows[K]){this.story.db.prepare('INSERT INTO experience_records VALUES(?,?,?,?,?) ON CONFLICT(kind,id) DO UPDATE SET data=excluded.data').run(kind,id,scope.saveId,scope.branchId,JSON.stringify(value));return value}
+ list<K extends keyof Rows>(kind:K,scope?:{saveId:string;branchId:string}):Rows[K][]{const rows=scope?this.story.db.prepare('SELECT data FROM experience_records WHERE kind=? AND save_id=? AND branch_id=? ORDER BY rowid DESC').all(kind,scope.saveId,scope.branchId):this.story.db.prepare('SELECT data FROM experience_records WHERE kind=? ORDER BY rowid DESC').all(kind);return(rows as {data:string}[]).map(r=>JSON.parse(r.data))}
+ job(id:string,patch:Partial<ExperienceJob>){const old=this.get('job',id);return this.put('job',id,old,{...old,...patch,stateVersion:old.stateVersion+1})}
+}

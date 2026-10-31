@@ -9,11 +9,12 @@ import {CompanionPortrait} from '../companions/CompanionPortrait'
 import type {CompanionView} from '../companions/model'
 import type {StoryView} from '../saves/model'
 import {homeStorySummary} from './summary'
+import type {StoryClient} from '../saves/backend-client'
 import {HomeMedia,type MediaPanel,type MediaChoices} from './HomeMedia'
 
 /** No fabricated save: this is the real empty home of the first frontend slice. */
-export function Home({ activeStoryId=null,background,backgroundPosition,backgrounds,musics,onBackground,onOpenMaterials,playback,onToggleMusic,onSeekMusic,stories,onContinueStory,musicId,onMusic, companion, resources, assetWarning, muted, onMute, onOpenSaves, onOpenLearning, onOpenCompanions, onOpenSettings, covered=false, entryFromTitle = false, transitioning = false, reducedMotion = false }: {
-  activeStoryId?:string|null;background:string;backgroundPosition:number;backgrounds:MediaChoices;musics:MediaChoices;onBackground:(id:string)=>void;onOpenMaterials:()=>void;playback:HomePlayback;onToggleMusic:()=>Promise<boolean>;onSeekMusic:(seconds:number)=>boolean;stories:readonly StoryView[];onContinueStory:(id:string)=>void;musicId:string;onMusic:(id:string)=>Promise<boolean>;companion:CompanionView;resources: ResourceCatalog; assetWarning: string | null; muted: boolean; onMute: () => void; onOpenSaves:(create?:boolean)=>void;onOpenLearning:()=>void;onOpenCompanions:()=>void;onOpenSettings:()=>void;covered?:boolean;entryFromTitle?: boolean; transitioning?: boolean; reducedMotion?: boolean
+export function Home({ chatClient=null,activeBranchId=null,typewriterEnabled=true,charsPerSecond=4,onRegisterChatFlush,onChatTouched,activeStoryId=null,background,backgroundPosition,backgrounds,musics,onBackground,onOpenMaterials,playback,onToggleMusic,onSeekMusic,stories,onContinueStory,musicId,onMusic, companion, resources, assetWarning, muted, onMute, onOpenSaves, onOpenLearning, onOpenCompanions, onOpenSettings, covered=false, entryFromTitle = false, transitioning = false, reducedMotion = false }: {
+  chatClient?:StoryClient|null;activeBranchId?:string|null;typewriterEnabled?:boolean;charsPerSecond?:number;onRegisterChatFlush?:(flush:()=>Promise<void>)=>void;onChatTouched?:()=>void;activeStoryId?:string|null;background:string;backgroundPosition:number;backgrounds:MediaChoices;musics:MediaChoices;onBackground:(id:string)=>void;onOpenMaterials:()=>void;playback:HomePlayback;onToggleMusic:()=>Promise<boolean>;onSeekMusic:(seconds:number)=>boolean;stories:readonly StoryView[];onContinueStory:(id:string)=>void;musicId:string;onMusic:(id:string)=>Promise<boolean>;companion:CompanionView;resources: ResourceCatalog; assetWarning: string | null; muted: boolean; onMute: () => void; onOpenSaves:(create?:boolean)=>void;onOpenLearning:()=>void;onOpenCompanions:()=>void;onOpenSettings:()=>void;covered?:boolean;entryFromTitle?: boolean; transitioning?: boolean; reducedMotion?: boolean
 }) {
   const summary=homeStorySummary(stories)
   const [mediaPanel,setMediaPanel]=useState<MediaPanel>(null)
@@ -24,7 +25,8 @@ export function Home({ activeStoryId=null,background,backgroundPosition,backgrou
   const [backgroundMissing, setBackgroundMissing] = useState(false)
   useEffect(()=>setBackgroundMissing(false),[background])
   const [notice, setNotice] = useState<string | null>(null)
-  const [chatOpen,setChatOpen]=useState(false)
+  const [chatOpen,setChatOpen]=useState(false),[chatPose,setChatPose]=useState<string|null>(null)
+  useEffect(()=>setChatPose(null),[activeStoryId,companion.id])
   const [chatFocusRequest,setChatFocusRequest]=useState(0)
   const portrait=useRef<HTMLButtonElement>(null)
   const returnFocus=useRef<HTMLElement|null>(null)
@@ -56,7 +58,7 @@ export function Home({ activeStoryId=null,background,backgroundPosition,backgrou
       </div>
     </header>
     <button ref={portrait} className="home__portrait" aria-label={`与 ${companion.name} 聊聊`} aria-expanded={chatOpen} onClick={openChat}>
-      <CompanionPortrait image={companion.sprites[companion.defaultPose]} name={companion.name} resources={resources}/>
+      <CompanionPortrait image={companion.sprites[chatPose??companion.defaultPose]??companion.sprites[companion.defaultPose]} name={companion.name} resources={resources}/>
     </button>
     <div className="home__portrait-hint" hidden={chatOpen}><Icon name="mouse" resources={resources} />点击搭档，与 TA 聊聊 <span>›</span></div>
     <section className="home__navigation" aria-label="主要功能">
@@ -83,7 +85,7 @@ export function Home({ activeStoryId=null,background,backgroundPosition,backgrou
       </div>
     </section>
     <div className="home__greeting" hidden={chatOpen}><span /><p><b>{companion.name}</b>：今天想接着聊，还是一起看看课本？</p></div>
-    <HomeChat activeStoryId={activeStoryId} open={chatOpen} focusRequest={chatFocusRequest} partnerId={companion.id} partnerName={companion.name} resources={resources} onClose={closeChat} onCreateStory={()=>openSaves(portrait.current,true)}/>
+    <HomeChat client={chatClient} activeBranchId={activeBranchId} typewriter={typewriterEnabled} charsPerSecond={charsPerSecond} onRegisterFlush={onRegisterChatFlush} onStoryTouched={onChatTouched} onOpenSettings={()=>{setChatOpen(false);onOpenSettings()}} onPose={setChatPose} activeStoryId={activeStoryId} open={chatOpen} focusRequest={chatFocusRequest} partnerId={companion.id} partnerName={companion.name} resources={resources} onClose={closeChat} onCreateStory={()=>openSaves(portrait.current,true)}/>
     {assetWarning && <div className="home__asset-warning" role="status">{assetWarning}</div>}
     {notice && <div className="home__notice" role="status"><span>{notice}</span><button className="quiet-button" onClick={() => setNotice(null)} aria-label="关闭提示">×</button></div>}
     </div>

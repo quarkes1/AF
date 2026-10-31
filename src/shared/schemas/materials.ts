@@ -2,6 +2,8 @@ import {z} from 'zod'
 const id=z.string().min(1).max(160),name=z.string().trim().min(1).max(160),empty=z.object({}).strict()
 const envelope=z.object({protocolVersion:z.literal(1),requestId:z.string().uuid(),command:id,target:z.object({kind:z.enum(['resource','course','provider','job','profile']),id:id.nullable()}).strict(),saveId:z.null(),branchId:z.null(),expectedStateVersion:z.number().int().nonnegative().nullable(),idempotencyKey:z.string().uuid().nullable(),payload:z.unknown()}).strict()
 const schema={
+ 'resource.settings.get':z.object({}).strict(),
+ 'resource.settings.update':z.object({classificationBatchSize:z.number().int().min(1).max(100)}).strict(),
  'resource.list':z.object({limit:z.number().int().min(1).max(100).optional(),cursor:z.string().nullable().optional(),courseId:id.nullable().optional(),status:z.string().nullable().optional()}).strict(),
  'course.list':z.object({limit:z.number().int().min(1).max(100).optional(),cursor:z.string().nullable().optional()}).strict(),'provider.list':empty,'jobs.list':empty,'jobs.get':z.object({jobId:id}).strict(),'resource.sources':empty,
  'resource.watch':z.object({sourceId:id,enabled:z.boolean()}).strict(),
@@ -31,6 +33,6 @@ const schema={
  'textbook.skip':z.object({courseId:id}).strict(),
  'textbook.confirm':z.object({courseId:id,candidateId:id.nullable(),chapterMapVersion:z.number().int().min(1),useExistingProgress:z.boolean()}).strict(),
 } as const
-const reads=new Set(['resource.list','course.list','provider.list','jobs.list','jobs.get','resource.read','resource.pick','resource.blocks','resource.image','resource.open','source.retrieve','resource.sources'])
+const reads=new Set(['resource.settings.get','resource.list','course.list','provider.list','jobs.list','jobs.get','resource.read','resource.pick','resource.blocks','resource.image','resource.open','source.retrieve','resource.sources'])
 
 export {envelope as materialRequestSchema,schema as materialCommandSchemas,reads as materialReadCommands}

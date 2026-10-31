@@ -6,8 +6,18 @@ import {LearningStage} from './LearningStage'
 import {filterCourses,initialCourseView,newLessonSession,type CourseMapState,type CourseView,type LessonSession} from './model'
 import type {SettingsPreferences} from '../settings/model'
 import './learning.css'
+import {NativeLearningStage} from './NativeLearningStage'
+import {TextbookSettings} from './TextbookSettings'
+import {useCourses} from './useCourses'
+import type {BackendClient} from '../materials/backend-client'
+import type {StoryClient} from '../saves/backend-client'
+import type {ChatScope} from '../../../shared/contracts/home-chat'
+import type {SourceRef} from '../../../shared/contracts/experience'
+import type {CompanionView} from '../companions/model'
 
-export function CourseScreen({preferences,open,resources,onBack,initialCourses=[],review=false}:{preferences:SettingsPreferences;open:boolean;resources:ResourceCatalog;onBack:()=>void;initialCourses?:readonly CourseView[];review?:boolean}){
+export function CourseScreen({preferences,open,resources,onBack,initialCourses:providedCourses=[],review=false,covered=false,backend=null,client=null,scope=null,companion,onRequireStory,onMaterials,onSource,onMaterial,onMain}:{preferences:SettingsPreferences;open:boolean;resources:ResourceCatalog;onBack:()=>void;initialCourses?:readonly CourseView[];review?:boolean;covered?:boolean;backend?:BackendClient|null;client?:StoryClient|null;scope?:ChatScope|null;companion?:CompanionView;onRequireStory?:()=>void;onMaterials?:()=>void;onSource?:(source:SourceRef)=>void;onMaterial?:(id:string)=>void;onMain?:()=>void}){
+  const catalog=useCourses(backend,open&&!review,client,scope),initialCourses=review||!backend?providedCourses:catalog.courses
+
   const [view,setView]=useState<'overview'|'map'|'stage'>('overview')
   const [query,setQuery]=useState(''),[courseId,setCourseId]=useState<string|null>(initialCourses[0]?.id??null)
   const [maps,setMaps]=useState<Record<string,CourseMapState>>({})
@@ -17,9 +27,10 @@ export function CourseScreen({preferences,open,resources,onBack,initialCourses=[
   const screen=useRef<HTMLElement>(null),overviewOffset=useRef(0)
   const wasOpen=useRef(false)
   useLayoutEffect(()=>{
-    if(open&&!wasOpen.current)setView('overview')
+    if(open&&!wasOpen.current||!open&&wasOpen.current)setView('overview')
     wasOpen.current=open
   },[open])
+  useEffect(()=>{if(initialCourses.length&&!initialCourses.some(c=>c.id===courseId))setCourseId(initialCourses[0].id)},[initialCourses,courseId])
   const course=initialCourses.find(c=>c.id===courseId)
   const map=course?(maps[course.id]??initialCourseView(course)):null
   const chapter=course?.chapters.find(c=>c.id===map?.chapterId)
@@ -29,7 +40,7 @@ export function CourseScreen({preferences,open,resources,onBack,initialCourses=[
   const filtered=filterCourses(initialCourses,query)
   const patchMap=(patch:Partial<CourseMapState>)=>{if(course)setMaps(old=>({...old,[course.id]:{...(old[course.id]??initialCourseView(course)),...patch}}))}
   const patchSession=(patch:Partial<LessonSession>)=>setSessions(old=>({...old,[sessionKey]:{...(old[sessionKey]??newLessonSession()),...patch}}))
-  const importMaterials=()=>setNotice('资料导入与解析模块尚未接入；当前不会创建课程或上传文件。')
+  const importMaterials=()=>{if(onMaterials&&!review)onMaterials();else setNotice('演示模式不导入真实资料。')}
   const enterMap=(id=courseId)=>{
     if(!id)return
     setCourseId(id);setView('map');setNotice(null)
@@ -71,14 +82,14 @@ export function CourseScreen({preferences,open,resources,onBack,initialCourses=[
   },[dialog])
   const startLearning=()=>{
     if(!course||!chapter||!section||chapter.status!=='ready')return
-    if(!review){setNotice('请先创建故事并配置模型。当前学习目标已保留，完成配置后仍需确认开始。');return}
+    if(!review&&(!client||!scope)){setNotice('请先创建或选中一个故事，学习目标已保留。');onRequireStory?.();return}
     setView('stage');setNotice(null)
   }
   const statusText=(item:CourseView)=>item.textbookState==='confirmed'?'教材已核对':item.textbookState==='inferred'?'教材待核对':'通用目录 / 未指定教材'
-  return <section ref={screen} className="course-screen" data-open={open} data-testid="course-screen" inert={!open} aria-hidden={!open} aria-label="章节学习">
+  return <section ref={screen} className="course-screen" data-open={open} data-testid="course-screen" inert={!open||covered} aria-hidden={!open||covered} aria-label="章节学习">
     <img className="course-screen__background" src={resources.url('background.library-hall-day')} alt=""/>
     <div className="course-screen__shade"/>
-    {view==='stage'&&course&&chapter&&section?<LearningStage preferences={preferences} active={open} backRef={back} course={course} chapter={chapter} section={section} resources={resources} session={session} onChange={patchSession} onBack={returnMap} onHome={onBack} onNotice={setNotice} onSource={()=>setDialog('materials')}/>:<>
+    {open&&view==='stage'&&course&&chapter&&section?(!review&&client&&scope&&companion?<NativeLearningStage active={open&&!covered} key={`${scope.saveId}:${chapter.id}`} client={client} scope={scope} course={course} chapter={chapter} companion={companion} resources={resources} onBack={returnMap} onMain={onMain??onBack} onSource={ref=>onSource?.(ref)}/>:<LearningStage preferences={preferences} active={open} backRef={back} course={course} chapter={chapter} section={section} resources={resources} session={session} onChange={patchSession} onBack={returnMap} onHome={onBack} onNotice={setNotice} onSource={()=>setDialog('materials')}/>):<>
       <img className="course-screen__brand" src={resources.url('brand.logo.inverse')} alt="AF"/>
       <header className="course-screen__header"><div><button ref={back} className="quiet-button" aria-label={view==='map'?'返回学科总览':'返回首页'} onClick={view==='map'?returnOverview:onBack}><Icon name="arrow-left" resources={resources}/></button><h1>章节学习</h1></div><nav className="course-breadcrumb" aria-label="学习位置"><button onClick={returnOverview}>学科总览</button>{view==='map'&&<><span>/</span><span>{course?.name}</span></>}</nav></header>
       {review&&<p className="course-screen__review">演示课程 · 仅预览界面，不记录学习证据</p>}
@@ -98,7 +109,8 @@ export function CourseScreen({preferences,open,resources,onBack,initialCourses=[
         </aside>:<button className="chapter-reopen save-secondary" onClick={()=>patchMap({detailOpen:true})} disabled={!chapter}>展开章节详情</button>}
       </>:null}
     </>}
+    {catalog.error&&!review&&<p className="course-notice" role="alert">{catalog.error}</p>}
     {notice&&<div className="course-notice" role="status"><p>{notice}</p><button className="quiet-button" aria-label="关闭学习提示" onClick={()=>{setNotice(null);focusBack()}}><Icon name="close" resources={resources}/></button></div>}
-    <dialog ref={modal} className="course-dialog" aria-labelledby="course-dialog-title" onCancel={event=>{event.preventDefault();setDialog(null)}}><header><h2 id="course-dialog-title">{dialog==='textbook'?'教材与版本':'关联资料'}</h2><button className="quiet-button" onClick={()=>setDialog(null)} aria-label="关闭资料面板"><Icon name="close" resources={resources}/></button></header>{dialog==='textbook'?<><p>{course?.textbook}</p><p>教材状态：{course&&statusText(course)}</p><p>完整教材、课件或试题均可作为入口。后续通过简短问答确认版本，也可跳过并采用推定或通用框架。</p><button className="save-secondary" onClick={()=>{setDialog(null);setNotice('教材版本问答与资料导入尚未接入，所选科目和位置已保留。')}}>设置教材版本</button></>:<><p>{chapter?.name??'当前课程'}</p>{chapter?.materials.length?<ul>{chapter.materials.map(material=><li key={material.id}><strong>{material.name}</strong><span>{material.location}</span><button className="learning-inline-action" onClick={()=>{setDialog(null);setNotice('资料阅读器尚未接入；演示条目不对应真实文件，当前不会打开或下载文件。')}}>定位来源</button></li>)}</ul>:<p>暂无可定位资料。此处仅展示已关联的来源，不提供虚构文件。</p>}<small>演示资料并非用户教材。数学示例为自编内容，不冒用教材页码。</small></>}</dialog>
+    <dialog ref={modal} className="course-dialog" aria-labelledby="course-dialog-title" onCancel={event=>{event.preventDefault();setDialog(null)}}><header><h2 id="course-dialog-title">{dialog==='textbook'?'教材与版本':'关联资料'}</h2><button className="quiet-button" onClick={()=>setDialog(null)} aria-label="关闭资料面板"><Icon name="close" resources={resources}/></button></header>{dialog==='textbook'?backend&&!review&&course?<TextbookSettings backend={backend} courseId={course.id} onChanged={()=>setNotice('教材目录已更新，既有学习证据保留。')}/>:<><p>{course?.textbook}</p><p>教材状态：{course&&statusText(course)}</p><p>完整教材、课件或试题均可作为入口。后续通过简短问答确认版本，也可跳过并采用推定或通用框架。</p><button className="save-secondary" onClick={()=>{setDialog(null);setNotice('教材版本问答与资料导入尚未接入，所选科目和位置已保留。')}}>设置教材版本</button></>:<><p>{chapter?.name??'当前课程'}</p>{chapter?.materials.length?<ul>{chapter.materials.map(material=><li key={material.id}><strong>{material.name}</strong><span>{material.location}</span><button className="learning-inline-action" onClick={()=>{setDialog(null);onMaterial&&!review?onMaterial(material.id):setNotice('演示条目不对应真实文件。')}}>定位来源</button></li>)}</ul>:<p>暂无可定位资料。此处仅展示已关联的来源，不提供虚构文件。</p>}{review&&<small>演示资料并非用户教材。数学示例为自编内容，不冒用教材页码。</small>}</>}</dialog>
   </section>
 }

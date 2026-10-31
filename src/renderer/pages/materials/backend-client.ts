@@ -1,6 +1,6 @@
 import type {BackendRequest,CourseRecord,MaterialJob,MaterialRecord,NameReview} from '../../../shared/contracts/materials'
 import type {LibraryItem} from './model'
-const readCommands=new Set(['resource.list','course.list','provider.list','jobs.list','jobs.get','resource.read','resource.pick','resource.blocks','resource.image','resource.open','source.retrieve','resource.sources'])
+const readCommands=new Set(['resource.settings.get','resource.list','course.list','provider.list','jobs.list','jobs.get','resource.read','resource.pick','resource.blocks','resource.image','resource.open','source.retrieve','resource.sources'])
 export class BackendClient{
  version=0
  async waitJob(id:string,timeoutMs=150000){const end=Date.now()+timeoutMs;while(Date.now()<end){const job=await this.call<MaterialJob>('jobs.get',{jobId:id},id);if(!job)throw new Error('后台任务已不存在。');if(job.status==='completed')return job.result;if(['failed','cancelled','superseded'].includes(job.status))throw new Error(job.error??'任务未完成。');await new Promise(r=>setTimeout(r,500))}throw new Error('任务仍在后台处理中，可在资料管理中查看或取消。')}

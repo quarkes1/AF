@@ -3,6 +3,7 @@ import {createHash,randomUUID} from 'node:crypto'
 import {mkdirSync,existsSync,copyFileSync} from 'node:fs'
 import {join} from 'node:path'
 import {z} from 'zod'
+import type {UserProfile} from '../../../shared/contracts/home-chat'
 import type {CharacterContent,CharacterTemplate,StoryRecord,StorySummary,StorySelection,StoryRequest,StoryResponse} from '../../../shared/contracts/story'
 import {storyCommandSchemas,storyReads,storyRequestSchema} from '../../../shared/schemas/story'
 
@@ -12,7 +13,7 @@ const now=()=>new Date().toISOString()
 const defaultContent:CharacterContent={name:'Aurore',sourceKind:'original',sourceWork:'AF 原创搭档',personality:'温和、好奇，愿意一起寻找答案。',partnerIdentity:'同校的伙伴',userIdentity:'大学生',address:'',background:'现实校园',knowledge:'依据自身经历、被告知与实际查阅的内容回应。',speech:'',relationship:'刚认识不久',initiative:'跟随用户设置',immutable:'',events:'',poses,defaultPose:'01-neutral',sprites:Object.fromEntries(poses.map(p=>[p.id,`character.af-guide.${p.id}`])),examples:true}
 
 export class StoryStore{
- private db:DatabaseSync
+ readonly db:DatabaseSync
  constructor(root:string,private resources:Resources){
   const directory=join(root,'data');mkdirSync(directory,{recursive:true});const path=join(directory,'story.sqlite');this.db=new DatabaseSync(path)
   const version=(this.db.prepare('PRAGMA user_version').get() as {user_version:number}).user_version
@@ -33,13 +34,13 @@ export class StoryStore{
  }
  close(){this.db.close()}
  version(){return Number((this.db.prepare("SELECT value FROM story_meta WHERE key='version'").get() as {value:string}).value)}
- private transaction<T>(fn:()=>T){this.db.exec('BEGIN IMMEDIATE');try{const value=fn();this.db.prepare("UPDATE story_meta SET value=CAST(value AS INTEGER)+1 WHERE key='version'").run();this.db.exec('COMMIT');return value}catch(error){this.db.exec('ROLLBACK');throw error}}
+ transaction<T>(fn:()=>T){this.db.exec('BEGIN IMMEDIATE');try{const value=fn();this.db.prepare("UPDATE story_meta SET value=CAST(value AS INTEGER)+1 WHERE key='version'").run();this.db.exec('COMMIT');return value}catch(error){this.db.exec('ROLLBACK');throw error}}
  private template(id:string):CharacterTemplate{const row=this.db.prepare('SELECT data FROM templates WHERE id=? AND removed=0').get(id) as {data:string}|undefined;if(!row)throw new Error('NOT_FOUND');return JSON.parse(row.data)}
- private save(id:string):StoryRecord{const row=this.db.prepare('SELECT data FROM saves WHERE id=?').get(id) as {data:string}|undefined;if(!row)throw new Error('NOT_FOUND');return JSON.parse(row.data)}
- private selection():StorySelection{const row=this.db.prepare("SELECT value FROM story_meta WHERE key='selection'").get() as {value:string}|undefined;return row?JSON.parse(row.value):{kind:'template',templateId:'af-guide'}}
+ save(id:string):StoryRecord{const row=this.db.prepare('SELECT data FROM saves WHERE id=?').get(id) as {data:string}|undefined;if(!row)throw new Error('NOT_FOUND');return JSON.parse(row.data)}
+ selection():StorySelection{const row=this.db.prepare("SELECT value FROM story_meta WHERE key='selection'").get() as {value:string}|undefined;return row?JSON.parse(row.value):{kind:'template',templateId:'af-guide'}}
  private writeSelection(selection:StorySelection){const revision=this.selectionVersion()+1;this.db.prepare("INSERT INTO story_meta VALUES('selectionVersion',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").run(String(revision));this.db.prepare("INSERT INTO story_meta VALUES('selection',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").run(JSON.stringify(selection))}
  private writeTemplate(t:CharacterTemplate){this.db.prepare('INSERT INTO templates VALUES(?,0,?) ON CONFLICT(id) DO UPDATE SET data=excluded.data').run(t.id,JSON.stringify(t));this.db.prepare('INSERT INTO template_versions VALUES(?,?,?)').run(t.id,t.templateVersion,JSON.stringify(t))}
- private writeSave(s:StoryRecord){this.db.prepare('INSERT INTO saves VALUES(?,?) ON CONFLICT(id) DO UPDATE SET data=excluded.data').run(s.id,JSON.stringify(s))}
+ writeSave(s:StoryRecord){this.db.prepare('INSERT INTO saves VALUES(?,?) ON CONFLICT(id) DO UPDATE SET data=excluded.data').run(s.id,JSON.stringify(s))}
  private validateContent(content:CharacterContent,draft:boolean){
   if(Buffer.byteLength(JSON.stringify(content))>64*1024*1024)throw new Error('INVALID_PAYLOAD')
   for(const image of Object.values(content.sprites))if(image&&!(image.startsWith('character.')&&this.resources.isRegistered(image))&&!(/^data:image\/png;base64,[A-Za-z0-9+/=\r\n]+$/.test(image)&&this.resources.isValidPng(image)))throw new Error('INVALID_PAYLOAD')
@@ -47,14 +48,14 @@ export class StoryStore{
  }
  private page<T>(items:T[],p:{limit?:number;cursor?:string|null}){const offset=p.cursor?Number(p.cursor):0;if(!Number.isSafeInteger(offset)||offset<0)throw new Error('INVALID_PAYLOAD');const limit=p.limit??100;return{items:items.slice(offset,offset+limit),nextCursor:offset+limit<items.length?String(offset+limit):null}}
  private selectionVersion(){const row=this.db.prepare("SELECT value FROM story_meta WHERE key='selectionVersion'").get() as {value:string}|undefined;return Number(row?.value??0)}
- private commandVersion(command:string,p:any){if(command==='selection.get'||command==='template.select')return this.selectionVersion();if(p.saveId)return this.save(p.saveId).stateVersion;if(p.id)return this.template(p.id).templateVersion;return this.version()}
+ private commandVersion(command:string,p:any){if(command.startsWith('profile.'))return this.profile().stateVersion;if(command==='selection.get'||command==='template.select')return this.selectionVersion();if(p.saveId)return this.save(p.saveId).stateVersion;if(p.id)return this.template(p.id).templateVersion;return this.version()}
  request(raw:unknown):StoryResponse{
   let request:StoryRequest|undefined,stateVersion:number|null=null
   try{
    request=storyRequestSchema.parse(raw)
    if(!Object.hasOwn(storyCommandSchemas,request.command))throw new Error('INVALID_PAYLOAD')
    const command=request.command as keyof typeof storyCommandSchemas,p=storyCommandSchemas[command].parse(request.payload) as any,read=storyReads.has(command)
-   const kind=command.startsWith('template.')?'template':command.startsWith('save.')?'save':'selection',id=p.id??p.saveId??null
+   const kind=command.startsWith('template.')?'template':command.startsWith('save.')?'save':command.startsWith('profile.')?'profile':'selection',id=p.id??p.saveId??null
    if(request.target.kind!==kind||request.target.id!==id||request.saveId!==(p.saveId??null)||request.branchId!==(p.branchId??null))throw new Error('FORBIDDEN')
    if(read?request.idempotencyKey!==null:!request.idempotencyKey)throw new Error('INVALID_PAYLOAD')
    // Authorize ownership before replaying an accepted intent; deleted-save receipts remain target-scoped.
@@ -74,8 +75,11 @@ export class StoryStore{
    return{protocolVersion:1,requestId:request?.requestId??'',ok:false,stateVersion,error:{code,message:message[code],retryable:code==='RUNTIME_UNAVAILABLE',detailsRef:null}}
   }
  }
+ profile():UserProfile{const row=this.db.prepare("SELECT value FROM story_meta WHERE key='profile'").get() as {value:string}|undefined;return row?JSON.parse(row.value):{displayName:'我',preferredAddress:'',timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,textScale:1,reducedMotion:false,stateVersion:0}}
  private dispatch(command:keyof typeof storyCommandSchemas,p:any):unknown{
   switch(command){
+   case 'profile.get':return this.profile()
+   case 'profile.update':{const profile={...this.profile(),...p.patch,stateVersion:this.profile().stateVersion+1};profile.displayName=profile.displayName.trim();profile.preferredAddress=profile.preferredAddress.trim();this.db.prepare("INSERT INTO story_meta VALUES('profile',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").run(JSON.stringify(profile));return profile}
    case 'template.list':return this.page((this.db.prepare('SELECT data FROM templates WHERE removed=0 ORDER BY rowid').all() as {data:string}[]).map(r=>JSON.parse(r.data)),p)
    case 'template.get':return this.template(p.id)
    case 'template.create':{this.validateContent(p.content,p.draft);const time=now(),t:CharacterTemplate={id:randomUUID(),builtIn:false,templateVersion:1,content:{...p.content,name:p.content.name.trim()},draft:p.draft,createdAt:time,updatedAt:time};this.writeTemplate(t);return t}

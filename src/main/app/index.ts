@@ -1,7 +1,7 @@
 import { app, BrowserWindow, session,dialog,shell,nativeImage } from 'electron'
 import { dirname, resolve,relative,isAbsolute,basename } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import {mkdtempSync} from 'node:fs'
+import {mkdtempSync,readFileSync} from 'node:fs'
 import {tmpdir} from 'node:os'
 import appIcon from '../../../assets/brand/app-icon/aurore-256.png?asset'
 import taskbarIcon from '../../../assets/brand/app-icon/aurore.ico?asset'
@@ -12,6 +12,10 @@ import {MaterialService} from '../modules/resources/service'
 import {installMaterialIpc} from '../ipc/materials'
 import {StoryStore} from '../modules/story/store'
 import {installStoryIpc} from '../ipc/story'
+import {HomeChatService,type CharacterWorkerResult} from '../modules/story/home-service'
+import {LayoutValidator} from '../infrastructure/layout'
+import {ExperienceService} from '../modules/story/experience-service'
+import {runWorker} from '../runtime/bridge/worker'
 import resourceRegistry from '../../../assets/registry.json'
 
 const applicationId=taskbarApplicationId(process.env.AF_TEST_MODE==='1')
@@ -27,6 +31,9 @@ const here = dirname(fileURLToPath(import.meta.url))
 let window: BrowserWindow | null = null
 let materialService:MaterialService|undefined
 let disposeMaterialIpc:(()=>void)|undefined
+let homeChatService:HomeChatService|undefined
+let experienceService:ExperienceService|undefined
+let layoutValidator:LayoutValidator|undefined
 let storyStore:StoryStore|undefined,disposeStoryIpc:(()=>void)|undefined
 function createWindow() {
   window = new BrowserWindow({
@@ -52,7 +59,7 @@ function createWindow() {
   window.on('ready-to-show', () => { if (process.env.AF_TEST_MODE !== '1') window?.show() })
   if (process.env.ELECTRON_RENDERER_URL) void window.loadURL(process.env.ELECTRON_RENDERER_URL)
   else void window.loadFile(resolve(here, '../renderer/index.html'))
-  window.on('closed', () => { window = null })
+  window.on('closed', () => { window = null;app.quit() })
 }
 if (!app.requestSingleInstanceLock()) app.quit()
 else {
@@ -61,13 +68,17 @@ else {
     session.defaultSession.setPermissionRequestHandler((_contents, _permission, callback) => callback(false))
     const root=app.getPath('userData')
     const repository=new MaterialRepository(root)
-    materialService=new MaterialService(repository,new ProviderProfile(root,repository.db),{parser:resolve(here,'materials-parser.js'),agent:resolve(here,'materials-agent.js'),runtime:resolve(here,'../resources/document-runtime'),skill:resolve(here,'../resources/skills/resource-ingest/1.0.0/SKILL.md')})
-    disposeMaterialIpc=installMaterialIpc(materialService)
+    const provider=new ProviderProfile(root,repository.db)
+    materialService=new MaterialService(repository,provider,{parser:resolve(here,'materials-parser.js'),agent:resolve(here,'materials-agent.js'),runtime:resolve(here,'../resources/document-runtime'),skill:resolve(here,'../resources/skills/resource-ingest/1.0.0/SKILL.md')})
+    disposeMaterialIpc=installMaterialIpc(materialService,()=>{homeChatService?.providerChanged();experienceService?.providerChanged()})
     const characterIds=new Set(resourceRegistry.resources.filter(r=>r.id.startsWith('character.')&&['approved','ready'].includes(r.status)).map(r=>r.id))
     storyStore=new StoryStore(root,{isRegistered:id=>characterIds.has(id),isValidPng:data=>{try{const bytes=Buffer.from(data.slice(data.indexOf(',')+1),'base64');if(!bytes.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])))return false;const image=nativeImage.createFromDataURL(data),size=image.getSize();return !image.isEmpty()&&size.width>0&&size.height>0&&size.width*size.height<=32000000}catch{return false}},courseExists:id=>materialService!.snapshot().courses.some(c=>c.id===id)})
-    disposeStoryIpc=installStoryIpc(storyStore)
+    homeChatService=new HomeChatService(storyStore,{provider,worker:(input,signal)=>runWorker<CharacterWorkerResult>(resolve(here,'character-agent.js'),{...input,skill:readFileSync(resolve(here,'../resources/skills/character-dialogue/1.0.0/SKILL.md'),'utf8')},signal,120000)})
+    layoutValidator=new LayoutValidator(resolve(here,'../renderer'),root,process.env.ELECTRON_RENDERER_URL)
+    experienceService=new ExperienceService(storyStore,{home:homeChatService,provider,sources:materialService,layout:(request,signal)=>layoutValidator!.measure(request,signal),validateLayout:(blocks,mode,signal)=>layoutValidator!.matrix(blocks,mode,signal),backgroundIds:new Set(resourceRegistry.resources.filter(r=>r.id.startsWith('background.')&&['approved','ready'].includes(r.status)).map(r=>r.id)),worker:(input,signal,onProgress,onTool)=>{const skill=input.bundle.purpose==='scriptDraft'?'story-act-compose':input.bundle.purpose==='learningCompose'?'chapter-compose':'research-with-evidence';return runWorker(resolve(here,'experience-agent.js'),{...input,skill:readFileSync(resolve(here,`../resources/skills/${skill}/1.0.0/SKILL.md`),'utf8')},signal,120000,onProgress,onTool)}})
+    disposeStoryIpc=installStoryIpc(experienceService)
     createWindow()
   }).catch(()=>{dialog.showErrorBox('AF 资料库初始化失败','资料库或必要组件暂时无法打开。原文件未改动；请保留应用数据目录及数据库备份，修复 AF 后重试。');app.quit()})
-  app.on('before-quit',()=>{materialService?.dispose();disposeMaterialIpc?.();disposeStoryIpc?.();storyStore?.close()})
+  app.on('before-quit',()=>{experienceService?.dispose();layoutValidator?.dispose();homeChatService?.dispose();materialService?.dispose();disposeMaterialIpc?.();disposeStoryIpc?.();storyStore?.close()})
   app.on('window-all-closed', () => app.quit())
 }

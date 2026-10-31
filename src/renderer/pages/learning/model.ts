@@ -2,7 +2,7 @@
 export interface SectionView {id:string;name:string;lesson?:LessonView}
 export interface LessonView {intro:string;paragraphs:string[];formula?:string;graph?:'derivative';source:string;question?:{prompt:string;choices:string[];correct:number;explanation:string}}
 export interface ChapterView {id:string;name:string;status:'ready'|'parsing'|'failed';imageId:string;sections:SectionView[];materials:{id:string;name:string;location:string}[]}
-export interface CourseView {id:string;name:string;textbook:string;textbookState:'confirmed'|'inferred'|'generic';resourceCount:number;reading:string;practice:string;chapters:ChapterView[];last?:{chapterId:string;sectionId:string}}
+export interface CourseView {id:string;name:string;textbook:string;textbookState:'confirmed'|'inferred'|'generic';resourceCount:number;reading:string;practice:string;chapters:ChapterView[];chapterMapVersion?:number;last?:{chapterId:string;sectionId:string}}
 export interface CourseMapState {chapterId:string|null;sectionId:string|null;zoom:number;scrollLeft:number;scrollTop:number;directory:boolean;detailOpen:boolean;anchorChanged:boolean}
 export function filterCourses(courses:readonly CourseView[],query:string){
   const needle=query.trim().toLocaleLowerCase()

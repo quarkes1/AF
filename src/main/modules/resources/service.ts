@@ -2,6 +2,8 @@ import {randomUUID,createHash} from 'node:crypto'
 import {readFileSync,existsSync} from 'node:fs'
 import {join} from 'node:path'
 import {z} from 'zod'
+import {modelGate} from '../../runtime/model-gate'
+import {courseOutline,buildCourseSource} from '../learning/sources'
 import {classifyContent,type CategoryContext} from './classification'
 import {MaterialRepository,normalizeCourse} from './repository'
 import type {MaterialJob,MaterialSnapshot,ContentBlock,NameReview,TextbookState} from '../../../shared/contracts/materials'
@@ -16,6 +18,10 @@ export class MaterialService{
  private parseRunning=0;private modelRunning=0;private parseWait:(()=>void)[]=[];private modelWait:(()=>void)[]=[]
  constructor(readonly repo:MaterialRepository,readonly provider:ProviderProfile,private paths:{parser:string;agent:string;runtime:string;skill:string},private execute=runWorker){}
  snapshot():MaterialSnapshot{return{items:this.repo.list(),courses:this.repo.courses(),jobs:this.repo.jobs(),provider:this.provider.summary(),stateVersion:this.repo.version()}}
+ processingSettings(){const row=this.repo.db.prepare("SELECT value FROM meta WHERE key='classification_batch_size'").get() as {value:string}|undefined,value=Number(row?.value??20);return{classificationBatchSize:Number.isSafeInteger(value)&&value>=1&&value<=100?value:20}}
+ configureProcessing(raw:unknown){const value=z.object({classificationBatchSize:z.number().int().min(1).max(100)}).strict().parse(raw);this.repo.transaction(()=>this.repo.db.prepare("INSERT INTO meta VALUES('classification_batch_size',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").run(String(value.classificationBatchSize)));return value}
+ learningCatalog(){return this.repo.courses().map(course=>courseOutline(course,this.repo.list()))}
+ learningSource(courseId:string,chapterId:string,version:number){return buildCourseSource(this.repo.course(courseId),this.repo.list(),id=>this.repo.blocks(id),chapterId,version)}
  private async slot<T>(kind:'parse'|'model',operation:()=>Promise<T>){const wait=kind==='parse'?this.parseWait:this.modelWait;while((kind==='parse'?this.parseRunning:this.modelRunning)>=2)await new Promise<void>(r=>wait.push(r));kind==='parse'?this.parseRunning++:this.modelRunning++;try{return await operation()}finally{kind==='parse'?this.parseRunning--:this.modelRunning--;wait.shift()?.()}}
  private job(purpose:MaterialJob['purpose'],ids:string[]){const job:MaterialJob={id:randomUUID(),purpose,status:'queued',documentIds:ids,error:null,completed:0,total:ids.length,createdAt:Date.now()};this.repo.putJob(job);this.aborts.set(job.id,new AbortController());return job}
  private status(job:MaterialJob,patch:Partial<MaterialJob>){const saved=this.repo.jobs().find(j=>j.id===job.id);if(saved&&['cancelled','superseded'].includes(saved.status)&&patch.status!==saved.status)return;Object.assign(job,patch);this.repo.putJob(job)}
@@ -48,10 +54,12 @@ export class MaterialService{
  private classificationTail:Promise<void>=Promise.resolve()
  classify(ids:string[]){
   const docs=[...new Set(ids)].map(id=>this.repo.get(id)).filter(d=>!d.manualOverride&&d.blocks>0)
-  const job=this.job('resourceClassify',docs.map(x=>x.id))
-  // Keep reconciliation and commit in library order, so concurrent imports see the preceding canonical category.
-  this.classificationTail=this.classificationTail.then(()=>this.classifyBatch(job)).catch(()=>{})
-  return{jobId:job.id,turnId:null,status:'queued',pollAfterMs:250}
+  const size=this.processingSettings().classificationBatchSize,jobs:MaterialJob[]=[]
+  for(let offset=0;offset<Math.max(1,docs.length);offset+=size){const job=this.job('resourceClassify',docs.slice(offset,offset+size).map(x=>x.id));jobs.push(job)
+   // Each admitted batch retains bounded discovery windows; all following batches remain queued.
+   this.classificationTail=this.classificationTail.then(()=>this.classifyBatch(job)).catch(()=>{})
+  }
+  return{jobId:jobs[0].id,jobIds:jobs.map(j=>j.id),turnId:null,status:'queued',pollAfterMs:250}
  }
  private async classifyBatch(job:MaterialJob){
   const signal=this.aborts.get(job.id)!.signal
@@ -120,14 +128,14 @@ export class MaterialService{
  }
  startProviderTest(){const job=this.job('providerTest',[]);const signal=this.aborts.get(job.id)!.signal;this.status(job,{status:'running'});void this.provider.test(signal).then(result=>{signal.throwIfAborted();this.status(job,{status:'completed',result})}).catch(error=>this.status(job,{status:signal.aborted?'cancelled':'failed',error:this.message(error)})).finally(()=>this.aborts.delete(job.id));return{jobId:job.id,turnId:null,status:'queued',pollAfterMs:250}}
  private async model(job:MaterialJob,input:unknown,signal:AbortSignal,scope?:{purpose:'resourceClassify'|'resourceReconcile';documentIds:string[];catalog:CategoryContext[]}){
-  return this.slot('model',async()=>{
+  return modelGate.run(signal,()=>this.slot('model',async()=>{
    signal.throwIfAborted()
    const purpose=scope?.purpose??job.purpose,documents=(scope?.documentIds??job.documentIds).map(id=>({id,filename:this.repo.get(id).filename,blocks:this.repo.blocks(id)}))
    const catalog=scope?.catalog??this.repo.courses(),separations=purpose==='resourceClassify'?[]:this.repo.separations()
    const contextHash=createHash('sha256').update(JSON.stringify({purpose,input,documents,catalog,separations})).digest('hex')
    this.status(job,{contextHash})
    return this.execute<unknown>(this.paths.agent,{config:this.provider.get(),purpose,input,catalog,separations,documents,skill:readFileSync(this.paths.skill,'utf8')},signal,120000)
-  })
+  }))
  }
  private message(error:unknown){const message=error instanceof Error?error.message:'任务失败。';return message.includes('sk-')?'模型调用失败，详见服务商配置。':message.slice(0,1000)}
 }

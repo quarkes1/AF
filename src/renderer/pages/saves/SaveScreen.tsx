@@ -12,8 +12,8 @@ function Thumbnail({resources,id}:{resources:ResourceCatalog;id?:string}){
   return <div className="save-thumbnail">{id&&resources.has(id)&&!missing?<img src={resources.url(id)} alt="存档演出截图" onError={()=>setMissing(true)}/>:<><Icon name="file-empty" resources={resources}/><span>暂无演出截图</span></>}</div>
 }
 
-export function SaveScreen({open,resources,onBack,stories,onStoriesChange,resumeRequest,review=false,createRequest=0,selectedCompanion=null,onEnterStory,backLabel='返回首页',onCreate,onRename,onDelete,companions=[],selectedCompanionId='af-guide',activeStoryId=null}:{
-  open:boolean;resources:ResourceCatalog;onBack:()=>void;stories:StoryView[];onStoriesChange:Dispatch<SetStateAction<StoryView[]>>;resumeRequest?:{id:string;sequence:number};review?:boolean;createRequest?:number;selectedCompanion?:string|null;onEnterStory:(story:StoryView)=>boolean|Promise<boolean>;backLabel?:string;onCreate?:(values:NewStoryValues)=>Promise<StoryView>;onRename?:(story:StoryView,name:string)=>Promise<StoryView>;onDelete?:(story:StoryView)=>Promise<void>;companions?:CompanionView[];selectedCompanionId?:string;activeStoryId?:string|null
+export function SaveScreen({open,resources,onBack,stories,onStoriesChange,resumeRequest,review=false,createRequest=0,selectedCompanion=null,onEnterStory,backLabel='返回首页',onCreate,onRename,onDelete,companions=[],selectedCompanionId='af-guide',activeStoryId=null,onLoadCheckpoints,onReplayCheckpoint}:{
+  open:boolean;resources:ResourceCatalog;onBack:()=>void;stories:StoryView[];onStoriesChange:Dispatch<SetStateAction<StoryView[]>>;resumeRequest?:{id:string;sequence:number};review?:boolean;createRequest?:number;selectedCompanion?:string|null;onEnterStory:(story:StoryView)=>boolean|Promise<boolean>;backLabel?:string;onCreate?:(values:NewStoryValues)=>Promise<StoryView>;onRename?:(story:StoryView,name:string)=>Promise<StoryView>;onDelete?:(story:StoryView)=>Promise<void>;companions?:CompanionView[];selectedCompanionId?:string;activeStoryId?:string|null;onLoadCheckpoints?:(story:StoryView)=>Promise<CheckpointView[]>;onReplayCheckpoint?:(story:StoryView,checkpoint:CheckpointView)=>void
 }){
   const setStories=onStoriesChange
   const handledResume=useRef(0)
@@ -65,10 +65,11 @@ export function SaveScreen({open,resources,onBack,stories,onStoriesChange,resume
     field.current?.focus()
     return()=>{modal.current?.close();(previousFocus.current?.isConnected?previousFocus.current:back.current)?.focus({preventScroll:true})}
   },[dialog])
-  const toCheckpoints=()=>{
+  const toCheckpoints=async()=>{
     if(view==='checkpoints')return
     if(!story){setNotice('请先选择一个故事，再查看它的保存点。');return}
     storyPage.current=listing.page;setView('checkpoints');setPage(0);setCheckpointId(null);setFilter('manual');setNotice(null)
+    if(onLoadCheckpoints)try{const items=await onLoadCheckpoints(story);setStories(old=>old.map(s=>s.id===story.id?{...s,checkpoints:items}:s))}catch(e){setNotice(e instanceof Error?e.message:'保存点读取失败。')}
   }
   const changePage=(next:number)=>{
     const result=paginate<StoryView|CheckpointView>(view==='stories'?orderedStories:checkpoints,next,view==='stories')
@@ -80,7 +81,7 @@ export function SaveScreen({open,resources,onBack,stories,onStoriesChange,resume
     const sequence=++activation.current
     if(!canResume(target)){setNotice(target.status==='corrupt'?'存档损坏，需通过备份恢复。':'存档迁移中，完成后才可继续。');return}
     try{const entered=await onEnterStory(target);if(sequence!==activation.current)return;if(!entered){setNotice('存档对应的搭档或默认立绘不可用，当前搭档未改变。');return}
-    setNotice(onCreate?`已激活故事“${target.name}”，首页使用此档的搭档快照。主线演出尚未接入。`:`已将首页搭档切换为 ${target.companionSnapshot?.name??target.partner}。演出模块尚未接入，当前未读取真实剧情或改写存档。`)}catch(reason){if(sequence===activation.current)setNotice(reason instanceof Error?reason.message:'激活失败，原故事未改变。')}
+    setNotice(onCreate?`已激活故事“${target.name}”，正在进入该存档的主线。`:`已将首页搭档切换为 ${target.companionSnapshot?.name??target.partner}。演出模块尚未接入，当前未读取真实剧情或改写存档。`)}catch(reason){if(sequence===activation.current)setNotice(reason instanceof Error?reason.message:'激活失败，原故事未改变。')}
   }
   const resume=()=>{if(story&&!checkpoint?.corrupt)restoreStory(story)}
   useEffect(()=>{
@@ -157,8 +158,8 @@ export function SaveScreen({open,resources,onBack,stories,onStoriesChange,resume
         <dl><div><dt>搭档</dt><dd>{story?.partner}</dd></div><div><dt>主线</dt><dd>{selected.chapter}</dd></div><div><dt>{view==='stories'?'最后修改':'最后保存'}</dt><dd>{displayTime(view==='stories'&&story?storyModifiedAt(story):selected.savedAt)}</dd></div>{view==='checkpoints'&&checkpoint&&<div><dt>分支</dt><dd>{checkpoint.branch}</dd></div>}</dl>
         {(stateLabel||checkpoint?.corrupt)&&<p className="save-detail__warning">{checkpoint?.corrupt?'保存点损坏，请尝试其他保存点或备份。':stateLabel}</p>}
         <div className="save-detail__primary">
-          <button className="save-primary" disabled={!story||!canResume(story)||!!checkpoint?.corrupt} onClick={resume}>{view==='stories'?'继续故事':'读取此处'}<span aria-hidden="true">→</span></button>
-          <button className="save-secondary" disabled={view==='checkpoints'&&!!checkpoint?.corrupt} onClick={()=>view==='stories'?toCheckpoints():previewAction('只读回看')}>{view==='stories'?'查看保存点':'只读回看'}</button>
+          <button className="save-primary" disabled={!story||!canResume(story)||!!checkpoint?.corrupt||!!onLoadCheckpoints&&view==='checkpoints'} title={onLoadCheckpoints&&view==='checkpoints'?'保存点当前提供只读回看；继续故事恢复最新进度。':undefined} onClick={resume}>{view==='stories'?'继续故事':'读取此处'}<span aria-hidden="true">→</span></button>
+          <button className="save-secondary" disabled={view==='checkpoints'&&!!checkpoint?.corrupt} onClick={()=>view==='stories'?void toCheckpoints():onReplayCheckpoint&&story&&checkpoint?onReplayCheckpoint(story,checkpoint):previewAction('只读回看')}>{view==='stories'?'查看保存点':'只读回看'}</button>
           {view==='checkpoints'&&<button className="save-secondary" disabled={checkpoint?.corrupt} onClick={()=>previewAction('从此分叉')}>从此分叉</button>}
         </div>
         {view==='stories'&&<div className="save-detail__actions"><button className="quiet-button" onClick={()=>showDialog('rename')}><Icon name="edit" resources={resources}/>重命名</button><button className="quiet-button" onClick={()=>previewAction('导出故事包')}><Icon name="upload" resources={resources}/>导出</button><details><summary aria-label="管理所选故事"><Icon name="more" resources={resources}/></summary><button onClick={()=>showDialog('delete')}>删除故事</button></details></div>}

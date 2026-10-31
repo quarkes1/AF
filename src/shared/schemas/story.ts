@@ -9,6 +9,8 @@ export const characterContentSchema=z.object({name,sourceKind:z.enum(['original'
 })
 const page=z.object({limit:z.number().int().min(1).max(100).optional(),cursor:z.string().max(160).nullable().optional()}).strict()
 export const storyCommandSchemas={
+ 'profile.get':z.object({}).strict(),
+ 'profile.update':z.object({patch:z.object({displayName:text(32,1).optional(),preferredAddress:text(64).optional(),timezone:z.string().max(100).refine(s=>{try{new Intl.DateTimeFormat('zh',{timeZone:s});return true}catch{return false}}).optional(),textScale:z.number().min(1).max(1.5).optional(),reducedMotion:z.boolean().optional()}).strict()}).strict(),
  'template.list':page,'template.get':z.object({id}).strict(),
  'template.create':z.object({content:characterContentSchema,draft:z.boolean()}).strict(),
  'template.update':z.object({id,templateVersion:z.number().int().min(1),content:characterContentSchema,draft:z.boolean()}).strict(),
@@ -18,5 +20,5 @@ export const storyCommandSchemas={
  'save.create':z.object({name,characterTemplateId:id,characterTemplateVersion:z.number().int().min(1),worldSetting:z.object({mode:z.enum(['realWorld','custom']),description:text(8000,1)}).strict(),partnerIdentity:text(2000,1),userIdentity:text(2000,1),relationshipStart:text(2000,1),courseIds:z.array(id).max(500)}).strict(),
  'save.activate':z.object({saveId:id,branchId:id}).strict(),'save.rename':z.object({saveId:id,name}).strict(),'save.delete':z.object({saveId:id,confirmedName:name}).strict(),
 } as const
-export const storyReads=new Set(['template.list','template.get','selection.get','save.list','save.get'])
-export const storyRequestSchema=z.object({protocolVersion:z.literal(1),requestId:id,command:z.string().max(80),target:z.object({kind:z.enum(['template','save','selection']),id:id.nullable()}).strict(),saveId:id.nullable(),branchId:id.nullable(),expectedStateVersion:z.number().int().min(0).nullable(),idempotencyKey:id.nullable(),payload:z.unknown()}).strict()
+export const storyReads=new Set(['template.list','template.get','selection.get','save.list','save.get','profile.get'])
+export const storyRequestSchema=z.object({protocolVersion:z.literal(1),requestId:id,command:z.string().max(80),target:z.object({kind:z.enum(['template','save','selection','profile','job']),id:id.nullable()}).strict(),saveId:id.nullable(),branchId:id.nullable(),expectedStateVersion:z.number().int().min(0).nullable(),idempotencyKey:id.nullable(),payload:z.unknown()}).strict()

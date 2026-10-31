@@ -175,3 +175,5 @@ button:active:not(:disabled) .icon { transform: scale(.94); transition-duration:
   ::-webkit-scrollbar-thumb:hover{background:rgb(210 228 239 /85%)}
   ::-webkit-scrollbar-button,::-webkit-scrollbar-button:single-button{display:none;width:0;height:0}
 }
+
+.home-chat__message{margin-bottom:10px;white-space:pre-wrap}.home-chat__message small{display:block;font-size:.75rem;color:var(--cyan);margin-bottom:2px}.home-chat__message--user{color:#c9d5de}.home-chat__job{font-size:.8125rem;color:var(--secondary)}.home-chat__error{font-size:.8125rem;color:#efc29e}.home-chat__controls{display:flex;gap:14px;flex-wrap:wrap}

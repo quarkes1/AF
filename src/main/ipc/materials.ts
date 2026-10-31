@@ -7,7 +7,7 @@ import {basename,extname,join,relative,isAbsolute} from 'node:path'
 import type {BackendRequest,BackendResponse,MaterialRecord} from '../../shared/contracts/materials'
 import {MaterialService} from '../modules/resources/service'
 import {SourceService} from '../modules/resources/sources'
-export function installMaterialIpc(service:MaterialService){
+export function installMaterialIpc(service:MaterialService,onProviderChanged?:()=>void){
  const sources=new SourceService(service)
  const pending=new Map<string,{hash:string;promise:Promise<BackendResponse>}>()
  ipcMain.handle('af:materials',(event,raw:unknown)=>{
@@ -41,6 +41,8 @@ export function installMaterialIpc(service:MaterialService){
    if(atomic)service.repo.beginIntent()
    let result:unknown
    switch(command){
+    case 'resource.settings.get':result=service.processingSettings();break
+    case 'resource.settings.update':result=service.configureProcessing(p);break
     case 'resource.list':{const all=service.repo.list().filter(d=>(!p.courseId||d.courseIds.includes(p.courseId))&&(!p.status||d.state===p.status));const start=p.cursor?Number(Buffer.from(p.cursor,'base64url').toString()):0;if(!Number.isSafeInteger(start)||start<0)throw new Error('INVALID_PAYLOAD');const limit=p.limit??20;result={items:all.slice(start,start+limit),nextCursor:start+limit<all.length?Buffer.from(String(start+limit)).toString('base64url'):null};break}
     case 'course.list':{const all=service.repo.courses(),start=p.cursor?Number(Buffer.from(p.cursor,'base64url').toString()):0,limit=p.limit??20;if(!Number.isSafeInteger(start)||start<0)throw new Error('INVALID_PAYLOAD');result={items:all.slice(start,start+limit),nextCursor:start+limit<all.length?Buffer.from(String(start+limit)).toString('base64url'):null};break}
     case 'provider.list':result=service.provider.summary();break
@@ -84,6 +86,7 @@ export function installMaterialIpc(service:MaterialService){
    }
    if(key)service.repo.db.prepare('INSERT INTO commands VALUES(?,?,?)').run(key,hash,JSON.stringify(result))
    if(atomic){service.repo.commitIntent();atomic=false}
+   if(command==='provider.configure')onProviderChanged?.()
    return{protocolVersion:1,requestId:request.requestId,ok:true,stateVersion:service.repo.version(),data:result}
   }catch(error){if(atomic)service.repo.rollbackIntent();const known=['INVALID_PAYLOAD','FORBIDDEN','NOT_FOUND','IDEMPOTENCY_CONFLICT','STALE_STATE'];const message=error instanceof z.ZodError?'请求格式不正确。':error instanceof Error?error.message:'后台请求失败。';const code=known.includes(message)?message:error instanceof z.ZodError?'INVALID_PAYLOAD':'RESOURCE_ERROR';return{protocolVersion:1,requestId:request?.requestId??'',ok:false,stateVersion:service.repo.version(),error:{code,message:message.includes('sk-')?'模型请求失败。':message,retryable:!['FORBIDDEN','INVALID_PAYLOAD','IDEMPOTENCY_CONFLICT'].includes(code),detailsRef:null}}}
  }

@@ -29,7 +29,7 @@ test('learning empty state never fabricates courses and returns to the preserved
     await expect(page.getByRole('heading',{name:'添加学习资料'})).toBeVisible()
     await expect(page.getByRole('button',{name:/^选择学科/})).toHaveCount(0)
     await page.getByRole('button',{name:'选文件夹',exact:true}).click()
-    await expect(page.getByText(/资料导入与解析模块尚未接入/)).toBeVisible()
+    await expect(page.getByRole('region',{name:'资料管理',exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'返回学习',exact:true})).toBeVisible()
     await page.keyboard.press('Escape');await page.getByRole('button',{name:'返回首页',exact:true}).click()
     await expect(page.getByTestId('course-screen')).toBeHidden()
     await expect(page.getByRole('button',{name:/^章节学习/})).toBeFocused()
